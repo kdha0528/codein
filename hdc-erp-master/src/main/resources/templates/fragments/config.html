@@ -1,0 +1,15 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="config">
+  <!--  공통 meta-->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- 공통 css, js -->
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.6.0-1/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+
+  <title>Handok IT ERP</title>
+  <!--custom css-->
+  <th:block layout:fragment="custom-css"/>
+
+</th:block>
+</html>

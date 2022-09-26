@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>layout</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- 공통 css, js -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.6.0-1/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+    <link rel="stylesheet" th:href="@{/css/right-sidebar.css}">
+
+    <title>Handok IT ERP</title>
+    <!--custom css-->
+</head>
+
+<body>
+<th:block sec:Sauthorize="isAuthenticated()">
+    <div class="d-flex" id="wrapper">
+        <!--sidebar-->
+        <th:block th:replace="fragments/sidebar :: sidebar"/>
+        <div class="vw-100">
+            <div id="page-content-wrapper">
+                <!--content-->
+                <th:block th:replace="fragments/header :: header"/>
+                <th:block layout:fragment="content"/>
+            </div>
+            <!--footer-->
+            <th:block th:replace="fragments/footer :: footer"/>
+        </div>
+    </div>
+</th:block>
+<!--script-->
+<th:block th:replace="fragments/scripts :: scripts"/>
+</body>
+</html>

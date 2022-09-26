@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<th:block th:fragment="modal">
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal">
+    일정추가
+  </button>
+
+  <!--TODO:사용자의 로그인 이름을 불러오기-->
+  <!--<input type="hidden" name="userName" id="userName" th:value="${#authentication.getName()}">-->
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">일정추가</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="scheduleAdd" action="/index/schedules" method="post">
+            <ul>
+              <li>
+                <div>
+                  시작 날짜 :
+                  <input type="date" name="startScheduleDate" id="startScheduleDate">
+                </div>
+              </li>
+              <li>
+                <div>
+                  종료 날짜 :
+                  <input type="date" name="endScheduleDate" id="endScheduleDate">
+                </div>
+              </li>
+              <li>
+                <div>
+                  일정 :
+                  <input type="text" name="scheduleDetail" id="scheduleDetail">
+                </div>
+              </li>
+            </ul>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+              <button type="button" class="btn btn-primary" onclick="scheduleAddFunc();">등록</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ScriptFragment</title>
+</head>
+<body>
+  <th:block th:fragment="scripts">
+      <script th:src="@{/webjars/jquery/3.5.1/jquery.min.js}"></script>
+      <script th:src="@{/webjars/popper.js/1.16.0/umd/popper.min.js}"></script>
+      <script th:src="@{/webjars/bootstrap/4.6.0-1/js/bootstrap.min.js}"></script>
+      <script th:src="@{/js/sidebar.js}" type="text/javascript"></script>
+      <script th:src="@{/js/right-sidebar.js}" type="text/javascript"></script>
+    <th:block layout:fragment="custom_scripts"/>
+  </th:block>
+</body>
+</html>

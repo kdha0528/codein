@@ -1,0 +1,172 @@
+.calendar_content{
+    scrollbar-face-color: #F6F6F6;
+    scrollbar-highlight-color: #bbbbbb;
+    scrollbar-3dlight-color: #FFFFFF;
+    scrollbar-shadow-color: #bbbbbb;
+    scrollbar-darkshadow-color: #FFFFFF;
+    scrollbar-track-color: #FFFFFF;
+    scrollbar-arrow-color: #bbbbbb;
+}
+
+.calendar_content td {
+    font-family: serif, sans-serif;
+    font-size: 9pt;
+    color: #595959;
+}
+
+.calendar_content th {
+    font-family: serif, sans-serif;
+    font-size: 9pt;
+    color: #000000;
+}
+
+.calendar_content select {
+    font-family: serif, sans-serif;
+    font-size: 9pt;
+    color: #595959;
+}
+
+
+.divDotText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar_content A:link {
+    font-size: 9pt;
+    font-family: serif, sans-serif;
+    color: #000000;
+    text-decoration: none;
+}
+
+.calendar_content A:visited {
+    font-size: 9pt;
+    font-family: serif, sans-serif;
+    color: #000000;
+    text-decoration: none;
+}
+
+.calendar_content A:active {
+    font-size: 9pt;
+    font-family: serif, sans-serif;
+    color: red;
+    text-decoration: none;
+}
+
+.calendar_content A:hover {
+    font-size: 9pt;
+    font-family: serif, sans-serif;
+    color: red;
+    text-decoration: none;
+}
+
+.day {
+    width: 100px;
+    height: 30px;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+}
+
+.sat {
+    color: #529dbc;
+}
+
+.sun {
+    color: red;
+}
+
+.today_button_div {
+    float: right;
+}
+
+.today_button {
+    width: 100px;
+    height: 30px;
+}
+
+.navigation {
+    text-align: center;
+    font-size: 25px;
+    vertical-align: middle;
+}
+
+.calendar_body {
+    width: 100%;
+    background-color: #FFFFFF;
+    border: 1px solid white;
+    border-collapse: collapse;
+}
+
+.calendar_body .today {
+    border: 1px solid white;
+    height: 120px;
+    background-color: #c9c9c9;
+    text-align: left;
+    vertical-align: top;
+}
+
+.calendar_body .date {
+    font-weight: bold;
+    font-size: 15px;
+    padding-left: 3px;
+    padding-top: 3px;
+}
+
+.calendar_body .sat_day {
+    border: 1px solid white;
+    height: 120px;
+    background-color: #EFEFEF;
+    text-align: left;
+    vertical-align: top;
+}
+
+.calendar_body .sat_day .sat {
+    color: #529dbc;
+    font-weight: bold;
+    font-size: 15px;
+    padding-left: 3px;
+    padding-top: 3px;
+}
+
+.calendar_body .sun_day {
+    border: 1px solid white;
+    height: 120px;
+    background-color: #EFEFEF;
+    text-align: left;
+    vertical-align: top;
+}
+
+.calendar_body .sun_day .sun {
+    color: red;
+    font-weight: bold;
+    font-size: 15px;
+    padding-left: 3px;
+    padding-top: 3px;
+}
+
+.calendar_body .normal_day {
+    border: 1px solid white;
+    height: 120px;
+    background-color: #EFEFEF;
+    vertical-align: top;
+    text-align: left;
+}
+
+.before_after_month {
+    margin: 10px;
+    font-weight: bold;
+}
+
+.before_after_year {
+    font-weight: bold;
+}
+
+.this_month {
+    margin: 10px;
+}
+
+td>p{
+    margin: 0px 0px 0px;
+    background-color: lightblue;
+}

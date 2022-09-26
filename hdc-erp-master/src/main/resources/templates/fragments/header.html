@@ -1,0 +1,31 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>header fragment</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.6.0-1/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav th:fragment="header" class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <button class="btn btn-outline-light pl-0" id="menu-toggle">
+        <img th:src="@{/img/arrow-bar-left.svg}" src="/img/arrow-bar-left.svg" id="sidebar-close-img" alt="arrow">
+        <img class="d-none" th:src="@{/img/arrow-bar-right.svg}" src="/img/arrow-bar-right.svg" id="sidebar-open-img" alt="arrow">
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <span class="navbar-brand px-2 mr-0">Irostub</span>
+            </li>
+            <li id="header-user-thumbnail" class="nav-item">
+                <a class="nav-link" href="#">
+                <img th:src="@{/img/gear-fill.svg}" src="/img/gear-fill.svg" alt="user-thumbnail">
+                </a>
+            </li>
+        </ul>
+    </div>
+    <button class="btn btn-outline-light pl-0" id="right-menu-toggle">
+        <img th:src="@{/img/arrow-bar-right.svg}" src="/img/arrow-bar-right.svg" id="right-sidebar-close-img" alt="arrow">
+        <img class="d-none" th:src="@{/img/arrow-bar-left.svg}" src="/img/arrow-bar-left.svg" id="right-sidebar-open-img" alt="arrow">
+    </button>
+</nav>
+</body>
+</html>

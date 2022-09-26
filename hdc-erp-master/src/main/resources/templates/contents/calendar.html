@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html
+        lang="ko"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout/calendar-layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" layout:fragment="custom-css" th:href="@{/css/calendar.css}">
+</head>
+<body>
+<div layout:fragment="content" class="calendar_content container-fluid">
+        <div class="calendar">
+            <!--날짜 네비게이션  -->
+            <div class="navigation">
+                <a class="before_after_year"
+                   th:href="@{${#httpServletRequest.requestURI}(year=${todayInfo.searchYear}-1,month=${todayInfo.searchMonth}-1)}">
+                    &lt;&lt;
+                    <!-- 이전해 -->
+                </a>
+                <a class="before_after_month"
+                   th:href="@{${#httpServletRequest.requestURI}(year=${todayInfo.beforeYear},month=${todayInfo.beforeMonth})}">
+                    &lt;
+                    <!-- 이전달 -->
+                </a>
+                <span th:text="${todayInfo.searchYear} + ."></span>
+                <span th:if="${todayInfo.searchMonth < 10}" th:text="${'0'+todayInfo.searchMonth}"></span>
+                <span th:unless="${todayInfo.searchMonth < 10}" th:text="${todayInfo.searchMonth}"></span>
+                <a class="before_after_month"
+                   th:href="@{${#httpServletRequest.requestURI}(year=${todayInfo.afterYear},month=${todayInfo.afterMonth})}">
+                    <!-- 다음달 -->
+                    &gt;
+                </a>
+                <a class="before_after_year"
+                   th:href="@{${#httpServletRequest.requestURI}(year=${todayInfo.searchYear}+1,month=${todayInfo.searchMonth}-1)}">
+                    <!-- 다음해 -->
+                    &gt;&gt;
+                </a>
+            </div>
+
+            <th:block th:replace="fragments/modal :: modal">
+
+            </th:block>
+
+            <div class="today_button_div">
+            <input type="button" class="btn btn-outline-secondary" onclick="javascript:location.href='/index'" value="go today"/>
+            </div>
+            <table class="calendar_body">
+
+                <thead>
+                <tr bgcolor="#CECECE">
+                    <td class="day sun">
+                        일
+                    </td>
+                    <td class="day">
+                        월
+                    </td>
+                    <td class="day">
+                        화
+                    </td>
+                    <td class="day">
+                        수
+                    </td>
+                    <td class="day">
+                        목
+                    </td>
+                    <td class="day">
+                        금
+                    </td>
+                    <td class="day sat">
+                        토
+                    </td>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="dat,dateStat : ${dateList}">
+                    <tr th:if="${dateStat.index}%7==0">
+                    </tr>
+                    <td onclick="tdActionHandler(event)" class="sun_day" th:if="${dateStat.index}%7==0 and ${dat.value} != 'today'">
+                        <div class="sun" th:text="${dat.date}">
+                        </div>
+                        <th:block th:each="scheduleDto,scheduleStat : ${scheduleDtos}">
+                            <th:block th:if="${dat.year}==${scheduleDto.year} and ${dat.month}==${scheduleDto.month} and ${dat.date}==${scheduleDto.date}">
+                                <p th:text="${scheduleDto.scheduleDetail}"></p>
+                                <input type="hidden" th:value="${scheduleDto.id}">
+                            </th:block>
+                        </th:block>
+                    </td>
+                    <td onclick="tdActionHandler(event)" class="today" th:if="${dat.value} == 'today'">
+                        <div class="date" th:text="${dat.date}">
+                        </div>
+                        <th:block th:each="scheduleDto,scheduleStat : ${scheduleDtos}">
+                            <th:block th:if="${dat.year}==${scheduleDto.year} and ${dat.month}==${scheduleDto.month} and ${dat.date}==${scheduleDto.date}">
+                                <p th:text="${scheduleDto.scheduleDetail}"></p>
+                                <input type="hidden" th:value="${scheduleDto.id}">
+                            </th:block>
+                        </th:block>
+                    </td>
+                    <td onclick="tdActionHandler(event)" class="sat_day" th:if="${dateStat.index}%7==6 and ${dat.value} != 'today'">
+                        <div class="sat" th:text="${dat.date}">
+                        </div>
+                        <th:block th:each="scheduleDto,scheduleStat : ${scheduleDtos}">
+                            <th:block th:if="${dat.year}==${scheduleDto.year} and ${dat.month}==${scheduleDto.month} and ${dat.date}==${scheduleDto.date}">
+                                <p th:text="${scheduleDto.scheduleDetail}"></p>
+                                <input type="hidden" th:value="${scheduleDto.id}">
+                            </th:block>
+                        </th:block>
+                    </td>
+                    <td onclick="tdActionHandler(event)" class="normal_day"
+                        th:unless="${dateStat.index}%7==6 or ${dat.value}=='today' or ${dateStat.index}%7==0">
+                        <div class="date" th:text="${dat.date}">
+                        </div>
+                        <th:block th:each="scheduleDto,scheduleStat : ${scheduleDtos}">
+                            <th:block th:if="${dat.year}==${scheduleDto.year} and ${dat.month}==${scheduleDto.month} and ${dat.date}==${scheduleDto.date}">
+                                <p th:text="${scheduleDto.scheduleDetail}"></p>
+                                <input type="hidden" th:value="${scheduleDto.id}">
+                            </th:block>
+                        </th:block>
+                    </td>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+</div>
+    <script layout:fragment="custom_scripts" th:src="@{/js/calendar.js}" type="text/javascript"></script>
+</body>
+</html>

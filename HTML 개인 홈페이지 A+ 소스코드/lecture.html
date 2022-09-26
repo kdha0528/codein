@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width", initial-scale="1">
+		<title>코딩 부스터</title>
+		<link rel="stylesheet" href="css/bootstrap.css">
+		<link rel="stylesheet" href="css/codingBooster.css">
+	</head>
+	<body>
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+						data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+						<span class="sr-only"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="index.html">코딩 부스터</a>
+				</div>
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="index.html">소개<span class="sr-only"></span></a></li>
+						<li><a href="instructor.html">강사진</a></li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+								aria-haspopup="true" aria-expanded="false">강의<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="lecture.html?lectureName=C">C언어</a></li>
+								<li><a href="lecture.html?lectureName=Java">Java</a></li>
+								<li><a href="lecture.html?lectureName=Android">안드로이드</a></li>
+							</ul>
+						</li>
+					</ul>
+					<form class="navbar-form navbar-left">
+						<div class="form-group">
+							<input type="text" class="form-control" placeholder="내용을 입력하세요.">
+						</div>
+						<button type="submit" class="btn btn-default">검색</button>
+					</form>
+					<ul class="nav navbar-nav navbar-right">
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+								aria-haspopup="true" aria-expanded="false">접속하기<span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="loginForm.html">로그인</a></li>
+								<li><a href="registerForm.html">회원가입</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="container">
+			<div class="row">
+				<ul class="list-group">
+					<a href="#" class="list-group-item active">1강 Hello World</a>
+					<a href="#" class="list-group-item">2강 변수와 상수</a>
+					<a href="#" class="list-group-item">3강 데이터 타입</a>
+					<a href="#" class="list-group-item">4강 연산자</a>
+					<a href="#" class="list-group-item">5강 조건문과 반복문</a>
+				</ul>
+			</div>
+			<div class="row">
+					<div class="embed-responsive embed-responsive-16by9">
+							<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/dh4hdtZ00EU"></iframe>
+					</div>
+			</div>
+			<hr>
+			<div class="row">
+					<p>
+							첫 번쨰 강의는 C언어 개발 환경을 설치한 이후에 "Hello World"를 출력해보는 시간을 가집니다.
+					</p>
+					<pre class="pre-scrollable">
+#include &lt;stdio.h&gt;
+
+int main(void)
+{
+	printf("Hello World!");
+}
+					</pre>
+			</div>
+		</div>
+		<div class="container">
+				<hr>
+				<form class="form-horizontal">
+						<div class="form-group">
+								<label>댓글: </label>
+								<textarea class="form-control" rows="5" id="commentContent" name="commentContent"></textarea>
+								<br>
+								<button type="submit" class="btn pull-right">등록</button>
+						</div>
+				</form>
+				<hr>
+		</div>
+		<footer style="background-color: #000000; color: #ffffff">
+			<div class="container">
+				<br>
+				<div class="row">
+					<div class="col-sm-2" style="text-align: center;"><h5>Copyright &copy; 2017</h5><h5>나동빈(Dongbin Na)</h5></div>
+					<div class="col-sm-4"><h4>대표자 소개</h4><p>저는 코딩 부스터의 대표 나동빈입니다. 한국교원대학교에서 공부를 하고 있으며 웹 개발에 관심이 많습니다.</p></div>
+					<div class="col-sm-2"><h4 style="text-align: center;">내비게이션</h4>
+						<div class="list-group">
+							<a href="index.html" class="list-group-item">소개</a>
+							<a href="instructor.html" class="list-group-item">강사진</a>
+							<a href="lecture.html" class="list-group-item">강의</a>
+						</div>
+					</div>
+					<div class="col-sm-2"><h4 style="text-align: center;">SNS</h4>
+						<div class="list-group">
+							<a href="https://www.facebook.com/dongbin.na" class="list-group-item">페이스북</a>
+							<a href="https://www.youtube.com/channel/UChflhu32f5EUHlY7_SetNWw" class="list-group-item">유튜브</a>
+							<a href="http://tv.naver.com/ndb796" class="list-group-item">네이버 TV</a>
+						</div>
+					</div>
+					<div class="col-sm-2"><h4 style="text-align: center;"><span class="glyphicon glyphicon-ok"></span>&nbsp;by 나동빈</h4></div>
+				</div>
+			</div>
+		</footer>
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+		<script src="js/bootstrap.js"></script>
+	</body>
+</html>
