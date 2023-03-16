@@ -67,3 +67,6 @@ target
 .flattened-pom.xml
 secrets.yml
 .gradletasknamecache
+
+# codein
+nodeenv-18
