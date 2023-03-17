@@ -1,1 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/codein_db
+    username: root
+    password:
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+  sql:
+    init:
+      mode: always
+
 
