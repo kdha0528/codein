@@ -30,7 +30,7 @@ public class MemberService {
                 .email(signup.getEmail())
                 .password(encryptedPassword)
                 .name(signup.getName())
-                .tel(signup.getTel())
+                .phone(signup.getPhone())
                 .birth(signup.getBirth())
                 .sex(signup.getSex())
                 .build();

@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.codein'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+sourceCompatibility = '18'
 
 configurations {
     compileOnly {
@@ -67,7 +67,7 @@ asciidoctor {
 
 bootJar {
     dependsOn asciidoctor
-    copy{
+    copy {
         from asciidoctor.outputDir
         into "src/main/resources/static/docs"
     }

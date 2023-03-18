@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
-
 
 @SpringBootTest
 class MemberServiceTest {
@@ -40,8 +38,8 @@ class MemberServiceTest {
                 .email("kdha4585@gmail.com")
                 .password("1234")
                 .name("데일이")
-                .tel("01075444357")
-                .birth(LocalDate.of(1996, 5, 28))
+                .phone("01075444357")
+                .birth("1996-05-28")
                 .sex("남성")
                 .build();
 

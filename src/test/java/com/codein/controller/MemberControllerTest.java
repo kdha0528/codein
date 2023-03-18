@@ -11,8 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -43,11 +41,11 @@ class MemberControllerTest {
                 .email("kdha4585@gmail.com")
                 .password("1234")
                 .name("데일이")
-                .tel("01075444357")
-                .birth(LocalDate.of(1996, 5, 28))
+                .phone("01075444357")
+                .birth("1996-05-28")
                 .sex("남성")
-                .build();
-
+                .build(
+                );
         // expected
         mockMvc.perform(post("/signup")
                         .content(objectMapper.writeValueAsString(signup))

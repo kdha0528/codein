@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,9 +26,9 @@ public class Member {
 
     private String name;
 
-    private String tel;
+    private String phone;
 
-    private LocalDate birth;
+    private String birth;
 
     private String sex;
 
@@ -38,11 +37,11 @@ public class Member {
     private Long point;
 
     @Builder
-    public Member(String email, String password, String name, String tel, LocalDate birth, String sex) {
+    public Member(String email, String password, String name, String phone, String birth, String sex) {
         this.email = email;
         this.password = password;
         this.name = name;
-        this.tel = tel;
+        this.phone = phone;
         this.birth = birth;
         this.sex = sex;
         this.createdAt = LocalDateTime.now();

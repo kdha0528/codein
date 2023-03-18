@@ -3,6 +3,7 @@ package com.codein.controller;
 
 import com.codein.request.Signup;
 import com.codein.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,8 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public void signup(@RequestBody Signup signup) {
+    public void signup(@RequestBody @Valid Signup signup) {
+        signup.validate();
         memberService.signup(signup);
     }
 }

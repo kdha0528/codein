@@ -11,8 +11,6 @@ import 'element-plus/dist/index.css';
 
 import 'bootstrap/dist/css/bootstrap-utilities.css';
 
-import './assets/main.css';
-
 const app = createApp(App);
 
 app.use(createPinia());
