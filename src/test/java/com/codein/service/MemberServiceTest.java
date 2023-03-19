@@ -3,6 +3,7 @@ package com.codein.service;
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.repository.MemberRepository;
+import com.codein.request.Signin;
 import com.codein.request.Signup;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -56,4 +57,32 @@ class MemberServiceTest {
         Assertions.assertTrue(passwordEncoder.matches(signup.getPassword(), member.getPassword()));
     }
 
+    @Test
+    @DisplayName("로그인 성공")
+    void test2() {
+        // given
+        PasswordEncoder encoder = new PasswordEncoder();
+        String encryptedPassword = encoder.encrypt("1234");
+
+        Member member = Member.builder()
+                .name("데일리")
+                .email("kdha4585@gmail.com")
+                .password(encryptedPassword)
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("1234")
+                .build();
+        memberRepository.save(member);
+
+        Signin signin = Signin.builder()
+                .email("kdha4585@gmail.com")
+                .password("1234")
+                .build();
+
+        // when
+        String accessToken = memberService.signin(signin);
+
+        // then
+        Assertions.assertNotNull(accessToken);
+    }
 }

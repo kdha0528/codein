@@ -1,10 +1,7 @@
 package com.codein.domain;
 
 import com.codein.response.MemberResponse;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +10,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,6 +36,9 @@ public class Member {
 
     private Long point;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.EAGER)
+    private final List<Session> sessions = new ArrayList<>();
+
     @Builder
     public Member(String email, String password, String name, String phone, String birth, String sex) {
         this.email = email;
@@ -52,7 +51,17 @@ public class Member {
         this.point = 0L;
     }
 
-    public MemberResponse changeMemberResponse(){
+    public MemberResponse changeMemberResponse() {
         return new MemberResponse(this);
+    }
+
+
+    public Session addSession() {
+        Session session = Session.builder()
+                .member(this)
+                .build();
+        this.sessions.add(session);
+
+        return session;
     }
 }
