@@ -1,5 +1,6 @@
 package com.codein.domain;
 
+import com.codein.response.MemberResponse;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,6 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -46,5 +50,9 @@ public class Member {
         this.sex = sex;
         this.createdAt = LocalDateTime.now();
         this.point = 0L;
+    }
+
+    public MemberResponse changeMemberResponse(){
+        return new MemberResponse(this);
     }
 }
