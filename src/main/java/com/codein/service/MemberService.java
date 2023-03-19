@@ -4,11 +4,17 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.exception.AlreadyExistsAccountException;
 import com.codein.repository.MemberRepository;
+import com.codein.request.PageSize;
 import com.codein.request.Signup;
+import com.codein.response.MemberResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -35,6 +41,10 @@ public class MemberService {
                 .sex(signup.getSex())
                 .build();
         memberRepository.save(member);
+    }
+
+    public List<MemberResponse> getMemberList(PageSize pageSize){
+        return  memberRepository.getMemberResponseList(pageSize);
     }
 
 }

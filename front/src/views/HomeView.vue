@@ -9,7 +9,7 @@ const router = useRouter()
 const members = ref([]);
 
 
-axios.get("/my-backend-api/members?page=1&size=5").then((response) => {
+axios.get("/my-backend-api/?page=1&size=5").then((response) => {
   response.data.forEach((r: any) => {
     members.value.push(r);
   });
@@ -19,17 +19,12 @@ axios.get("/my-backend-api/members?page=1&size=5").then((response) => {
 <template>
   <ul>
     <li v-for="member in members" :key="member.id">
-      <div class="account">
-        {{ member.account }}
+      <div class="email">
+        {{ member.email }}
       </div>
-
-      <div class="name">
-        {{ member.name }}
-      </div>
-
       <div class="sub d-flex">
-        <div class="category">MEMBER</div>
-        <div class="regDate">member.createdAt</div>
+        <div class="id">{{member.id}}</div>
+        <div class="name">{{member.name}}</div>
       </div>
     </li>
   </ul>
@@ -69,7 +64,7 @@ ul {
       margin-top: 8px;
       font-size: 0.78rem;
 
-      .regDate {
+      .name {
         margin-left: 10px;
         color: #6b6b6b;
       }

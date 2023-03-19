@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import {reactive, ref} from 'vue';
-import type {FormRules} from 'element-plus';
+import type {FormInstance, FormRules} from 'element-plus';
 import {useRouter} from 'vue-router';
 import axios from 'axios';
 
 const router = useRouter();
+
+const ruleFormRef = ref<FormInstance>();
 
 const email = ref('');
 const password = ref('');
@@ -65,7 +67,7 @@ const checkAge = (rule: any, value: any, callback: any) => {
 };
 
 const checkPhone = (rule: any, value: any, callback: any) => {
-  if (value === '') {
+  if (phone.value === '') {
     callback(new Error('Please input your phone number'));
   } else {
     callback();
@@ -89,33 +91,38 @@ const rules = reactive<FormRules>({
   birth: [{validator: checkAge, trigger: 'blur'}],
   phone: [{validator: checkPhone, trigger: 'blur'}],
 });
-/*
-const signup = function () {
-  console.log();
-  axios.post("/my-backend-api/signup", {});
-};*/
 
 const signup = function () {
-  console.log(email.value, "-", password.value, "-", name.value, "-", birth.value, "-", sex.value, "-", phone.value);
-  axios
-      .post('/my-backend-api/signup', {
-        email: email.value,
-        password: password.value,
-        name: name.value,
-        birth: birth.value,
-        sex: sex.value,
-        phone: phone.value,
-      })
-      .then(() => {
-        router.replace({name: "home"});
-      })
+  axios.post('/my-backend-api/signup', {
+    email: email.value,
+    password: password.value,
+    name: name.value,
+    birth: birth.value,
+    sex: sex.value,
+    phone: phone.value,
+  }).then(() => {
+    router.replace({name: "home"});
+  })
 };
 
+const resetForm = function () {
+  email.value = '';
+  password.value = '';
+  checkPassword.value = '';
+  name.value = '';
+  birth.value = '2000-01-01';
+  phone.value = '';
+  sex.value = 'male';
+}
 
 </script>
 
 <template>
-  <el-form status-icon :rules="rules" label-width="120px" class="demo-ruleForm">
+  <el-form
+      status-icon
+      :rules="rules"
+      label-width="120px"
+      class="demo-ruleForm">
     <el-form-item label="Email" prop="email">
       <el-input v-model="email" autocomplete="off"/>
     </el-form-item>
@@ -157,6 +164,7 @@ const signup = function () {
 
     <el-form-item>
       <el-button type="primary" @click="signup()">Sign up</el-button>
+      <el-button @click="resetForm()">Reset</el-button>
     </el-form-item>
   </el-form>
 </template>
