@@ -1,7 +1,7 @@
 package com.codein.config;
 
-import com.codein.exception.Unauthorized;
 import com.codein.repository.SessionRepository;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,24 +17,14 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        String accessToken = request.getParameter("SESSION");
+        Cookie[] cookies = request.getCookies();
 
         // 리퀘스트에 세션이 존재하는지 확인
-        if (accessToken == null || accessToken.equals("")) {
-            log.error("세션이 존재하지 않습니다.");
-            throw new Unauthorized();
+        if (cookies == null || cookies[0].getValue().equals("")) {
+            log.error("쿠키가 존재하지 않습니다.");
+            return false;
         }
 
         return true;
     }
-    /*
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
-    }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
-    }*/
 }

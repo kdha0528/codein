@@ -3,6 +3,7 @@ package com.codein.service;
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.repository.MemberRepository;
+import com.codein.repository.SessionRepository;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
 import org.junit.jupiter.api.AfterEach;
@@ -22,6 +23,8 @@ class MemberServiceTest {
     @Autowired
     private MemberService memberService;
 
+    @Autowired
+    private SessionRepository sessionRepository;
 
     @AfterEach
     void clean() {

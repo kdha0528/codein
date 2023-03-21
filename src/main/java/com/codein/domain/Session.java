@@ -19,7 +19,6 @@ public class Session {
     private String accessToken;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder

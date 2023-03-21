@@ -20,12 +20,14 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String email;
 
     private String password;
 
     private String name;
 
+    @Column(unique = true)
     private String phone;
 
     private String birth;

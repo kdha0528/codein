@@ -35,9 +35,8 @@ public class MemberService {
             throw new InvalidSigninInformation();
         }
 
-
         Session session = member.addSession();
-
+        
         return session.getAccessToken();
     }
 

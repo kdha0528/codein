@@ -1,8 +1,11 @@
 package com.codein.controller;
 
+import com.codein.domain.Member;
 import com.codein.repository.MemberRepository;
+import com.codein.request.Signin;
 import com.codein.request.Signup;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,5 +55,35 @@ class MemberControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("로그인 성공")
+    void test2() throws Exception {
+        //given
+        Member member = Member.builder()
+                .name("데일이")
+                .email("kdha4585@gmail.com")
+                .password("1234")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("남성")
+                .build();
+
+        memberRepository.save(member);
+
+        Signin signin = Signin.builder() //테스트 할 때는 객체 클래스에 생성자 빌더 어노테이션 달아서 생성
+                .email("kdha4585@gmail.com")
+                .password("1234")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/signin")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signin)))
+                .andExpect(status().isOk())
+                .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
+
     }
 }
