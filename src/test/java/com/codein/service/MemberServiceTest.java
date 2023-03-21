@@ -2,16 +2,21 @@ package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
+import com.codein.domain.Session;
+import com.codein.exception.Unauthorized;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.function.BiFunction;
 
 
 @SpringBootTest
@@ -69,7 +74,7 @@ class MemberServiceTest {
 
         Member member = Member.builder()
                 .name("데일리")
-                .email("kdha4585@gmail.com")
+                .email("kdha4585")
                 .password(encryptedPassword)
                 .birth("2000-01-01")
                 .sex("male")
@@ -88,4 +93,47 @@ class MemberServiceTest {
         // then
         Assertions.assertNotNull(accessToken);
     }
+
+    @Test
+    @Transactional
+    @DisplayName("로그아웃")
+    void test3() {
+        // given
+        Signup signup = Signup.builder()
+                .name("데일리")
+                .email("kdha4585@gmail.com")
+                .password("1234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("1234")
+                .build();
+        memberService.signup(signup);
+
+        Signin signin = Signin.builder()
+                .email("kdha4585@gmail.com")
+                .password("1234")
+                .build();
+        String accessToken = memberService.signin(signin);
+
+        // when
+        memberService.logout(accessToken);
+
+        // then
+        Member member = memberRepository.findByEmail("kdha4585@gmail.com")
+                .orElseThrow(Unauthorized::new);
+
+        BiFunction<String, Member, Session> findMemberSession = (t, m) -> {
+            for (Session s : m.getSessions()) {
+                if (s.getAccessToken().equals(t)) {
+                    return s;
+                }
+            }
+            return null;
+        };
+
+        Session memberSession = findMemberSession.apply(accessToken, member);
+
+        Assertions.assertNull(memberSession);
+    }
+
 }

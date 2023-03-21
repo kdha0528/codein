@@ -1,11 +1,15 @@
 package com.codein.controller;
 
 
+import com.codein.config.SecurityConfig.Secured;
+import com.codein.domain.Role;
+import com.codein.repository.MemberRepository;
 import com.codein.request.PageSize;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
 import com.codein.response.MemberResponse;
 import com.codein.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +25,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
+    private final MemberRepository memberRepository;
 
     private final MemberService memberService;
 
@@ -34,6 +39,7 @@ public class MemberController {
         signup.validate();
         memberService.signup(signup);
     }
+
 
     @PostMapping("/signin")
     public ResponseEntity<Object> signin(@RequestBody Signin signin) {
@@ -51,5 +57,12 @@ public class MemberController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .build();
+    }
+
+    @GetMapping("/logout")
+    @Secured(role = Role.MEMBER)
+    public void logout(HttpServletRequest request) {
+        String accessToken = request.getHeader("SESSION");
+        memberService.logout(accessToken);
     }
 }

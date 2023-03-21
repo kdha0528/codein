@@ -5,7 +5,9 @@ import com.codein.domain.Member;
 import com.codein.domain.Session;
 import com.codein.exception.AlreadyExistsAccountException;
 import com.codein.exception.InvalidSigninInformation;
+import com.codein.exception.NotSigninedAccount;
 import com.codein.repository.MemberRepository;
+import com.codein.repository.SessionRepository;
 import com.codein.request.PageSize;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
@@ -23,6 +25,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SessionRepository sessionRepository;
 
 
     public String signin(Signin signin) {
@@ -36,7 +39,7 @@ public class MemberService {
         }
 
         Session session = member.addSession();
-        
+
         return session.getAccessToken();
     }
 
@@ -65,4 +68,13 @@ public class MemberService {
         return memberRepository.getMemberResponseList(pageSize);
     }
 
+
+    public void logout(String accessToken) {
+
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(NotSigninedAccount::new);
+
+        Member member = session.getMember();
+        member.deleteSession(session);
+    }
 }
