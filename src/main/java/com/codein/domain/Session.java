@@ -1,6 +1,7 @@
 package com.codein.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,8 +17,10 @@ public class Session {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     private String accessToken;
-
+    
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 

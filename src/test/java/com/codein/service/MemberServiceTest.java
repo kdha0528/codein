@@ -9,8 +9,8 @@ import com.codein.repository.SessionRepository;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,8 @@ class MemberServiceTest {
     @Autowired
     private SessionRepository sessionRepository;
 
-    @AfterEach
+
+    @BeforeEach
     void clean() {
         memberRepository.deleteAll();
     }
@@ -74,7 +75,7 @@ class MemberServiceTest {
 
         Member member = Member.builder()
                 .name("데일리")
-                .email("kdha4585")
+                .email("kdha4585@gmail.com")
                 .password(encryptedPassword)
                 .birth("2000-01-01")
                 .sex("male")

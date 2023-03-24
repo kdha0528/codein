@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 public class SecurityConfig {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public @interface Secured {
+    public @interface MySecured {
         Role role() default Role.MEMBER;
     }
 }

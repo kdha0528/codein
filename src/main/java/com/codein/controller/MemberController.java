@@ -1,15 +1,16 @@
 package com.codein.controller;
 
 
-import com.codein.config.SecurityConfig.Secured;
+import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.Role;
 import com.codein.repository.MemberRepository;
+import com.codein.repository.SessionRepository;
 import com.codein.request.PageSize;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
 import com.codein.response.MemberResponse;
 import com.codein.service.MemberService;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
+    private final SessionRepository sessionRepository;
     private final MemberRepository memberRepository;
 
     private final MemberService memberService;
@@ -59,10 +61,10 @@ public class MemberController {
                 .build();
     }
 
-    @GetMapping("/logout")
-    @Secured(role = Role.MEMBER)
-    public void logout(HttpServletRequest request) {
-        String accessToken = request.getHeader("SESSION");
-        memberService.logout(accessToken);
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/logout")
+    public String logout(@CookieValue(value = "SESSION") Cookie cookie) {
+        memberService.logout(cookie.getValue());
+        return "redirect:/";
     }
 }

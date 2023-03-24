@@ -48,7 +48,6 @@ public class Member {
     private final List<Session> sessions = new ArrayList<>();
 
     @Setter
-    @NotNull
     private Role role;
 
     @Builder
@@ -61,7 +60,7 @@ public class Member {
         this.sex = sex;
         this.createdAt = LocalDateTime.now();
         this.point = 0L;
-        this.role = Role.ADMIN;
+        this.role = Role.MEMBER;
     }
 
     public MemberResponse changeMemberResponse() {

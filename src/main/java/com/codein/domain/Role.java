@@ -1,7 +1,7 @@
 package com.codein.domain;
 
 public enum Role {
-
+    
     ADMIN("ADMIN"),
     MEMBER("MEMBER");
 

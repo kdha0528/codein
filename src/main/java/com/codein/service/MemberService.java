@@ -40,6 +40,8 @@ public class MemberService {
 
         Session session = member.addSession();
 
+        System.out.println(" ");
+
         return session.getAccessToken();
     }
 
@@ -62,6 +64,8 @@ public class MemberService {
                 .sex(signup.getSex())
                 .build();
         memberRepository.save(member);
+
+        System.out.println("  ");
     }
 
     public List<MemberResponse> getMemberList(PageSize pageSize) {
@@ -76,5 +80,7 @@ public class MemberService {
 
         Member member = session.getMember();
         member.deleteSession(session);
+
+        System.out.println("  ");
     }
 }

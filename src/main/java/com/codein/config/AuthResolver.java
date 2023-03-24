@@ -30,21 +30,6 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
-        /*HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
-
-        // request 존재 여부 확인
-        if (httpServletRequest == null) {
-            log.error("httpServletRequest is null");
-            throw new Unauthorized();
-        }
-
-        // request가 존재한다면 그 안에 cookie가 있는지 확인
-        Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies.length == 0) {
-            log.error("쿠키가 없음");
-            throw new Unauthorized();
-        }*/
-
         // httpRequest 존재 여부 확인
         HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 
