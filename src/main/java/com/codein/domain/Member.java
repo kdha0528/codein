@@ -83,4 +83,19 @@ public class Member {
             throw new NotSigninedAccount();
         }
     }
+
+    public MemberEditor.MemberEditorBuilder toEditor() {
+        return MemberEditor.builder()
+                .email(email)
+                .password(password)
+                .name(name)
+                .phone(phone);
+    }
+
+    public void edit(MemberEditor memberEditor) {
+        email = memberEditor.getEmail();
+        password = memberEditor.getPassword();
+        name = memberEditor.getName();
+        phone = memberEditor.getPhone();
+    }
 }

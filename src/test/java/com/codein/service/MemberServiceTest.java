@@ -97,7 +97,7 @@ class MemberServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("로그아웃")
+    @DisplayName("로그아웃 성공")
     void test3() {
         // given
         Signup signup = Signup.builder()

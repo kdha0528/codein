@@ -1,6 +1,7 @@
 package com.codein.controller;
 
 import com.codein.domain.Member;
+import com.codein.exception.AlreadyExistsAccountException;
 import com.codein.exception.NotSigninedAccount;
 import com.codein.repository.MemberRepository;
 import com.codein.request.Signin;
@@ -18,11 +19,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -30,9 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MemberControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,46 +49,194 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("회원가입")
-    void test1() throws Exception {
+    void test1_1() throws Exception {
         //given
         Signup signup = Signup.builder()
-                .email("kdha4585@gmail.com")
-                .password("1234")
-                .name("데일이")
-                .phone("01075444357")
-                .birth("1996-05-28")
-                .sex("남성")
-                .build(
-                );
+                .email("kdha4585@gmail.com") // email 형식
+                .password("123a1A34")   // 8~20 숫자, 소문자, 대문자
+                .name("데일이")    // 2~10글자
+                .phone("01075444357")   // 전화번호 형식 '-'제외
+                .birth("1996-05-28")    // 날짜 형식
+                .sex("male")    // male or female
+                .build();
         // expected
         mockMvc.perform(post("/signup")
                         .content(objectMapper.writeValueAsString(signup))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
-        System.out.println(" ");
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 : 중복된 이메일")
+    void test1_2() throws Exception {
+        //given
+        Signup signup1 = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        memberService.signup(signup1);
+
+        Signup signup2 = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01044444444")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+
+        // expected
+        mockMvc.perform(post("/signup")
+                        .content(objectMapper.writeValueAsString(signup2))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(new AlreadyExistsAccountException().getMessage()))
+                .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 : 중복된 전화번호")
+    void test1_3() throws Exception {
+        //given
+        Signup signup1 = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        memberService.signup(signup1);
+
+        Signup signup2 = Signup.builder()
+                .email("kdha1234@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        // expected
+        mockMvc.perform(post("/signup")
+                        .content(objectMapper.writeValueAsString(signup2))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 : 올바르지 않은 형식의 전화번호")
+    void test1_4() throws Exception {
+        //given
+        Signup signup = Signup.builder()
+                .email("kdha1234@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("010-7544-4357") // "-" 없어야됨
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        // expected
+        mockMvc.perform(post("/signup")
+                        .content(objectMapper.writeValueAsString(signup))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 : 비밀번호 특수문자 사용")
+    void test1_5() throws Exception {
+        //given
+        Signup signup = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234@@")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        // expected
+        mockMvc.perform(post("/signup")
+                        .content(objectMapper.writeValueAsString(signup))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 : 이메일 형식 불일치")
+    void test1_6() throws Exception {
+        //given
+        Signup signup = Signup.builder()
+                .email("kdha4585")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        // expected
+        mockMvc.perform(post("/signup")
+                        .content(objectMapper.writeValueAsString(signup))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 : 비밀번호 글자 수 초과")
+    void test1_7() throws Exception {
+        //given
+        Signup signup = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("1234123412351235123512351235123") // 20글자 까지
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        // expected
+        mockMvc.perform(post("/signup")
+                        .content(objectMapper.writeValueAsString(signup))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
     }
 
     @Test
     @Transactional
     @DisplayName("로그인 성공")
-    void test2() throws Exception {
+    void test2_1() throws Exception {
         //given
         Signup signup = Signup.builder()
-                .name("데일이")
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
+                .name("데일이")
                 .phone("01075444357")
                 .birth("1996-05-28")
-                .sex("남성")
-                .build();
+                .sex("male")
+                .build(
+                );
         memberService.signup(signup);
 
         Signin signin = Signin.builder()
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .build();
-        System.out.println(" ");
 
         // expected
         mockMvc.perform(post("/signin")
@@ -102,8 +248,66 @@ class MemberControllerTest {
 
     @Test
     @Transactional
+    @DisplayName("로그인 실패 : 비밀번호 불일치")
+    void test2_2() throws Exception {
+        //given
+        Signup signup = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        memberService.signup(signup);
+
+        Signin signin = Signin.builder()
+                .email("kdha4585@gmail.com")
+                .password("12345678")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/signin")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signin)))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("로그인 실패 : 존재하지 않는 이메일")
+    void test2_3() throws Exception {
+        //given
+        Signup signup = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build(
+                );
+        memberService.signup(signup);
+
+        Signin signin = Signin.builder()
+                .email("kdha0528@gmail.com")
+                .password("12341234")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/signin")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signin)))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @Transactional
     @DisplayName("로그아웃 성공")
-    void test3() throws Exception {
+    void test3_1() throws Exception {
         //given
         Signup signup = Signup.builder()
                 .name("데일이")
@@ -136,8 +340,8 @@ class MemberControllerTest {
 
     @Test
     @Transactional
-    @DisplayName("권한 부여 후 로그아웃 실패")
-    void test4() throws Exception {
+    @DisplayName("권한 소멸 후 로그아웃 실패")
+    void test3_2() throws Exception {
         //given
         Signup signup = Signup.builder()
                 .name("데일이")
@@ -166,7 +370,7 @@ class MemberControllerTest {
 
         // expected
         mockMvc.perform(post("/logout").cookie(cookies))
-                .andExpect(MockMvcResultMatchers.content().string("redirect:/"))
+                .andExpect(MockMvcResultMatchers.content().string(""))
                 .andDo(print());
     }
 }

@@ -9,7 +9,7 @@ const router = useRouter()
 const members = ref([]);
 
 
-axios.get("/my-backend-api/?page=1&size=5").then((response) => {
+axios.get("/my-backend-api/home?page=1&size=5").then((response) => {
   response.data.forEach((r: any) => {
     members.value.push(r);
   });
@@ -23,8 +23,8 @@ axios.get("/my-backend-api/?page=1&size=5").then((response) => {
         {{ member.email }}
       </div>
       <div class="sub d-flex">
-        <div class="id">{{member.id}}</div>
-        <div class="name">{{member.name}}</div>
+        <div class="id">{{ member.id }}</div>
+        <div class="name">{{ member.name }}</div>
       </div>
     </li>
   </ul>

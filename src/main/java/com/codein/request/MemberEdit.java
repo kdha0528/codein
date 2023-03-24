@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Signup {
+public class MemberEdit {
     @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
@@ -25,24 +25,12 @@ public class Signup {
     @NotBlank(message = "전화번호를 입력해주세요.")
     @Pattern(regexp = "^01(?:0|1|[6-9])(?:\\d{3}|\\d{4})\\d{4}$", message = "10 ~ 11 자리의 숫자만 입력 가능합니다.")
     private String phone;
-    @NotBlank(message = "생년월일을 입력해주세요.")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "올바른 형식으로 입력해주세요.")
-    private String birth;
-    @NotBlank(message = "성별을 입력해주세요.")
-    @Pattern(regexp = "^(?:male|female)$", message = "올바른 형식으로 입력해주세요.")
-    private String sex;
 
     @Builder
-    public Signup(String email, String password, String name, String phone, String birth, String sex) {
+    public MemberEdit(String email, String password, String name, String phone) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
-        this.birth = birth;
-        this.sex = sex;
-    }
-
-    public void validate() {
-        // 회원가입 절차에서 검증해야 할 기능들 만들어두기
     }
 }

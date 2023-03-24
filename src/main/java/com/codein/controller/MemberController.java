@@ -5,6 +5,7 @@ import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.Role;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.request.MemberEdit;
 import com.codein.request.PageSize;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
@@ -31,7 +32,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/")
+    @GetMapping("/home")
     public List<MemberResponse> getMemberList(@ModelAttribute PageSize pageSize) {
         return memberService.getMemberList(pageSize);
     }
@@ -65,6 +66,13 @@ public class MemberController {
     @PostMapping("/logout")
     public String logout(@CookieValue(value = "SESSION") Cookie cookie) {
         memberService.logout(cookie.getValue());
-        return "redirect:/";
+        return "redirect:/home";
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/memberedit")
+    public void memberEdit(@CookieValue(value = "SESSION") Cookie cookie, MemberEdit editProfile) {
+
+        memberService.memberEdit(cookie.getValue(), editProfile);
     }
 }

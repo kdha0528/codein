@@ -2,12 +2,14 @@ package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
+import com.codein.domain.MemberEditor;
 import com.codein.domain.Session;
 import com.codein.exception.AlreadyExistsAccountException;
 import com.codein.exception.InvalidSigninInformation;
 import com.codein.exception.NotSigninedAccount;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.request.MemberEdit;
 import com.codein.request.PageSize;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
@@ -47,9 +49,11 @@ public class MemberService {
 
 
     public void signup(Signup signup) {
-        Optional<Member> memberOptional = memberRepository.findByEmail(signup.getEmail());
 
-        if (memberOptional.isPresent()) {
+        Optional<Member> emailOptional = memberRepository.findByEmail(signup.getEmail());
+        Optional<Member> phoneOptional = memberRepository.findByPhone(signup.getPhone());
+
+        if (emailOptional.isPresent() || phoneOptional.isPresent()) {
             throw new AlreadyExistsAccountException();
         }
 
@@ -65,7 +69,6 @@ public class MemberService {
                 .build();
         memberRepository.save(member);
 
-        System.out.println("  ");
     }
 
     public List<MemberResponse> getMemberList(PageSize pageSize) {
@@ -82,5 +85,24 @@ public class MemberService {
         member.deleteSession(session);
 
         System.out.println("  ");
+    }
+
+    public void memberEdit(String accessToken, MemberEdit memberEdit) {
+
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(NotSigninedAccount::new);
+
+        Member member = session.getMember();
+
+        MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
+
+        MemberEditor memberEditor = memberEditorBuilder
+                .email(memberEdit.getEmail())
+                .password(memberEdit.getPassword())
+                .name(memberEdit.getName())
+                .phone(memberEdit.getPhone())
+                .build();
+
+        member.edit(memberEditor);
     }
 }
