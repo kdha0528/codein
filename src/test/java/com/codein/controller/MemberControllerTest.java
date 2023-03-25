@@ -1,15 +1,20 @@
 package com.codein.controller;
 
 import com.codein.domain.Member;
+import com.codein.domain.Session;
 import com.codein.exception.AlreadyExistsAccountException;
+import com.codein.exception.NotExistsAccountException;
 import com.codein.exception.NotSigninedAccount;
 import com.codein.repository.MemberRepository;
+import com.codein.repository.SessionRepository;
+import com.codein.request.MemberEdit;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class MemberControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
@@ -37,6 +43,9 @@ class MemberControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private SessionRepository sessionRepository;
 
     @Autowired
     private MemberService memberService;
@@ -218,7 +227,6 @@ class MemberControllerTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("로그인 성공")
     void test2_1() throws Exception {
         //given
@@ -247,7 +255,6 @@ class MemberControllerTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("로그인 실패 : 비밀번호 불일치")
     void test2_2() throws Exception {
         //given
@@ -276,7 +283,6 @@ class MemberControllerTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("로그인 실패 : 존재하지 않는 이메일")
     void test2_3() throws Exception {
         //given
@@ -305,7 +311,6 @@ class MemberControllerTest {
     }
 
     @Test
-    @Transactional
     @DisplayName("로그아웃 성공")
     void test3_1() throws Exception {
         //given
@@ -334,12 +339,11 @@ class MemberControllerTest {
         // expected
         mockMvc.perform(post("/logout").cookie(cookies))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("redirect:/"))
+                .andExpect(MockMvcResultMatchers.content().string("redirect:/home"))
                 .andDo(print());
     }
 
     @Test
-    @Transactional
     @DisplayName("권한 소멸 후 로그아웃 실패")
     void test3_2() throws Exception {
         //given
@@ -370,7 +374,50 @@ class MemberControllerTest {
 
         // expected
         mockMvc.perform(post("/logout").cookie(cookies))
-                .andExpect(MockMvcResultMatchers.content().string(""))
+                .andExpect(MockMvcResultMatchers.content().string("")) // 권한 실패로 logout 컨트롤러를 아예 지나지 않음
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원정보 수정 성공")
+    void test4() {
+        // given
+        Signup signup = Signup.builder()
+                .name("데일리")
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("01012341234")
+                .build();
+        memberService.signup(signup);
+
+        Signin signin = Signin.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        String accessToken = memberService.signin(signin);
+
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(NotSigninedAccount::new);
+
+        Member member = session.getMember();
+
+        MemberEdit memberEdit = MemberEdit.builder()
+                .email("kdha0528@gmail.com")
+                .phone("01044444444")
+                .name(null)
+                .password("11112222")
+                .build();
+        // when
+        memberService.memberEdit(accessToken, memberEdit);
+
+        // then
+        Member editedMember = memberRepository.findByEmail(member.getEmail())
+                .orElseThrow(NotExistsAccountException::new);
+        Assertions.assertEquals(member.getName(), editedMember.getName());
+        Assertions.assertEquals(member.getEmail(), editedMember.getEmail());
+        Assertions.assertEquals(member.getPhone(), editedMember.getPhone());
+        Assertions.assertEquals(member.getPassword(), editedMember.getPassword());
     }
 }

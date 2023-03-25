@@ -96,9 +96,11 @@ public class MemberService {
 
         MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
 
+        String encryptedPassword = passwordEncoder.encrypt(memberEdit.getPassword());
+
         MemberEditor memberEditor = memberEditorBuilder
                 .email(memberEdit.getEmail())
-                .password(memberEdit.getPassword())
+                .password(encryptedPassword)
                 .name(memberEdit.getName())
                 .phone(memberEdit.getPhone())
                 .build();

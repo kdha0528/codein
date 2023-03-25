@@ -3,9 +3,12 @@ package com.codein.service;
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.domain.Session;
+import com.codein.exception.NotExistsAccountException;
+import com.codein.exception.NotSigninedAccount;
 import com.codein.exception.Unauthorized;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.request.MemberEdit;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
 import jakarta.transaction.Transactional;
@@ -19,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.function.BiFunction;
 
 
+@Transactional
 @SpringBootTest
 class MemberServiceTest {
 
@@ -45,12 +49,12 @@ class MemberServiceTest {
         PasswordEncoder passwordEncoder = new PasswordEncoder();
 
         Signup signup = Signup.builder()
+                .name("데일리")
                 .email("kdha4585@gmail.com")
-                .password("1234")
-                .name("데일이")
-                .phone("01075444357")
-                .birth("1996-05-28")
-                .sex("남성")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("01012341234")
                 .build();
 
         // when
@@ -70,22 +74,19 @@ class MemberServiceTest {
     @DisplayName("로그인 성공")
     void test2() {
         // given
-        PasswordEncoder encoder = new PasswordEncoder();
-        String encryptedPassword = encoder.encrypt("1234");
-
-        Member member = Member.builder()
+        Signup signup = Signup.builder()
                 .name("데일리")
                 .email("kdha4585@gmail.com")
-                .password(encryptedPassword)
+                .password("12341234")
                 .birth("2000-01-01")
                 .sex("male")
-                .phone("1234")
+                .phone("01012341234")
                 .build();
-        memberRepository.save(member);
+        memberService.signup(signup);
 
         Signin signin = Signin.builder()
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .build();
 
         // when
@@ -95,24 +96,24 @@ class MemberServiceTest {
         Assertions.assertNotNull(accessToken);
     }
 
+
     @Test
-    @Transactional
     @DisplayName("로그아웃 성공")
     void test3() {
         // given
         Signup signup = Signup.builder()
                 .name("데일리")
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .birth("2000-01-01")
                 .sex("male")
-                .phone("1234")
+                .phone("01012341234")
                 .build();
         memberService.signup(signup);
 
         Signin signin = Signin.builder()
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .build();
         String accessToken = memberService.signin(signin);
 
@@ -137,4 +138,46 @@ class MemberServiceTest {
         Assertions.assertNull(memberSession);
     }
 
+    @Test
+    @DisplayName("회원정보 수정 성공")
+    void test4() {
+        // given
+        Signup signup = Signup.builder()
+                .name("데일리")
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("01012341234")
+                .build();
+        memberService.signup(signup);
+
+        Signin signin = Signin.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        String accessToken = memberService.signin(signin);
+
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(NotSigninedAccount::new);
+
+        Member member = session.getMember();
+
+        MemberEdit memberEdit = MemberEdit.builder()
+                .email("kdha0528@gmail.com")
+                .phone("01044444444")
+                .name(null)
+                .password("11112222")
+                .build();
+        // when
+        memberService.memberEdit(accessToken, memberEdit);
+
+        // then
+        Member editedMember = memberRepository.findByEmail(member.getEmail())
+                .orElseThrow(NotExistsAccountException::new);
+        Assertions.assertEquals(member.getName(), editedMember.getName());
+        Assertions.assertEquals(member.getEmail(), editedMember.getEmail());
+        Assertions.assertEquals(member.getPhone(), editedMember.getPhone());
+        Assertions.assertEquals(member.getPassword(), editedMember.getPassword());
+    }
 }
