@@ -61,6 +61,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         // accessToken이 존재하면 유효한 세션인지 확인
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(Unauthorized::new);
+        
 
         // 유효한 세션이라면 해당 유저 가져오기
         Member member = session.getMember();

@@ -1,12 +1,9 @@
 package com.codein.controller;
 
 import com.codein.domain.Member;
-import com.codein.domain.Session;
 import com.codein.exception.AlreadyExistsAccountException;
-import com.codein.exception.NotExistsAccountException;
 import com.codein.exception.NotSigninedAccount;
 import com.codein.repository.MemberRepository;
-import com.codein.repository.SessionRepository;
 import com.codein.request.MemberEdit;
 import com.codein.request.Signin;
 import com.codein.request.Signup;
@@ -14,7 +11,6 @@ import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,9 +39,6 @@ class MemberControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @Autowired
-    private SessionRepository sessionRepository;
 
     @Autowired
     private MemberService memberService;
@@ -317,7 +310,7 @@ class MemberControllerTest {
         Signup signup = Signup.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .phone("01075444357")
                 .birth("1996-05-28")
                 .sex("남성")
@@ -326,7 +319,7 @@ class MemberControllerTest {
 
         Signin signin = Signin.builder()
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .build();
 
         MvcResult result = mockMvc.perform(post("/signin")
@@ -344,7 +337,7 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("권한 소멸 후 로그아웃 실패")
+    @DisplayName("로그아웃 실패 : 권한 없음")
     void test3_2() throws Exception {
         //given
         Signup signup = Signup.builder()
@@ -380,44 +373,45 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("회원정보 수정 성공")
-    void test4() {
+    void test4_1() throws Exception {
         // given
         Signup signup = Signup.builder()
-                .name("데일리")
+                .name("데일이")
                 .email("kdha4585@gmail.com")
-                .password("12341234")
-                .birth("2000-01-01")
-                .sex("male")
-                .phone("01012341234")
+                .password("1234")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("남성")
                 .build();
         memberService.signup(signup);
 
         Signin signin = Signin.builder()
                 .email("kdha4585@gmail.com")
-                .password("12341234")
+                .password("1234")
                 .build();
-        String accessToken = memberService.signin(signin);
 
-        Session session = sessionRepository.findByAccessToken(accessToken)
-                .orElseThrow(NotSigninedAccount::new);
+        MvcResult result = mockMvc.perform(post("/signin")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signin)))
+                .andReturn();
 
-        Member member = session.getMember();
+        Cookie[] cookies = result.getResponse().getCookies();
 
         MemberEdit memberEdit = MemberEdit.builder()
                 .email("kdha0528@gmail.com")
-                .phone("01044444444")
+                .phone("01012341234")
                 .name(null)
                 .password("11112222")
                 .build();
-        // when
-        memberService.memberEdit(accessToken, memberEdit);
 
-        // then
-        Member editedMember = memberRepository.findByEmail(member.getEmail())
-                .orElseThrow(NotExistsAccountException::new);
-        Assertions.assertEquals(member.getName(), editedMember.getName());
-        Assertions.assertEquals(member.getEmail(), editedMember.getEmail());
-        Assertions.assertEquals(member.getPhone(), editedMember.getPhone());
-        Assertions.assertEquals(member.getPassword(), editedMember.getPassword());
+        // expected
+        mockMvc.perform(post("/memberedit").cookie(cookies)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(memberEdit))
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
     }
+
+
 }

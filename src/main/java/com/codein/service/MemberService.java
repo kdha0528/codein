@@ -42,8 +42,6 @@ public class MemberService {
 
         Session session = member.addSession();
 
-        System.out.println(" ");
-
         return session.getAccessToken();
     }
 
@@ -84,7 +82,6 @@ public class MemberService {
         Member member = session.getMember();
         member.deleteSession(session);
 
-        System.out.println("  ");
     }
 
     public void memberEdit(String accessToken, MemberEdit memberEdit) {
@@ -106,5 +103,9 @@ public class MemberService {
                 .build();
 
         member.edit(memberEditor);
+
+        member.deleteSession(session);
+        System.out.println(member.getSessions());
+        System.out.println(session.getAccessToken());
     }
 }

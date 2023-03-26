@@ -56,7 +56,6 @@ public class MemberController {
                 .sameSite("Strict")
                 .maxAge(Duration.ofDays(30))
                 .build();
-
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .build();
@@ -65,14 +64,15 @@ public class MemberController {
     @MySecured(role = Role.MEMBER)
     @PostMapping("/logout")
     public String logout(@CookieValue(value = "SESSION") Cookie cookie) {
+        System.out.println("---");
         memberService.logout(cookie.getValue());
         return "redirect:/home";
     }
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/memberedit")
-    public void memberEdit(@CookieValue(value = "SESSION") Cookie cookie, MemberEdit editProfile) {
-
-        memberService.memberEdit(cookie.getValue(), editProfile);
+    public void memberEdit(@CookieValue(value = "SESSION") Cookie cookie, @RequestBody MemberEdit memberEdit) {
+        System.out.println(memberEdit.getEmail());
+        memberService.memberEdit(cookie.getValue(), memberEdit);
     }
 }
