@@ -456,4 +456,49 @@ class MemberControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("회원정보 수정 성공 : 전부 null인 경우")
+    void test4_3() throws Exception {
+        // given
+        Signup signup = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build();
+        mockMvc.perform(post("/signup")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signup)));
+
+        Signin signin = Signin.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        MvcResult signinResult = mockMvc.perform(post("/signin")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signin)))
+                .andReturn();
+
+        Cookie[] cookies = signinResult.getResponse().getCookies();
+
+        MemberEdit memberEdit = MemberEdit.builder()    // 전부 null인 경우
+                .email(null)
+                .password(null)
+                .name(null)
+                .phone(null)
+                .build();
+
+        // expected
+        mockMvc.perform(post("/memberedit").cookie(cookies)
+                        .content(objectMapper.writeValueAsString(memberEdit))
+                        .contentType(APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+
 }
