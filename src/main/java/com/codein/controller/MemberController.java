@@ -3,8 +3,6 @@ package com.codein.controller;
 
 import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.Role;
-import com.codein.repository.MemberRepository;
-import com.codein.repository.SessionRepository;
 import com.codein.request.MemberEdit;
 import com.codein.request.PageSize;
 import com.codein.request.Signin;
@@ -27,8 +25,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
-    private final SessionRepository sessionRepository;
-    private final MemberRepository memberRepository;
 
     private final MemberService memberService;
 
@@ -39,13 +35,12 @@ public class MemberController {
 
     @PostMapping("/signup")
     public void signup(@RequestBody @Valid Signup signup) {
-        signup.validate();
         memberService.signup(signup);
     }
 
 
     @PostMapping("/signin")
-    public ResponseEntity<Object> signin(@RequestBody Signin signin) {
+    public ResponseEntity<Object> signin(@RequestBody @Valid Signin signin) {
         String accessToken = memberService.signin(signin);
 
         ResponseCookie responseCookie = ResponseCookie.from("SESSION", accessToken)
@@ -64,15 +59,14 @@ public class MemberController {
     @MySecured(role = Role.MEMBER)
     @PostMapping("/logout")
     public String logout(@CookieValue(value = "SESSION") Cookie cookie) {
-        System.out.println("---");
         memberService.logout(cookie.getValue());
         return "redirect:/home";
     }
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/memberedit")
-    public void memberEdit(@CookieValue(value = "SESSION") Cookie cookie, @RequestBody MemberEdit memberEdit) {
-        System.out.println(memberEdit.getEmail());
+    public void memberEdit(@CookieValue(value = "SESSION") Cookie cookie, @RequestBody @Valid MemberEdit memberEdit) {
+
         memberService.memberEdit(cookie.getValue(), memberEdit);
     }
 }

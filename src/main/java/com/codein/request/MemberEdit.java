@@ -12,6 +12,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class MemberEdit {
+
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
     @Pattern(regexp = "^[a-zA-Z0-9]{8,20}$", message = "비밀번호는 소문자, 대문자, 숫자를 이용하여 8~20글자 입력해주세요.")
@@ -28,4 +29,5 @@ public class MemberEdit {
         this.name = name;
         this.phone = phone;
     }
+
 }

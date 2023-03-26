@@ -66,7 +66,6 @@ public class MemberService {
                 .sex(signup.getSex())
                 .build();
         memberRepository.save(member);
-
     }
 
     public List<MemberResponse> getMemberList(PageSize pageSize) {
@@ -91,9 +90,11 @@ public class MemberService {
 
         Member member = session.getMember();
 
+        String encryptedPassword = null;
         MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
-
-        String encryptedPassword = passwordEncoder.encrypt(memberEdit.getPassword());
+        if (memberEdit.getPassword() != null) {
+            encryptedPassword = passwordEncoder.encrypt(memberEdit.getPassword());
+        }
 
         MemberEditor memberEditor = memberEditorBuilder
                 .email(memberEdit.getEmail())
@@ -105,7 +106,11 @@ public class MemberService {
         member.edit(memberEditor);
 
         member.deleteSession(session);
-        System.out.println(member.getSessions());
-        System.out.println(session.getAccessToken());
+
+        System.out.println(member.getEmail());
+        System.out.println(member.getPassword());
+        System.out.println(member.getName());
+        System.out.println(member.getPhone());
+
     }
 }

@@ -2,6 +2,7 @@ package com.codein.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class Signin {
     @NotBlank(message = "이메일을 입력해주세요.")
     private String email;
     @NotBlank(message = "비밀번호를 입력해주세요.")
+    @Pattern(regexp = "^[a-zA-Z0-9]{8,20}$", message = "비밀번호는 소문자, 대문자, 숫자를 이용하여 8~20글자 입력해주세요.")
     private String password;
 
     @Builder

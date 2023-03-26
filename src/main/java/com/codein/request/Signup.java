@@ -42,7 +42,4 @@ public class Signup {
         this.sex = sex;
     }
 
-    public void validate() {
-        // 회원가입 절차에서 검증해야 할 기능들 만들어두기
-    }
 }

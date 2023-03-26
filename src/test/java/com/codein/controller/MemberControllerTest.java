@@ -313,7 +313,7 @@ class MemberControllerTest {
                 .password("12341234")
                 .phone("01075444357")
                 .birth("1996-05-28")
-                .sex("남성")
+                .sex("male")
                 .build();
         memberService.signup(signup);
 
@@ -343,16 +343,16 @@ class MemberControllerTest {
         Signup signup = Signup.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .phone("01075444357")
                 .birth("1996-05-28")
-                .sex("남성")
+                .sex("male")
                 .build();
         memberService.signup(signup); // default로 role = member
 
         Signin signin = Signin.builder()
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .build();
 
         MvcResult result = mockMvc.perform(post("/signin")
@@ -378,16 +378,16 @@ class MemberControllerTest {
         Signup signup = Signup.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .phone("01075444357")
                 .birth("1996-05-28")
-                .sex("남성")
+                .sex("male")
                 .build();
         memberService.signup(signup);
 
         Signin signin = Signin.builder()
                 .email("kdha4585@gmail.com")
-                .password("1234")
+                .password("12341234")
                 .build();
 
         MvcResult result = mockMvc.perform(post("/signin")
@@ -399,9 +399,9 @@ class MemberControllerTest {
 
         MemberEdit memberEdit = MemberEdit.builder()
                 .email("kdha0528@gmail.com")
-                .phone("01012341234")
-                .name(null)
                 .password("11112222")
+                .name(null)
+                .phone("01012341234")
                 .build();
 
         // expected
@@ -413,5 +413,47 @@ class MemberControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("회원정보 수정 실패 : 이메일 형식 불일치")
+    void test4_2() throws Exception {
+        // given
+        Signup signup = Signup.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build();
+        mockMvc.perform(post("/signup")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signup)));
+
+        Signin signin = Signin.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        MvcResult signinResult = mockMvc.perform(post("/signin")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signin)))
+                .andReturn();
+
+        Cookie[] cookies = signinResult.getResponse().getCookies();
+
+        MemberEdit memberEdit = MemberEdit.builder()
+                .email("kdha4585")  // email 양식 틀림
+                .phone(null)
+                .name(null)
+                .password("12345678")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/memberedit").cookie(cookies)
+                        .content(objectMapper.writeValueAsString(memberEdit))
+                        .contentType(APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
 
 }
