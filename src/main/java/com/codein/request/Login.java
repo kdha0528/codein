@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Signin {
+public class Login {
 
     @Email(message = "이메일 형식을 맞춰주세요.")
     @NotBlank(message = "이메일을 입력해주세요.")
@@ -21,7 +21,7 @@ public class Signin {
     private String password;
 
     @Builder
-    public Signin(String email, String password) {
+    public Login(String email, String password) {
         this.email = email;
         this.password = password;
     }

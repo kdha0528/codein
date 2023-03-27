@@ -1,17 +1,17 @@
 package com.codein.controller;
 
 import com.codein.domain.Member;
-import com.codein.exception.AlreadyExistsAccountException;
-import com.codein.exception.NotSigninedAccount;
+import com.codein.domain.Role;
+import com.codein.error.exception.MemberNotLoginException;
 import com.codein.repository.MemberRepository;
+import com.codein.request.Login;
 import com.codein.request.MemberEdit;
-import com.codein.request.Signin;
 import com.codein.request.Signup;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +24,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 class MemberControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
@@ -44,7 +42,7 @@ class MemberControllerTest {
     private MemberService memberService;
 
 
-    @BeforeEach
+    @AfterEach
     void clean() {
         memberRepository.deleteAll();
     }
@@ -82,7 +80,9 @@ class MemberControllerTest {
                 .sex("male")
                 .build(
                 );
-        memberService.signup(signup1);
+        mockMvc.perform(post("/signup")
+                .content(objectMapper.writeValueAsString(signup1))
+                .contentType(APPLICATION_JSON));
 
         Signup signup2 = Signup.builder()
                 .email("kdha4585@gmail.com")
@@ -99,7 +99,6 @@ class MemberControllerTest {
                         .content(objectMapper.writeValueAsString(signup2))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(new AlreadyExistsAccountException().getMessage()))
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
     }
 
@@ -116,7 +115,9 @@ class MemberControllerTest {
                 .sex("male")
                 .build(
                 );
-        memberService.signup(signup1);
+        mockMvc.perform(post("/signup")
+                .content(objectMapper.writeValueAsString(signup1))
+                .contentType(APPLICATION_JSON));
 
         Signup signup2 = Signup.builder()
                 .email("kdha1234@gmail.com")
@@ -232,17 +233,19 @@ class MemberControllerTest {
                 .sex("male")
                 .build(
                 );
-        memberService.signup(signup);
+        mockMvc.perform(post("/signup")
+                .content(objectMapper.writeValueAsString(signup))
+                .contentType(APPLICATION_JSON));
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
 
         // expected
-        mockMvc.perform(post("/signin")
+        mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -260,17 +263,20 @@ class MemberControllerTest {
                 .sex("male")
                 .build(
                 );
-        memberService.signup(signup);
+        mockMvc.perform(post("/signup")
+                .content(objectMapper.writeValueAsString(signup))
+                .contentType(APPLICATION_JSON));
 
-        Signin signin = Signin.builder()
+
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12345678")
                 .build();
 
         // expected
-        mockMvc.perform(post("/signin")
+        mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
@@ -288,22 +294,25 @@ class MemberControllerTest {
                 .sex("male")
                 .build(
                 );
-        memberService.signup(signup);
+        mockMvc.perform(post("/signup")
+                .content(objectMapper.writeValueAsString(signup))
+                .contentType(APPLICATION_JSON));
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha0528@gmail.com")
                 .password("12341234")
                 .build();
 
         // expected
-        mockMvc.perform(post("/signin")
+        mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
     @Test
+    @Transactional
     @DisplayName("로그아웃 성공")
     void test3_1() throws Exception {
         //given
@@ -315,16 +324,18 @@ class MemberControllerTest {
                 .birth("1996-05-28")
                 .sex("male")
                 .build();
-        memberService.signup(signup);
+        mockMvc.perform(post("/signup")
+                .content(objectMapper.writeValueAsString(signup))
+                .contentType(APPLICATION_JSON));
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
 
-        MvcResult result = mockMvc.perform(post("/signin")
+        MvcResult result = mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andReturn();
 
         Cookie[] cookies = result.getResponse().getCookies();
@@ -337,6 +348,7 @@ class MemberControllerTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("로그아웃 실패 : 권한 없음")
     void test3_2() throws Exception {
         //given
@@ -348,30 +360,33 @@ class MemberControllerTest {
                 .birth("1996-05-28")
                 .sex("male")
                 .build();
-        memberService.signup(signup); // default로 role = member
+        mockMvc.perform(post("/signup")
+                .content(objectMapper.writeValueAsString(signup))
+                .contentType(APPLICATION_JSON)); // default로 role = member
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
 
-        MvcResult result = mockMvc.perform(post("/signin")
+        MvcResult result = mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andReturn();
 
         Cookie[] cookies = result.getResponse().getCookies();
         Member member = memberRepository.findByEmail("kdha4585@gmail.com")
-                .orElseThrow(NotSigninedAccount::new);
-        member.setRole(null);
+                .orElseThrow(MemberNotLoginException::new);
+        member.setRole(Role.NONE);   // 강제로 role 삭제
 
         // expected
         mockMvc.perform(post("/logout").cookie(cookies))
-                .andExpect(MockMvcResultMatchers.content().string("")) // 권한 실패로 logout 컨트롤러를 아예 지나지 않음
+                .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
 
     @Test
+    @Transactional
     @DisplayName("회원정보 수정 성공")
     void test4_1() throws Exception {
         // given
@@ -383,16 +398,18 @@ class MemberControllerTest {
                 .birth("1996-05-28")
                 .sex("male")
                 .build();
-        memberService.signup(signup);
+        mockMvc.perform(post("/signup")
+                .content(objectMapper.writeValueAsString(signup))
+                .contentType(APPLICATION_JSON));
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
 
-        MvcResult result = mockMvc.perform(post("/signin")
+        MvcResult result = mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andReturn();
 
         Cookie[] cookies = result.getResponse().getCookies();
@@ -414,6 +431,7 @@ class MemberControllerTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("회원정보 수정 실패 : 이메일 형식 불일치")
     void test4_2() throws Exception {
         // given
@@ -429,16 +447,16 @@ class MemberControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(signup)));
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        MvcResult signinResult = mockMvc.perform(post("/signin")
+        MvcResult loginResult = mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andReturn();
 
-        Cookie[] cookies = signinResult.getResponse().getCookies();
+        Cookie[] cookies = loginResult.getResponse().getCookies();
 
         MemberEdit memberEdit = MemberEdit.builder()
                 .email("kdha4585")  // email 양식 틀림
@@ -457,6 +475,7 @@ class MemberControllerTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("회원정보 수정 성공 : 전부 null인 경우")
     void test4_3() throws Exception {
         // given
@@ -472,16 +491,16 @@ class MemberControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(signup)));
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        MvcResult signinResult = mockMvc.perform(post("/signin")
+        MvcResult loginResult = mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andReturn();
 
-        Cookie[] cookies = signinResult.getResponse().getCookies();
+        Cookie[] cookies = loginResult.getResponse().getCookies();
 
         MemberEdit memberEdit = MemberEdit.builder()    // 전부 null인 경우
                 .email(null)
@@ -501,6 +520,7 @@ class MemberControllerTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("회원정보 수정 성공 : 전부 그대로인 경우")
     void test4_4() throws Exception {
         // given
@@ -516,16 +536,16 @@ class MemberControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(signup)));
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        MvcResult signinResult = mockMvc.perform(post("/signin")
+        MvcResult loginResult = mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signin)))
+                        .content(objectMapper.writeValueAsString(login)))
                 .andReturn();
 
-        Cookie[] cookies = signinResult.getResponse().getCookies();
+        Cookie[] cookies = loginResult.getResponse().getCookies();
 
         MemberEdit memberEdit = MemberEdit.builder()
                 .email("kdha4585@gmail.com")

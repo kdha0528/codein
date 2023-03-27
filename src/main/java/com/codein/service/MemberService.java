@@ -4,14 +4,15 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.domain.MemberEditor;
 import com.codein.domain.Session;
-import com.codein.exception.AlreadyExistsAccountException;
-import com.codein.exception.InvalidSigninInformation;
-import com.codein.exception.NotSigninedAccount;
+import com.codein.error.exception.EmailAlreadyExistsException;
+import com.codein.error.exception.InvalidLoginInputException;
+import com.codein.error.exception.MemberNotLoginException;
+import com.codein.error.exception.PhoneAlreadyExistsException;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.request.Login;
 import com.codein.request.MemberEdit;
 import com.codein.request.PageSize;
-import com.codein.request.Signin;
 import com.codein.request.Signup;
 import com.codein.response.MemberResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +31,14 @@ public class MemberService {
     private final SessionRepository sessionRepository;
 
 
-    public String signin(Signin signin) {
+    public String login(Login login) {
 
-        Member member = memberRepository.findByEmail(signin.getEmail())
-                .orElseThrow(InvalidSigninInformation::new);
+        Member member = memberRepository.findByEmail(login.getEmail())
+                .orElseThrow(InvalidLoginInputException::new);
 
-        var matches = passwordEncoder.matches(signin.getPassword(), member.getPassword());
+        var matches = passwordEncoder.matches(login.getPassword(), member.getPassword());
         if (!matches) {
-            throw new InvalidSigninInformation();
+            throw new InvalidLoginInputException();
         }
 
         Session session = member.addSession();
@@ -45,14 +46,15 @@ public class MemberService {
         return session.getAccessToken();
     }
 
-
     public void signup(Signup signup) {
 
         Optional<Member> emailOptional = memberRepository.findByEmail(signup.getEmail());
         Optional<Member> phoneOptional = memberRepository.findByPhone(signup.getPhone());
 
-        if (emailOptional.isPresent() || phoneOptional.isPresent()) {
-            throw new AlreadyExistsAccountException();
+        if (emailOptional.isPresent()) {
+            throw new EmailAlreadyExistsException();
+        } else if (phoneOptional.isPresent()) {
+            throw new PhoneAlreadyExistsException();
         }
 
         String encryptedPassword = passwordEncoder.encrypt(signup.getPassword());
@@ -72,11 +74,10 @@ public class MemberService {
         return memberRepository.getMemberResponseList(pageSize);
     }
 
-
     public void logout(String accessToken) {
 
         Session session = sessionRepository.findByAccessToken(accessToken)
-                .orElseThrow(NotSigninedAccount::new);
+                .orElseThrow(MemberNotLoginException::new);
 
         Member member = session.getMember();
         member.deleteSession(session);
@@ -86,7 +87,7 @@ public class MemberService {
     public void memberEdit(String accessToken, MemberEdit memberEdit) {
 
         Session session = sessionRepository.findByAccessToken(accessToken)
-                .orElseThrow(NotSigninedAccount::new);
+                .orElseThrow(MemberNotLoginException::new);
 
         Member member = session.getMember();
 
@@ -104,13 +105,5 @@ public class MemberService {
                 .build();
 
         member.edit(memberEditor);
-
-        member.deleteSession(session);
-
-        System.out.println(member.getEmail());
-        System.out.println(member.getPassword());
-        System.out.println(member.getName());
-        System.out.println(member.getPhone());
-
     }
 }

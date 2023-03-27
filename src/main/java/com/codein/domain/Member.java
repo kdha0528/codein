@@ -1,6 +1,6 @@
 package com.codein.domain;
 
-import com.codein.exception.NotSigninedAccount;
+import com.codein.error.exception.MemberNotLoginException;
 import com.codein.response.MemberResponse;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -77,10 +77,11 @@ public class Member {
         return session;
     }
 
+    
     public void deleteSession(Session session) {
         boolean removed = sessions.removeIf(s -> s.equals(session));
         if (!removed) {
-            throw new NotSigninedAccount();
+            throw new MemberNotLoginException();
         }
     }
 

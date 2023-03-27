@@ -2,7 +2,7 @@ package com.codein.config;
 
 import com.codein.config.data.MemberSession;
 import com.codein.domain.Session;
-import com.codein.exception.Unauthorized;
+import com.codein.error.exception.UnauthorizedException;
 import com.codein.repository.SessionRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,7 +35,7 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
 
         if (httpServletRequest == null) {
             log.error("httpServletRequest is null");
-            throw new Unauthorized();
+            throw new NullPointerException();
         }
 
         Cookie[] cookies = httpServletRequest.getCookies();
@@ -47,7 +47,7 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
                     return cookie;
                 }
             }
-            throw new Unauthorized();
+            throw new NullPointerException();
         };
 
         // validateSessionCookie 실행 후 반환된 cookie의 value를 accessToken에 저장
@@ -55,12 +55,12 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
 
         // accessToken이 null인지 확인
         if (accessToken == null || accessToken.equals("")) {
-            throw new Unauthorized();
+            throw new UnauthorizedException();
         }
 
         // accessToken이 유효한지 확인
         Session session = sessionRepository.findByAccessToken(accessToken)
-                .orElseThrow(Unauthorized::new);
+                .orElseThrow(UnauthorizedException::new);
 
         // 해당 토큰을 가지고 있는 유저의 아이디를 MemberSession 형태로 반환
         return new MemberSession(session.getMember().getId());

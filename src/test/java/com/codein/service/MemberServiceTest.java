@@ -3,17 +3,17 @@ package com.codein.service;
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.domain.Session;
-import com.codein.exception.NotExistsAccountException;
-import com.codein.exception.NotSigninedAccount;
-import com.codein.exception.Unauthorized;
+import com.codein.error.exception.MemberNotExistsException;
+import com.codein.error.exception.MemberNotLoginException;
+import com.codein.error.exception.UnauthorizedException;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.request.Login;
 import com.codein.request.MemberEdit;
-import com.codein.request.Signin;
 import com.codein.request.Signup;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ class MemberServiceTest {
     private SessionRepository sessionRepository;
 
 
-    @BeforeEach
+    @AfterEach
     void clean() {
         memberRepository.deleteAll();
     }
@@ -84,13 +84,13 @@ class MemberServiceTest {
                 .build();
         memberService.signup(signup);
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
 
         // when
-        String accessToken = memberService.signin(signin);
+        String accessToken = memberService.login(login);
 
         // then
         Assertions.assertNotNull(accessToken);
@@ -111,18 +111,18 @@ class MemberServiceTest {
                 .build();
         memberService.signup(signup);
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        String accessToken = memberService.signin(signin);
+        String accessToken = memberService.login(login);
 
         // when
         memberService.logout(accessToken);
 
         // then
         Member member = memberRepository.findByEmail("kdha4585@gmail.com")
-                .orElseThrow(Unauthorized::new);
+                .orElseThrow(UnauthorizedException::new);
 
         BiFunction<String, Member, Session> findMemberSession = (t, m) -> {
             for (Session s : m.getSessions()) {
@@ -152,14 +152,14 @@ class MemberServiceTest {
                 .build();
         memberService.signup(signup);
 
-        Signin signin = Signin.builder()
+        Login login = Login.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        String accessToken = memberService.signin(signin);
+        String accessToken = memberService.login(login);
 
         Session session = sessionRepository.findByAccessToken(accessToken)
-                .orElseThrow(NotSigninedAccount::new);
+                .orElseThrow(MemberNotLoginException::new);
 
         Member member = session.getMember();
 
@@ -174,7 +174,7 @@ class MemberServiceTest {
 
         // then
         Member editedMember = memberRepository.findByEmail(member.getEmail())
-                .orElseThrow(NotExistsAccountException::new);
+                .orElseThrow(MemberNotExistsException::new);
         Assertions.assertEquals(member.getName(), editedMember.getName());
         Assertions.assertEquals(member.getEmail(), editedMember.getEmail());
         Assertions.assertEquals(member.getPhone(), editedMember.getPhone());

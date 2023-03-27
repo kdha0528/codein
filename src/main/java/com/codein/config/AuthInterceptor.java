@@ -4,7 +4,8 @@ import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.Member;
 import com.codein.domain.Role;
 import com.codein.domain.Session;
-import com.codein.exception.Unauthorized;
+import com.codein.error.exception.InvalidAccessTokenException;
+import com.codein.error.exception.UnauthorizedException;
 import com.codein.repository.SessionRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +37,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
+
         // @MySecured가 있는 경우, session은 cookies에 담겨 있으므로 cookies가 null인지 검사
 
         Cookie[] cookies = request.getCookies();
@@ -52,16 +54,17 @@ public class AuthInterceptor implements HandlerInterceptor {
                     return cookie;
                 }
             }
-            throw new Unauthorized();
+            throw new NullPointerException();
         };
 
         // validateSessionCookie 실행 후 반환된 cookie의 value를 accessToken에 저장
         String accessToken = validateSessionCookie.apply(cookies).getValue();
 
+        System.out.println("cookies accesstoken = " + accessToken);
         // accessToken이 존재하면 유효한 세션인지 확인
         Session session = sessionRepository.findByAccessToken(accessToken)
-                .orElseThrow(Unauthorized::new);
-        
+                .orElseThrow(InvalidAccessTokenException::new);
+
 
         // 유효한 세션이라면 해당 유저 가져오기
         Member member = session.getMember();
@@ -79,10 +82,14 @@ public class AuthInterceptor implements HandlerInterceptor {
             if (role.equals("MEMBER")) {
                 if (member.getRole() == Role.ADMIN) {
                     return true;
-                } else return member.getRole() == Role.MEMBER;
+                } else if (member.getRole() == Role.MEMBER) {
+                    return true;
+                } else {
+                    throw new UnauthorizedException();
+                }
             }
         }
 
-        return false;
+        throw new UnauthorizedException();
     }
 }
