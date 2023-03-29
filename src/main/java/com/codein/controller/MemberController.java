@@ -4,8 +4,8 @@ package com.codein.controller;
 import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.Role;
 import com.codein.repository.SessionRepository;
+import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
-import com.codein.requestdto.MemberEditDto;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.SignupDto;
 import com.codein.responsedto.MemberResponseDto;
@@ -59,15 +59,22 @@ public class MemberController {
     }
 
     @MySecured(role = Role.MEMBER)
-    @PostMapping("/memberedit")
-    public String memberEdit(@CookieValue(value = "SESSION") Cookie cookie, @RequestBody @Valid MemberEditDto memberEditDto) {
-        memberService.memberEdit(cookie.getValue(), memberEditDto.toMemberServiceDto());
+    @PostMapping("/editmember")
+    public String editMember(@CookieValue(value = "SESSION") Cookie cookie, @RequestBody @Valid EditMemberDto editMemberDto) {
+        memberService.memberEdit(cookie.getValue(), editMemberDto.toMemberServiceDto());
         return "redirect:/logout";
     }
 
     @MySecured(role = Role.MEMBER)
-    @PostMapping("/memberdelete")
-    public String memberDelete(@CookieValue(value = "SESSION") Cookie cookie) {
+    @PostMapping("/deletemember")
+    public String deleteMember(@CookieValue(value = "SESSION") Cookie cookie) {
+        memberService.memberDelete(cookie.getValue());
+        return "redirect:/home";
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/findmember")
+    public String findMember(@CookieValue(value = "SESSION") Cookie cookie) {
         memberService.memberDelete(cookie.getValue());
         return "redirect:/home";
     }

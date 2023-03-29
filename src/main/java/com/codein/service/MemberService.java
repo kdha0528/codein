@@ -11,8 +11,8 @@ import com.codein.error.exception.PhoneAlreadyExistsException;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
 import com.codein.requestdto.PageSizeDto;
+import com.codein.requestservicedto.EditMemberServiceDto;
 import com.codein.requestservicedto.LoginServiceDto;
-import com.codein.requestservicedto.MemberEditServiceDto;
 import com.codein.responsedto.MemberResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final SessionRepository sessionRepository;
-
 
     @Transactional
     public void signup(Member member) {
@@ -98,7 +97,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void memberEdit(String accessToken, MemberEditServiceDto memberEditServiceDto) {
+    public void memberEdit(String accessToken, EditMemberServiceDto editMemberServiceDto) {
 
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
@@ -107,14 +106,14 @@ public class MemberService {
 
         String encryptedPassword = null;
         MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
-        if (memberEditServiceDto.getPassword() != null) {
-            encryptedPassword = passwordEncoder.encrypt(memberEditServiceDto.getPassword());
+        if (editMemberServiceDto.getPassword() != null) {
+            encryptedPassword = passwordEncoder.encrypt(editMemberServiceDto.getPassword());
         }
         MemberEditor memberEditor = memberEditorBuilder
-                .email(memberEditServiceDto.getEmail())
+                .email(editMemberServiceDto.getEmail())
                 .password(encryptedPassword)
-                .name(memberEditServiceDto.getName())
-                .phone(memberEditServiceDto.getPhone())
+                .name(editMemberServiceDto.getName())
+                .phone(editMemberServiceDto.getPhone())
                 .build();
 
         member.edit(memberEditor);

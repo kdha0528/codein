@@ -1,6 +1,6 @@
 package com.codein.requestdto;
 
-import com.codein.requestservicedto.MemberEditServiceDto;
+import com.codein.requestservicedto.EditMemberServiceDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class MemberEditDto {
+public class EditMemberDto {
 
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
@@ -24,15 +24,15 @@ public class MemberEditDto {
     private String phone;
 
     @Builder
-    public MemberEditDto(String email, String password, String name, String phone) {
+    public EditMemberDto(String email, String password, String name, String phone) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
     }
 
-    public MemberEditServiceDto toMemberServiceDto() {
-        return MemberEditServiceDto.builder()
+    public EditMemberServiceDto toMemberServiceDto() {
+        return EditMemberServiceDto.builder()
                 .email(this.email)
                 .password(this.password)
                 .name(this.name)

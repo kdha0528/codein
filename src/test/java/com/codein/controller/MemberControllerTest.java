@@ -3,8 +3,8 @@ package com.codein.controller;
 import com.codein.domain.Member;
 import com.codein.domain.Role;
 import com.codein.repository.MemberRepository;
+import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
-import com.codein.requestdto.MemberEditDto;
 import com.codein.requestdto.SignupDto;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -409,7 +409,7 @@ class MemberControllerTest {
 
         Cookie[] cookies = result.getResponse().getCookies();
 
-        MemberEditDto memberEditDto = MemberEditDto.builder()
+        EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha0528@gmail.com")
                 .password("11112222")
                 .name(null)
@@ -417,9 +417,9 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/memberedit").cookie(cookies)
+        mockMvc.perform(post("/editmember").cookie(cookies)
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(memberEditDto))
+                        .content(objectMapper.writeValueAsString(editMemberDto))
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -452,7 +452,7 @@ class MemberControllerTest {
 
         Cookie[] cookies = loginResult.getResponse().getCookies();
 
-        MemberEditDto memberEditDto = MemberEditDto.builder()
+        EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha4585")  // email 양식 틀림
                 .phone(null)
                 .name(null)
@@ -460,8 +460,8 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/memberedit").cookie(cookies)
-                        .content(objectMapper.writeValueAsString(memberEditDto))
+        mockMvc.perform(post("/editmember").cookie(cookies)
+                        .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
@@ -495,7 +495,7 @@ class MemberControllerTest {
 
         Cookie[] cookies = loginResult.getResponse().getCookies();
 
-        MemberEditDto memberEditDto = MemberEditDto.builder()    // 전부 null인 경우
+        EditMemberDto editMemberDto = EditMemberDto.builder()    // 전부 null인 경우
                 .email(null)
                 .password(null)
                 .name(null)
@@ -503,8 +503,8 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/memberedit").cookie(cookies)
-                        .content(objectMapper.writeValueAsString(memberEditDto))
+        mockMvc.perform(post("/editmember").cookie(cookies)
+                        .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -539,7 +539,7 @@ class MemberControllerTest {
 
         Cookie[] cookies = loginResult.getResponse().getCookies();
 
-        MemberEditDto memberEditDto = MemberEditDto.builder()
+        EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -547,8 +547,8 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/memberedit").cookie(cookies)
-                        .content(objectMapper.writeValueAsString(memberEditDto))
+        mockMvc.perform(post("/editmember").cookie(cookies)
+                        .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -556,5 +556,73 @@ class MemberControllerTest {
 
     }
 
-   
+    @Test
+    @DisplayName("회원탈퇴 성공")
+    void test5_1() throws Exception {
+        // given
+        SignupDto signupDto = SignupDto.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build();
+        mockMvc.perform(post("/signup")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signupDto)));
+
+        LoginDto loginDto = LoginDto.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        MvcResult loginResult = mockMvc.perform(post("/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andReturn();
+
+        Cookie[] cookies = loginResult.getResponse().getCookies();
+
+        // expected
+        mockMvc.perform(post("/deletemember").cookie(cookies))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("redirect:/home"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 실패 : 권한 없음")
+    void test5_2() throws Exception {
+        // given
+        SignupDto signupDto = SignupDto.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .name("데일이")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build();
+        mockMvc.perform(post("/signup")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signupDto)));
+
+        LoginDto loginDto = LoginDto.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        MvcResult loginResult = mockMvc.perform(post("/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andReturn();
+
+        Cookie[] cookies = loginResult.getResponse().getCookies();
+        Member member = memberRepository.findByEmail(signupDto.getEmail());
+        member.setRole(Role.NONE);
+        memberRepository.save(member);
+
+        // expected
+        mockMvc.perform(post("/deletemember").cookie(cookies))
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
 }

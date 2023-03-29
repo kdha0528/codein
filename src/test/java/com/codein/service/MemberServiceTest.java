@@ -4,8 +4,8 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
-import com.codein.requestdto.MemberEditDto;
 import com.codein.requestdto.SignupDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -139,22 +139,47 @@ class MemberServiceTest {
                 .build();
         String accessToken = memberService.login(login.toMemberServiceDto());
 
-        MemberEditDto memberEditDto = MemberEditDto.builder()
+        EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha0528@gmail.com")
                 .phone("01044444444")
                 .name(null)
                 .password("11112222")
                 .build();
         // when
-        memberService.memberEdit(accessToken, memberEditDto.toMemberServiceDto());
+        memberService.memberEdit(accessToken, editMemberDto.toMemberServiceDto());
 
         // then
-        Member editedMember = memberRepository.findByEmail(memberEditDto.getEmail());
+        Member editedMember = memberRepository.findByEmail(editMemberDto.getEmail());
         Assertions.assertEquals(signupDto.getName(), editedMember.getName());
-        Assertions.assertEquals(memberEditDto.getEmail(), editedMember.getEmail());
-        Assertions.assertEquals(memberEditDto.getPhone(), editedMember.getPhone());
-        Assertions.assertTrue(passwordEncoder.matches(memberEditDto.getPassword(), editedMember.getPassword()));
+        Assertions.assertEquals(editMemberDto.getEmail(), editedMember.getEmail());
+        Assertions.assertEquals(editMemberDto.getPhone(), editedMember.getPhone());
+        Assertions.assertTrue(passwordEncoder.matches(editMemberDto.getPassword(), editedMember.getPassword()));
     }
 
-   
+    @Test
+    @DisplayName("회원탈퇴 성공")
+    void test5() {
+        // given
+        SignupDto signupDto = SignupDto.builder()
+                .name("데일리")
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("01012341234")
+                .build();
+        memberService.signup(signupDto.toEntity());
+
+        LoginDto login = LoginDto.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        String accessToken = memberService.login(login.toMemberServiceDto());
+
+        // when
+        memberService.memberDelete(accessToken);
+
+        // then
+        Assertions.assertNull(memberRepository.findByEmail(signupDto.getEmail()));
+    }
 }

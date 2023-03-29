@@ -8,7 +8,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class MemberEditServiceDto {
+public class EditMemberServiceDto {
 
     private String email;
     private String password;
@@ -16,7 +16,7 @@ public class MemberEditServiceDto {
     private String phone;
 
     @Builder
-    public MemberEditServiceDto(String email, String password, String name, String phone) {
+    public EditMemberServiceDto(String email, String password, String name, String phone) {
         this.email = email;
         this.password = password;
         this.name = name;
