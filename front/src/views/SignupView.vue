@@ -92,8 +92,8 @@ const rules = reactive<FormRules>({
   phone: [{validator: checkPhone, trigger: 'blur'}],
 });
 
-const signup = function () {
-  axios.post('/my-backend-api/signup', {
+const signupDto = function () {
+  axios.post('/my-backend-api/signupDto', {
     email: email.value,
     password: password.value,
     name: name.value,
@@ -163,7 +163,7 @@ const resetForm = function () {
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" @click="signup()">Sign up</el-button>
+      <el-button type="primary" @click="signupDto()">Sign up</el-button>
       <el-button @click="resetForm()">Reset</el-button>
     </el-form-item>
   </el-form>

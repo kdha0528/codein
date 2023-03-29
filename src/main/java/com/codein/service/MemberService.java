@@ -10,16 +10,17 @@ import com.codein.error.exception.MemberNotLoginException;
 import com.codein.error.exception.PhoneAlreadyExistsException;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
-import com.codein.request.Login;
-import com.codein.request.MemberEdit;
-import com.codein.request.PageSize;
-import com.codein.request.Signup;
-import com.codein.response.MemberResponse;
+import com.codein.requestdto.PageSizeDto;
+import com.codein.requestservicedto.LoginServiceDto;
+import com.codein.requestservicedto.MemberEditServiceDto;
+import com.codein.responsedto.MemberResponseDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -31,49 +32,63 @@ public class MemberService {
     private final SessionRepository sessionRepository;
 
 
-    public String login(Login login) {
+    @Transactional
+    public void signup(Member member) {
 
-        Member member = memberRepository.findByEmail(login.getEmail())
-                .orElseThrow(InvalidLoginInputException::new);
+        Member emailMember = memberRepository.findByEmail(member.getEmail());
+        Member phoneMember = memberRepository.findByPhone(member.getPhone());
 
-        var matches = passwordEncoder.matches(login.getPassword(), member.getPassword());
-        if (!matches) {
-            throw new InvalidLoginInputException();
-        }
-
-        Session session = member.addSession();
-
-        return session.getAccessToken();
-    }
-
-    public void signup(Signup signup) {
-
-        Optional<Member> emailOptional = memberRepository.findByEmail(signup.getEmail());
-        Optional<Member> phoneOptional = memberRepository.findByPhone(signup.getPhone());
-
-        if (emailOptional.isPresent()) {
+        if (emailMember != null) {
             throw new EmailAlreadyExistsException();
-        } else if (phoneOptional.isPresent()) {
+        } else if (phoneMember != null) {
             throw new PhoneAlreadyExistsException();
         }
-
-        String encryptedPassword = passwordEncoder.encrypt(signup.getPassword());
-
-        var member = Member.builder()
-                .email(signup.getEmail())
-                .password(encryptedPassword)
-                .name(signup.getName())
-                .phone(signup.getPhone())
-                .birth(signup.getBirth())
-                .sex(signup.getSex())
-                .build();
+        member.encryptPassword(passwordEncoder.encrypt(member.getPassword()));
         memberRepository.save(member);
     }
 
-    public List<MemberResponse> getMemberList(PageSize pageSize) {
-        return memberRepository.getMemberResponseList(pageSize);
+
+    @Transactional
+    public String login(LoginServiceDto loginServiceDto) {
+
+        Member member = memberRepository.findByEmail(loginServiceDto.getEmail());
+
+        if (member == null) {
+            throw new InvalidLoginInputException();
+        }
+
+        if (!passwordEncoder.matches(loginServiceDto.getPassword(), member.getPassword())) {
+            throw new InvalidLoginInputException();
+        }
+
+        Session session = Session.builder()
+                .member(member)
+                .build();
+        member.addSession(session);
+
+        System.out.println("member get session = " + member.getSessions().get(0).getAccessToken());
+        System.out.println("session get member role =" + session.getMember().getRole());
+        return session.getAccessToken();
     }
 
+    @Transactional
+    public ResponseCookie createResponseCookie(String accessToken) {
+        return ResponseCookie.from("SESSION", accessToken)
+                .domain("localhost")
+                .path("/")
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Strict")
+                .maxAge(Duration.ofDays(30))
+                .build();
+    }
+
+
+    public List<MemberResponseDto> getMemberList(PageSizeDto pageSizeDto) {
+        return memberRepository.getMemberResponseList(pageSizeDto);
+    }
+
+    @Transactional
     public void logout(String accessToken) {
 
         Session session = sessionRepository.findByAccessToken(accessToken)
@@ -81,10 +96,11 @@ public class MemberService {
 
         Member member = session.getMember();
         member.deleteSession(session);
-
+        sessionRepository.save(session);
     }
 
-    public void memberEdit(String accessToken, MemberEdit memberEdit) {
+    @Transactional
+    public void memberEdit(String accessToken, MemberEditServiceDto memberEditServiceDto) {
 
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
@@ -93,17 +109,18 @@ public class MemberService {
 
         String encryptedPassword = null;
         MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
-        if (memberEdit.getPassword() != null) {
-            encryptedPassword = passwordEncoder.encrypt(memberEdit.getPassword());
+        if (memberEditServiceDto.getPassword() != null) {
+            encryptedPassword = passwordEncoder.encrypt(memberEditServiceDto.getPassword());
         }
 
         MemberEditor memberEditor = memberEditorBuilder
-                .email(memberEdit.getEmail())
+                .email(memberEditServiceDto.getEmail())
                 .password(encryptedPassword)
-                .name(memberEdit.getName())
-                .phone(memberEdit.getPhone())
+                .name(memberEditServiceDto.getName())
+                .phone(memberEditServiceDto.getPhone())
                 .build();
 
         member.edit(memberEditor);
     }
+    
 }

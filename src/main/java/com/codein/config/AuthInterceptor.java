@@ -6,6 +6,7 @@ import com.codein.domain.Role;
 import com.codein.domain.Session;
 import com.codein.error.exception.InvalidAccessTokenException;
 import com.codein.error.exception.UnauthorizedException;
+import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import java.util.function.Function;
 public class AuthInterceptor implements HandlerInterceptor {
 
     private final SessionRepository sessionRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -60,15 +62,13 @@ public class AuthInterceptor implements HandlerInterceptor {
         // validateSessionCookie 실행 후 반환된 cookie의 value를 accessToken에 저장
         String accessToken = validateSessionCookie.apply(cookies).getValue();
 
-        System.out.println("cookies accesstoken = " + accessToken);
         // accessToken이 존재하면 유효한 세션인지 확인
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(InvalidAccessTokenException::new);
 
-
         // 유효한 세션이라면 해당 유저 가져오기
-        Member member = session.getMember();
-
+        Member member = memberRepository.findByAccessToken(accessToken);
+        
         // 접근하는 컨트롤러의 role 확인
         String role = mySecured.role().toString();
 
@@ -79,7 +79,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 return member.getRole() == Role.ADMIN;
             }
             // member일 경우
-            if (role.equals("MEMBER")) {
+            else if (role.equals("MEMBER")) {
                 if (member.getRole() == Role.ADMIN) {
                     return true;
                 } else if (member.getRole() == Role.MEMBER) {
@@ -87,6 +87,10 @@ public class AuthInterceptor implements HandlerInterceptor {
                 } else {
                     throw new UnauthorizedException();
                 }
+            }
+            // none일 경우
+            else {
+                throw new UnauthorizedException();
             }
         }
 

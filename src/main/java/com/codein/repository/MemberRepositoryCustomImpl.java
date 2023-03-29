@@ -1,9 +1,11 @@
 package com.codein.repository;
 
+import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
-import com.codein.request.PageSize;
-import com.codein.response.MemberResponse;
+import com.codein.requestdto.PageSizeDto;
+import com.codein.responsedto.MemberResponseDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -16,20 +18,37 @@ import static com.codein.domain.QMember.member;
 @RequiredArgsConstructor
 public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
-
+    private final EntityManager em;
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<MemberResponse> getMemberResponseList(PageSize pageSize) {
-        List<Member> memberList = jpaQueryFactory.selectFrom(member)
-                .limit(pageSize.getSize())
-                .offset(pageSize.getOffset())
-                .orderBy(member.id.desc())
-                .stream()
-                .toList();
+    private final PasswordEncoder passwordEncoder;
 
-        return memberList.stream()
-                .map(Member::changeMemberResponse)
+    public List<MemberResponseDto> getMemberResponseList(PageSizeDto pageSizeDto) {
+        List<Member> memberList = jpaQueryFactory.selectFrom(member)
+                .limit(pageSizeDto.getSize())
+                .offset(pageSizeDto.getOffset())
+                .orderBy(member.id.desc())
+                .fetch();
+
+        return memberList.stream().map(Member::changeMemberResponse)
                 .collect(Collectors.toList());
     }
 
+    public Member findByEmail(String email) {
+        return jpaQueryFactory.selectFrom(member)
+                .where(member.email.eq(email))
+                .fetchOne();
+    }
+
+    public Member findByPhone(String phone) {
+        return jpaQueryFactory.selectFrom(member)
+                .where(member.phone.eq(phone))
+                .fetchOne();
+    }
+
+    public Member findByAccessToken(String accessToken) {
+        return jpaQueryFactory.selectFrom(member)
+                .where(member.sessions.any().accessToken.eq(accessToken))
+                .fetchOne();
+    }
 }

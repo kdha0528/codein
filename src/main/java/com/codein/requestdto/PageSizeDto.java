@@ -1,4 +1,4 @@
-package com.codein.request;
+package com.codein.requestdto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import static java.lang.Math.min;
 @Getter
 @Setter
 @Builder
-public class PageSize {
+public class PageSizeDto {
 
     private static final int MAX_SIZE = 20000;
 

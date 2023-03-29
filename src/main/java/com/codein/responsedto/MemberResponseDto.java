@@ -1,13 +1,12 @@
-package com.codein.response;
+package com.codein.responsedto;
 
 import com.codein.domain.Member;
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberResponse {
+public class MemberResponseDto {
 
     private Long id;
 
@@ -16,16 +15,15 @@ public class MemberResponse {
     private String name;
 
 
-
     // 생성자 오버로딩
-    public MemberResponse(Member member) {
+    public MemberResponseDto(Member member) {
         this.id = member.getId();
         this.email = member.getEmail();
         this.name = member.getName();
     }
 
     @Builder
-    public MemberResponse(Long id, String email, String name) {
+    public MemberResponseDto(Long id, String email, String name) {
         this.id = id;
         this.email = email;
         this.name = name;

@@ -1,7 +1,7 @@
 package com.codein.domain;
 
 import com.codein.error.exception.MemberNotLoginException;
-import com.codein.response.MemberResponse;
+import com.codein.responsedto.MemberResponseDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -44,11 +44,11 @@ public class Member {
     @Setter
     private Long point;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.LAZY)
     private final List<Session> sessions = new ArrayList<>();
 
     @Setter
-    private Role role;
+    private Role role = Role.MEMBER;
 
     @Builder
     public Member(String email, String password, String name, String phone, String birth, String sex) {
@@ -60,24 +60,17 @@ public class Member {
         this.sex = sex;
         this.createdAt = LocalDateTime.now();
         this.point = 0L;
-        this.role = Role.MEMBER;
     }
 
-    public MemberResponse changeMemberResponse() {
-        return new MemberResponse(this);
+    public MemberResponseDto changeMemberResponse() {
+        return new MemberResponseDto(this);
     }
 
 
-    public Session addSession() {
-        Session session = Session.builder()
-                .member(this)
-                .build();
+    public void addSession(Session session) {
         this.sessions.add(session);
-
-        return session;
     }
 
-    
     public void deleteSession(Session session) {
         boolean removed = sessions.removeIf(s -> s.equals(session));
         if (!removed) {
@@ -98,5 +91,9 @@ public class Member {
         password = memberEditor.getPassword();
         name = memberEditor.getName();
         phone = memberEditor.getPhone();
+    }
+
+    public void encryptPassword(String encryptedPassword) {
+        this.password = encryptedPassword;
     }
 }

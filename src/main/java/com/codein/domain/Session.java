@@ -19,14 +19,18 @@ public class Session {
 
     @NotNull
     private String accessToken;
-    
+
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
     private Member member;
 
     @Builder
     public Session(Member member) {
         this.accessToken = UUID.randomUUID().toString();
         this.member = member;
+    }
+
+    public Member getMember() {
+        return member;
     }
 }

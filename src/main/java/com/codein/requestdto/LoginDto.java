@@ -1,5 +1,6 @@
-package com.codein.request;
+package com.codein.requestdto;
 
+import com.codein.requestservicedto.LoginServiceDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Login {
+public class LoginDto {
 
     @Email(message = "이메일 형식을 맞춰주세요.")
     @NotBlank(message = "이메일을 입력해주세요.")
@@ -21,9 +22,15 @@ public class Login {
     private String password;
 
     @Builder
-    public Login(String email, String password) {
+    public LoginDto(String email, String password) {
         this.email = email;
         this.password = password;
     }
 
+    public LoginServiceDto toMemberServiceDto() {
+        return LoginServiceDto.builder()
+                .email(this.email)
+                .password(this.password)
+                .build();
+    }
 }

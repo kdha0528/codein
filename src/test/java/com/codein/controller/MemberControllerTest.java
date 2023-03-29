@@ -2,11 +2,10 @@ package com.codein.controller;
 
 import com.codein.domain.Member;
 import com.codein.domain.Role;
-import com.codein.error.exception.MemberNotLoginException;
 import com.codein.repository.MemberRepository;
-import com.codein.request.Login;
-import com.codein.request.MemberEdit;
-import com.codein.request.Signup;
+import com.codein.requestdto.LoginDto;
+import com.codein.requestdto.MemberEditDto;
+import com.codein.requestdto.SignupDto;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -51,7 +50,7 @@ class MemberControllerTest {
     @DisplayName("회원가입")
     void test1_1() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com") // email 형식
                 .password("123a1A34")   // 8~20 숫자, 소문자, 대문자
                 .name("데일이")    // 2~10글자
@@ -61,7 +60,7 @@ class MemberControllerTest {
                 .build();
         // expected
         mockMvc.perform(post("/signup")
-                        .content(objectMapper.writeValueAsString(signup))
+                        .content(objectMapper.writeValueAsString(signupDto))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
@@ -71,7 +70,7 @@ class MemberControllerTest {
     @DisplayName("회원가입 실패 : 중복된 이메일")
     void test1_2() throws Exception {
         //given
-        Signup signup1 = Signup.builder()
+        SignupDto signupDto1 = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -81,10 +80,10 @@ class MemberControllerTest {
                 .build(
                 );
         mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signup1))
+                .content(objectMapper.writeValueAsString(signupDto1))
                 .contentType(APPLICATION_JSON));
 
-        Signup signup2 = Signup.builder()
+        SignupDto signupDto2 = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -96,7 +95,7 @@ class MemberControllerTest {
 
         // expected
         mockMvc.perform(post("/signup")
-                        .content(objectMapper.writeValueAsString(signup2))
+                        .content(objectMapper.writeValueAsString(signupDto2))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
@@ -106,7 +105,7 @@ class MemberControllerTest {
     @DisplayName("회원가입 실패 : 중복된 전화번호")
     void test1_3() throws Exception {
         //given
-        Signup signup1 = Signup.builder()
+        SignupDto signupDto1 = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -116,10 +115,10 @@ class MemberControllerTest {
                 .build(
                 );
         mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signup1))
+                .content(objectMapper.writeValueAsString(signupDto1))
                 .contentType(APPLICATION_JSON));
 
-        Signup signup2 = Signup.builder()
+        SignupDto signupDto2 = SignupDto.builder()
                 .email("kdha1234@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -130,7 +129,7 @@ class MemberControllerTest {
                 );
         // expected
         mockMvc.perform(post("/signup")
-                        .content(objectMapper.writeValueAsString(signup2))
+                        .content(objectMapper.writeValueAsString(signupDto2))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
@@ -140,7 +139,7 @@ class MemberControllerTest {
     @DisplayName("회원가입 실패 : 올바르지 않은 형식의 전화번호")
     void test1_4() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha1234@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -151,7 +150,7 @@ class MemberControllerTest {
                 );
         // expected
         mockMvc.perform(post("/signup")
-                        .content(objectMapper.writeValueAsString(signup))
+                        .content(objectMapper.writeValueAsString(signupDto))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
@@ -161,7 +160,7 @@ class MemberControllerTest {
     @DisplayName("회원가입 실패 : 비밀번호 특수문자 사용")
     void test1_5() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234@@")
                 .name("데일이")
@@ -172,7 +171,7 @@ class MemberControllerTest {
                 );
         // expected
         mockMvc.perform(post("/signup")
-                        .content(objectMapper.writeValueAsString(signup))
+                        .content(objectMapper.writeValueAsString(signupDto))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
@@ -182,7 +181,7 @@ class MemberControllerTest {
     @DisplayName("회원가입 실패 : 이메일 형식 불일치")
     void test1_6() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585")
                 .password("12341234")
                 .name("데일이")
@@ -193,7 +192,7 @@ class MemberControllerTest {
                 );
         // expected
         mockMvc.perform(post("/signup")
-                        .content(objectMapper.writeValueAsString(signup))
+                        .content(objectMapper.writeValueAsString(signupDto))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
@@ -203,7 +202,7 @@ class MemberControllerTest {
     @DisplayName("회원가입 실패 : 비밀번호 글자 수 초과")
     void test1_7() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("1234123412351235123512351235123") // 20글자 까지
                 .name("데일이")
@@ -214,7 +213,7 @@ class MemberControllerTest {
                 );
         // expected
         mockMvc.perform(post("/signup")
-                        .content(objectMapper.writeValueAsString(signup))
+                        .content(objectMapper.writeValueAsString(signupDto))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andDo(print()); // Http 요청에 대한 summary 를 볼 수 있음.
@@ -224,7 +223,7 @@ class MemberControllerTest {
     @DisplayName("로그인 성공")
     void test2_1() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -234,10 +233,10 @@ class MemberControllerTest {
                 .build(
                 );
         mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signup))
+                .content(objectMapper.writeValueAsString(signupDto))
                 .contentType(APPLICATION_JSON));
 
-        Login login = Login.builder()
+        LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
@@ -254,7 +253,7 @@ class MemberControllerTest {
     @DisplayName("로그인 실패 : 비밀번호 불일치")
     void test2_2() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -264,11 +263,11 @@ class MemberControllerTest {
                 .build(
                 );
         mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signup))
+                .content(objectMapper.writeValueAsString(signupDto))
                 .contentType(APPLICATION_JSON));
 
 
-        Login login = Login.builder()
+        LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12345678")
                 .build();
@@ -285,7 +284,7 @@ class MemberControllerTest {
     @DisplayName("로그인 실패 : 존재하지 않는 이메일")
     void test2_3() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -295,10 +294,10 @@ class MemberControllerTest {
                 .build(
                 );
         mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signup))
+                .content(objectMapper.writeValueAsString(signupDto))
                 .contentType(APPLICATION_JSON));
 
-        Login login = Login.builder()
+        LoginDto loginDto = LoginDto.builder()
                 .email("kdha0528@gmail.com")
                 .password("12341234")
                 .build();
@@ -306,17 +305,16 @@ class MemberControllerTest {
         // expected
         mockMvc.perform(post("/login")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
+                        .content(objectMapper.writeValueAsString(loginDto)))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
     @Test
-    @Transactional
     @DisplayName("로그아웃 성공")
     void test3_1() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
                 .password("12341234")
@@ -325,10 +323,10 @@ class MemberControllerTest {
                 .sex("male")
                 .build();
         mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signup))
+                .content(objectMapper.writeValueAsString(signupDto))
                 .contentType(APPLICATION_JSON));
 
-        Login login = Login.builder()
+        LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
@@ -352,7 +350,7 @@ class MemberControllerTest {
     @DisplayName("로그아웃 실패 : 권한 없음")
     void test3_2() throws Exception {
         //given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
                 .password("12341234")
@@ -361,10 +359,10 @@ class MemberControllerTest {
                 .sex("male")
                 .build();
         mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signup))
+                .content(objectMapper.writeValueAsString(signupDto))
                 .contentType(APPLICATION_JSON)); // default로 role = member
 
-        Login login = Login.builder()
+        LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
@@ -375,8 +373,7 @@ class MemberControllerTest {
                 .andReturn();
 
         Cookie[] cookies = result.getResponse().getCookies();
-        Member member = memberRepository.findByEmail("kdha4585@gmail.com")
-                .orElseThrow(MemberNotLoginException::new);
+        Member member = memberRepository.findByEmail("kdha4585@gmail.com");
         member.setRole(Role.NONE);   // 강제로 role 삭제
 
         // expected
@@ -390,7 +387,7 @@ class MemberControllerTest {
     @DisplayName("회원정보 수정 성공")
     void test4_1() throws Exception {
         // given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
                 .password("12341234")
@@ -399,10 +396,10 @@ class MemberControllerTest {
                 .sex("male")
                 .build();
         mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signup))
+                .content(objectMapper.writeValueAsString(signupDto))
                 .contentType(APPLICATION_JSON));
 
-        Login login = Login.builder()
+        LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
@@ -414,7 +411,7 @@ class MemberControllerTest {
 
         Cookie[] cookies = result.getResponse().getCookies();
 
-        MemberEdit memberEdit = MemberEdit.builder()
+        MemberEditDto memberEditDto = MemberEditDto.builder()
                 .email("kdha0528@gmail.com")
                 .password("11112222")
                 .name(null)
@@ -424,7 +421,7 @@ class MemberControllerTest {
         // expected
         mockMvc.perform(post("/memberedit").cookie(cookies)
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(memberEdit))
+                        .content(objectMapper.writeValueAsString(memberEditDto))
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -435,7 +432,7 @@ class MemberControllerTest {
     @DisplayName("회원정보 수정 실패 : 이메일 형식 불일치")
     void test4_2() throws Exception {
         // given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -445,9 +442,9 @@ class MemberControllerTest {
                 .build();
         mockMvc.perform(post("/signup")
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(signup)));
+                .content(objectMapper.writeValueAsString(signupDto)));
 
-        Login login = Login.builder()
+        LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
@@ -458,7 +455,7 @@ class MemberControllerTest {
 
         Cookie[] cookies = loginResult.getResponse().getCookies();
 
-        MemberEdit memberEdit = MemberEdit.builder()
+        MemberEditDto memberEditDto = MemberEditDto.builder()
                 .email("kdha4585")  // email 양식 틀림
                 .phone(null)
                 .name(null)
@@ -467,7 +464,7 @@ class MemberControllerTest {
 
         // expected
         mockMvc.perform(post("/memberedit").cookie(cookies)
-                        .content(objectMapper.writeValueAsString(memberEdit))
+                        .content(objectMapper.writeValueAsString(memberEditDto))
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
@@ -479,7 +476,7 @@ class MemberControllerTest {
     @DisplayName("회원정보 수정 성공 : 전부 null인 경우")
     void test4_3() throws Exception {
         // given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -489,9 +486,9 @@ class MemberControllerTest {
                 .build();
         mockMvc.perform(post("/signup")
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(signup)));
+                .content(objectMapper.writeValueAsString(signupDto)));
 
-        Login login = Login.builder()
+        LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
@@ -502,7 +499,7 @@ class MemberControllerTest {
 
         Cookie[] cookies = loginResult.getResponse().getCookies();
 
-        MemberEdit memberEdit = MemberEdit.builder()    // 전부 null인 경우
+        MemberEditDto memberEditDto = MemberEditDto.builder()    // 전부 null인 경우
                 .email(null)
                 .password(null)
                 .name(null)
@@ -511,7 +508,7 @@ class MemberControllerTest {
 
         // expected
         mockMvc.perform(post("/memberedit").cookie(cookies)
-                        .content(objectMapper.writeValueAsString(memberEdit))
+                        .content(objectMapper.writeValueAsString(memberEditDto))
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -524,7 +521,7 @@ class MemberControllerTest {
     @DisplayName("회원정보 수정 성공 : 전부 그대로인 경우")
     void test4_4() throws Exception {
         // given
-        Signup signup = Signup.builder()
+        SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -534,9 +531,9 @@ class MemberControllerTest {
                 .build();
         mockMvc.perform(post("/signup")
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(signup)));
+                .content(objectMapper.writeValueAsString(signupDto)));
 
-        Login login = Login.builder()
+        LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
@@ -547,7 +544,7 @@ class MemberControllerTest {
 
         Cookie[] cookies = loginResult.getResponse().getCookies();
 
-        MemberEdit memberEdit = MemberEdit.builder()
+        MemberEditDto memberEditDto = MemberEditDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .name("데일이")
@@ -556,7 +553,7 @@ class MemberControllerTest {
 
         // expected
         mockMvc.perform(post("/memberedit").cookie(cookies)
-                        .content(objectMapper.writeValueAsString(memberEdit))
+                        .content(objectMapper.writeValueAsString(memberEditDto))
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())

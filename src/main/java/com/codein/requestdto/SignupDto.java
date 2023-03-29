@@ -1,5 +1,6 @@
-package com.codein.request;
+package com.codein.requestdto;
 
+import com.codein.domain.Member;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -12,7 +13,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Signup {
+public class SignupDto {
     @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
@@ -33,13 +34,24 @@ public class Signup {
     private String sex;
 
     @Builder
-    public Signup(String email, String password, String name, String phone, String birth, String sex) {
+    public SignupDto(String email, String password, String name, String phone, String birth, String sex) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.phone = phone;
         this.birth = birth;
         this.sex = sex;
+    }
+
+    public Member toEntity() {
+        return Member.builder()
+                .email(email)
+                .password(password)
+                .name(name)
+                .phone(phone)
+                .birth(birth)
+                .sex(sex)
+                .build();
     }
 
 }
