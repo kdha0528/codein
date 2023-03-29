@@ -66,11 +66,6 @@ public class Member {
         return new MemberResponseDto(this);
     }
 
-
-    public void addSession(Session session) {
-        this.sessions.add(session);
-    }
-
     public void deleteSession(Session session) {
         boolean removed = sessions.removeIf(s -> s.equals(session));
         if (!removed) {
@@ -87,10 +82,10 @@ public class Member {
     }
 
     public void edit(MemberEditor memberEditor) {
-        email = memberEditor.getEmail();
-        password = memberEditor.getPassword();
-        name = memberEditor.getName();
-        phone = memberEditor.getPhone();
+        this.email = memberEditor.getEmail();
+        this.password = memberEditor.getPassword();
+        this.name = memberEditor.getName();
+        this.phone = memberEditor.getPhone();
     }
 
     public void encryptPassword(String encryptedPassword) {

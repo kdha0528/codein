@@ -21,6 +21,7 @@ public class MemberEditor {
         return new MemberEditorBuilder();
     }
 
+    @Getter
     public static class MemberEditorBuilder {
         private String email;
         private String password;

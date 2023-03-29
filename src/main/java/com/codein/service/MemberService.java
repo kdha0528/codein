@@ -64,10 +64,7 @@ public class MemberService {
         Session session = Session.builder()
                 .member(member)
                 .build();
-        member.addSession(session);
 
-        System.out.println("member get session = " + member.getSessions().get(0).getAccessToken());
-        System.out.println("session get member role =" + session.getMember().getRole());
         return session.getAccessToken();
     }
 
@@ -94,9 +91,10 @@ public class MemberService {
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = session.getMember();
-        member.deleteSession(session);
-        sessionRepository.save(session);
+        sessionRepository.delete(session);
+        Member nullMember = memberRepository.findByAccessToken(accessToken);
+        if (nullMember != null) System.out.println("member is not null = " + nullMember.getEmail());
+
     }
 
     @Transactional
@@ -112,7 +110,6 @@ public class MemberService {
         if (memberEditServiceDto.getPassword() != null) {
             encryptedPassword = passwordEncoder.encrypt(memberEditServiceDto.getPassword());
         }
-
         MemberEditor memberEditor = memberEditorBuilder
                 .email(memberEditServiceDto.getEmail())
                 .password(encryptedPassword)
@@ -122,5 +119,13 @@ public class MemberService {
 
         member.edit(memberEditor);
     }
-    
+
+    @Transactional
+    public void memberDelete(String accessToken) {
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(MemberNotLoginException::new);
+
+        Member member = session.getMember();
+        memberRepository.delete(member);
+    }
 }

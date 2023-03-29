@@ -28,6 +28,7 @@ public class Session {
     public Session(Member member) {
         this.accessToken = UUID.randomUUID().toString();
         this.member = member;
+        member.getSessions().add(this);
     }
 
     public Member getMember() {

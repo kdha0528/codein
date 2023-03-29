@@ -64,4 +64,11 @@ public class MemberController {
         memberService.memberEdit(cookie.getValue(), memberEditDto.toMemberServiceDto());
         return "redirect:/logout";
     }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/memberdelete")
+    public String memberDelete(@CookieValue(value = "SESSION") Cookie cookie) {
+        memberService.memberDelete(cookie.getValue());
+        return "redirect:/home";
+    }
 }
