@@ -68,14 +68,14 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseCookie createResponseCookie(String accessToken) {
-        return ResponseCookie.from("SESSION", accessToken)
+    public ResponseCookie buildResponseCookie(String token) {
+        return ResponseCookie.from("accesstoken", token)
                 .domain("localhost")
                 .path("/")
                 .httpOnly(true)
                 .secure(false)
+                .maxAge(Duration.ofMinutes(30))
                 .sameSite("Strict")
-                .maxAge(Duration.ofDays(30))
                 .build();
     }
 
@@ -97,7 +97,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void memberEdit(String accessToken, EditMemberServiceDto editMemberServiceDto) {
+    public void editMember(String accessToken, EditMemberServiceDto editMemberServiceDto) {
 
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
@@ -120,10 +120,9 @@ public class MemberService {
     }
 
     @Transactional
-    public void memberDelete(String accessToken) {
+    public void deleteMember(String accessToken) {
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
-
         Member member = session.getMember();
         memberRepository.delete(member);
     }

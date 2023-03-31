@@ -43,7 +43,7 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
         // cookies에서 session이 있는 쿠키를 반환하는 메소드
         Function<Cookie[], Cookie> validateSessionCookie = cookieList -> {
             for (Cookie cookie : cookieList) {
-                if (cookie.getName().equals("SESSION")) {
+                if (cookie.getName().equals("accesstoken")) {
                     return cookie;
                 }
             }

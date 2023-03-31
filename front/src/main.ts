@@ -1,20 +1,18 @@
-import { createApp } from 'vue';
-import { createPinia } from 'pinia';
-
+import {createApp} from 'vue';
 import App from './App.vue';
 import router from './router';
-
-import 'normalize.css';
+import store from './stores';
 
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
-
+import 'normalize.css';
 import 'bootstrap/dist/css/bootstrap-utilities.css';
 
-const app = createApp(App);
 
-app.use(createPinia());
+const app = createApp(App);
+app.use(store);
 app.use(router);
 app.use(ElementPlus);
+
 
 app.mount('#app');

@@ -14,4 +14,3 @@ spring:
     init:
       mode: always
 
-

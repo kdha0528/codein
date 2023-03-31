@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseCookie;
 
 
 @SpringBootTest
@@ -85,9 +86,10 @@ class MemberServiceTest {
 
         // when
         String accessToken = memberService.login(login.toMemberServiceDto());
+        ResponseCookie responseCookie = memberService.buildResponseCookie(accessToken);
 
         // then
-        Assertions.assertNotNull(accessToken);
+        Assertions.assertNotNull(responseCookie);
     }
 
 
@@ -110,7 +112,7 @@ class MemberServiceTest {
                 .password("12341234")
                 .build();
         String accessToken = memberService.login(login.toMemberServiceDto());
-
+        ResponseCookie responseCookie = memberService.buildResponseCookie(accessToken);
         // when
         memberService.logout(accessToken);
 
@@ -137,7 +139,9 @@ class MemberServiceTest {
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
+
         String accessToken = memberService.login(login.toMemberServiceDto());
+        ResponseCookie responseCookie = memberService.buildResponseCookie(accessToken);
 
         EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha0528@gmail.com")
@@ -146,7 +150,7 @@ class MemberServiceTest {
                 .password("11112222")
                 .build();
         // when
-        memberService.memberEdit(accessToken, editMemberDto.toMemberServiceDto());
+        memberService.editMember(accessToken, editMemberDto.toMemberServiceDto());
 
         // then
         Member editedMember = memberRepository.findByEmail(editMemberDto.getEmail());
@@ -174,10 +178,11 @@ class MemberServiceTest {
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        String accessToken = memberService.login(login.toMemberServiceDto());
 
+        String accessToken = memberService.login(login.toMemberServiceDto());
+        ResponseCookie responseCookie = memberService.buildResponseCookie(accessToken);
         // when
-        memberService.memberDelete(accessToken);
+        memberService.deleteMember(accessToken);
 
         // then
         Assertions.assertNull(memberRepository.findByEmail(signupDto.getEmail()));

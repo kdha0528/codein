@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {useRouter} from "vue-router";
 import axios from "axios";
 
-
-const router = useRouter()
-
 const members = ref([]);
-
 
 axios.get("/my-backend-api/home?page=1&size=5").then((response) => {
   response.data.forEach((r: any) => {

@@ -4,7 +4,7 @@ import type {FormInstance, FormRules} from 'element-plus';
 import {useRouter} from 'vue-router';
 import axios from 'axios';
 
-const router = useRouter();
+const route = useRouter();
 
 const ruleFormRef = ref<FormInstance>();
 
@@ -92,8 +92,8 @@ const rules = reactive<FormRules>({
   phone: [{validator: checkPhone, trigger: 'blur'}],
 });
 
-const signupDto = function () {
-  axios.post('/my-backend-api/signupDto', {
+const signup = function () {
+  axios.post('/my-backend-api/signup', {
     email: email.value,
     password: password.value,
     name: name.value,
@@ -101,7 +101,26 @@ const signupDto = function () {
     sex: sex.value,
     phone: phone.value,
   }).then(() => {
-    router.replace({name: "home"});
+    route.replace({name: "home"});
+  }).catch(error => {
+    console.error(error);
+    if (error.response.data.code == "C001") {
+      alert("회원가입 양식에 맞지 않습니다.");
+    } else if (error.response.data.code == "M001") {
+      alert("이미 존재하는 이메일 입니다.");
+    } else if (error.response.data.code == "M007") {
+      alert("이미 존재하는 전화번호 입니다.");
+    } else {
+      alert(error);
+    }
+    email.value = '';
+    password.value = '';
+    checkPassword.value = '';
+    name.value = '';
+    birth.value = '2000-01-01';
+    sex.value = 'male';
+    phone.value = '';
+    route.replace("signup");
   })
 };
 
@@ -127,10 +146,10 @@ const resetForm = function () {
       <el-input v-model="email" autocomplete="off"/>
     </el-form-item>
     <el-form-item label="Password" prop="password">
-      <el-input v-model="password" autocomplete="off"/>
+      <el-input v-model="password" show-password autocomplete="off"/>
     </el-form-item>
     <el-form-item label="Confirm" prop="checkPassword">
-      <el-input v-model="checkPassword" autocomplete="off"/>
+      <el-input v-model="checkPassword" show-password autocomplete="off"/>
     </el-form-item>
     <el-form-item label="Name" prop="name">
       <el-input v-model="name"/>
@@ -163,7 +182,7 @@ const resetForm = function () {
     </el-form-item>
 
     <el-form-item>
-      <el-button type="primary" @click="signupDto()">Sign up</el-button>
+      <el-button type="primary" @click="signup()">Sign up</el-button>
       <el-button @click="resetForm()">Reset</el-button>
     </el-form-item>
   </el-form>

@@ -21,7 +21,7 @@ public enum ErrorCode {
     MEMBER_NOT_LOGIN(400, "M004", "Member is not login yet"),
     UNAUTHORIZED_ACCESS(403, "M005", "Access is unauthorized"),
     ACCESS_TOKEN_INVALID(401, "M006", "Access token is invalid"),
-    PHONE_ALREADY_EXISTS(400, "M001", "Phone is already exists"),
+    PHONE_ALREADY_EXISTS(400, "M007", "Phone is already exists"),
     // Post
 
 
