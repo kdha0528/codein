@@ -1,12 +1,7 @@
-<script setup lang="ts">
-import Content from '@/components/Content.vue';
-import Header from '@/components/Header.vue';</script>
+<script setup lang="ts"></script>
 
 <template>
-  <div class="d-flex flex-column" style="max-width:960px; margin: 0 auto;">
-    <Header/>
-    <Content/>
-  </div>
+  <RouterView/>
 </template>
 
 <style>

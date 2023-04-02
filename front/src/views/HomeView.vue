@@ -1,5 +1,23 @@
+<template>
+  <Header/>
+  <div class="content">
+    <ul>
+      <li v-for="member in members" :key="member.id">
+        <div class="email">
+          {{ member.email }}
+        </div>
+        <div class="sub d-flex">
+          <div class="id">{{ member.id }}</div>
+          <div class="name">{{ member.name }}</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
 <script setup lang="ts">
-import {ref} from "vue";
+import Header from '@/components/Header.vue';
+import { ref } from "vue";
 import axios from "axios";
 
 const members = ref([]);
@@ -11,21 +29,9 @@ axios.get("/my-backend-api/home?page=1&size=5").then((response) => {
 });
 </script>
 
-<template>
-  <ul>
-    <li v-for="member in members" :key="member.id">
-      <div class="email">
-        {{ member.email }}
-      </div>
-      <div class="sub d-flex">
-        <div class="id">{{ member.id }}</div>
-        <div class="name">{{ member.name }}</div>
-      </div>
-    </li>
-  </ul>
-</template>
-
 <style scoped lang="scss">
+@import "../components/css/contentBase.css";
+
 ul {
   list-style: none;
   padding: 0;

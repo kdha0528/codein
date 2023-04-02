@@ -1,0 +1,6 @@
+.content {
+    height: calc(100vh - 60px);
+    width: 80%;
+    max-width: 980px;
+    margin: 0 auto;
+}

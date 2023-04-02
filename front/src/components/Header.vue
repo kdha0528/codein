@@ -1,9 +1,29 @@
+<template>
+  <div v-if="isUserLogin">
+    <el-header>
+      <el-menu mode="horizontal" router>
+        <el-menu-item index="/home">Home</el-menu-item>
+        <el-menu-item index="/profile">개인정보</el-menu-item>
+        <el-menu-item index="/logout" @click="logout">로그아웃</el-menu-item>
+      </el-menu>
+    </el-header>
+  </div>
+  <div v-else>
+    <el-header>
+      <el-menu mode="horizontal" router>
+        <el-menu-item index="/home">Home</el-menu-item>
+        <el-menu-item index="/signup">회원가입</el-menu-item>
+        <el-menu-item index="/login">로그인</el-menu-item>
+      </el-menu>
+    </el-header>
+  </div>
+</template>
 <script setup lang="ts">
 import axios from "axios";
-import {ref} from "vue";
+import { ref } from "vue";
 import router from "@/router";
-import {authStorage} from "@/stores/auth"
-import {useRouter} from "vue-router";
+import { authStorage } from "@/stores/auth"
+import { useRouter } from "vue-router";
 
 
 const auth = authStorage();
@@ -28,27 +48,6 @@ const logout = function () {
   )
 }
 </script>
-<template>
-  <template v-if="isUserLogin">
-    <el-header>
-      <el-menu mode="horizontal" router>
-        <el-menu-item index="/home">Home</el-menu-item>
-        <el-menu-item index="/profile">개인정보</el-menu-item>
-        <el-menu-item index="/logout" @click="logout">로그아웃</el-menu-item>
-      </el-menu>
-    </el-header>
-  </template>
-  <template v-else>
-    <el-header>
-      <el-menu mode="horizontal" router>
-        <el-menu-item index="/home">Home</el-menu-item>
-        <el-menu-item index="/signup">회원가입</el-menu-item>
-        <el-menu-item index="/login">로그인</el-menu-item>
-      </el-menu>
-    </el-header>
-  </template>
-</template>
-
 <style scoped lang="scss">
 .header {
   padding: 0;

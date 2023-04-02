@@ -1,9 +1,31 @@
+<template>
+  <Header/>
+  <div class="content">
+    <el-form
+        status-icon
+        :rules="rules"
+        label-width="120px"
+        class="demo-ruleForm">
+      <el-form-item label="Email" prop="email">
+        <el-input v-model="email"/>
+      </el-form-item>
+      <el-form-item label="Password" prop="password">
+        <el-input v-model="password" show-password/>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="login()">Log in</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
 <script lang="ts" setup>
-import {reactive, ref} from 'vue';
-import type {FormRules} from 'element-plus';
+import Header from '@/components/Header.vue';
+import { reactive, ref } from 'vue';
+import type { FormRules } from 'element-plus';
 import axios from 'axios';
-import {authStorage} from "@/stores/auth";
-import {useRouter} from "vue-router";
+import { authStorage } from "@/stores/auth";
+import { useRouter } from "vue-router";
 
 const auth = authStorage();
 const route = useRouter();
@@ -63,26 +85,9 @@ const login = function () {
 
 </script>
 
-<template>
-  <el-form
-      status-icon
-      :rules="rules"
-      label-width="120px"
-      class="demo-ruleForm">
-    <el-form-item label="Email" prop="email">
-      <el-input v-model="email"/>
-    </el-form-item>
-    <el-form-item label="Password" prop="password">
-      <el-input v-model="password" show-password/>
-    </el-form-item>
-
-    <el-form-item>
-      <el-button type="primary" @click="login()">Log in</el-button>
-    </el-form-item>
-  </el-form>
-</template>
-
 <style scoped>
+@import "../components/css/contentBase.css";
+
 .el-form-item {
   margin-bottom: 20px;
 }

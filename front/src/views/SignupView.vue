@@ -1,7 +1,62 @@
+<template>
+  <Header/>
+  <div class="content">
+    <el-form
+        status-icon
+        :rules="rules"
+        label-width="120px"
+        class="demo-ruleForm">
+      <el-form-item label="Email" prop="email">
+        <el-input v-model="email" autocomplete="off"/>
+      </el-form-item>
+      <el-form-item label="Password" prop="password">
+        <el-input v-model="password" show-password autocomplete="off"/>
+      </el-form-item>
+      <el-form-item label="Confirm" prop="checkPassword">
+        <el-input v-model="checkPassword" show-password autocomplete="off"/>
+      </el-form-item>
+      <el-form-item label="Name" prop="name">
+        <el-input v-model="name"/>
+      </el-form-item>
+      <div class="d-flex justify-content-start">
+        <el-form-item label="Birth" prop="birth">
+          <div class="demo-date-picker">
+            <el-date-picker
+                v-model="birth"
+                type="date"
+                placeholder="Pick a day"
+                format="YYYY/MM/DD"
+                value-format="YYYY-MM-DD"
+            >
+              <template #default="cell">
+                <div class="cell" :class="{ current: cell.isCurrent }">
+                  <span class="text">{{ cell.text }}</span>
+                </div>
+              </template>
+            </el-date-picker>
+          </div>
+        </el-form-item>
+        <el-form-item label="" prop="sex">
+          <el-radio v-model="sex" label="male">Male</el-radio>
+          <el-radio v-model="sex" label="female">Female</el-radio>
+        </el-form-item>
+      </div>
+      <el-form-item label="Phone" prop="phone">
+        <el-input v-model="phone"/>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="signup()">Sign up</el-button>
+        <el-button @click="resetForm()">Reset</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
+</template>
 <script lang="ts" setup>
-import {reactive, ref} from 'vue';
-import type {FormInstance, FormRules} from 'element-plus';
-import {useRouter} from 'vue-router';
+import Header from '@/components/Header.vue';
+import { reactive, ref } from 'vue';
+import type { FormInstance, FormRules } from 'element-plus';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 const route = useRouter();
@@ -136,59 +191,9 @@ const resetForm = function () {
 
 </script>
 
-<template>
-  <el-form
-      status-icon
-      :rules="rules"
-      label-width="120px"
-      class="demo-ruleForm">
-    <el-form-item label="Email" prop="email">
-      <el-input v-model="email" autocomplete="off"/>
-    </el-form-item>
-    <el-form-item label="Password" prop="password">
-      <el-input v-model="password" show-password autocomplete="off"/>
-    </el-form-item>
-    <el-form-item label="Confirm" prop="checkPassword">
-      <el-input v-model="checkPassword" show-password autocomplete="off"/>
-    </el-form-item>
-    <el-form-item label="Name" prop="name">
-      <el-input v-model="name"/>
-    </el-form-item>
-    <div class="d-flex justify-content-start">
-      <el-form-item label="Birth" prop="birth">
-        <div class="demo-date-picker">
-          <el-date-picker
-              v-model="birth"
-              type="date"
-              placeholder="Pick a day"
-              format="YYYY/MM/DD"
-              value-format="YYYY-MM-DD"
-          >
-            <template #default="cell">
-              <div class="cell" :class="{ current: cell.isCurrent }">
-                <span class="text">{{ cell.text }}</span>
-              </div>
-            </template>
-          </el-date-picker>
-        </div>
-      </el-form-item>
-      <el-form-item label="" prop="sex">
-        <el-radio v-model="sex" label="male">Male</el-radio>
-        <el-radio v-model="sex" label="female">Female</el-radio>
-      </el-form-item>
-    </div>
-    <el-form-item label="Phone" prop="phone">
-      <el-input v-model="phone"/>
-    </el-form-item>
-
-    <el-form-item>
-      <el-button type="primary" @click="signup()">Sign up</el-button>
-      <el-button @click="resetForm()">Reset</el-button>
-    </el-form-item>
-  </el-form>
-</template>
-
 <style scoped>
+@import "../components/css/contentBase.css";
+
 .el-form-item {
   margin-bottom: 20px;
 }
