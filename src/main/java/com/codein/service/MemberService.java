@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -98,11 +99,23 @@ public class MemberService {
 
     @Transactional
     public void editMember(String accessToken, EditMemberServiceDto editMemberServiceDto) {
-
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
         Member member = session.getMember();
+
+        if (editMemberServiceDto.getEmail() != null) {
+            Member emailMember = memberRepository.findByEmail(editMemberServiceDto.getEmail());
+            if (emailMember != null && !Objects.equals(emailMember.getEmail(), member.getEmail())) {
+                throw new EmailAlreadyExistsException();
+            }
+        }
+        if (editMemberServiceDto.getPhone() != null) {
+            Member phoneMember = memberRepository.findByPhone(editMemberServiceDto.getPhone());
+            if (phoneMember != null && !Objects.equals(phoneMember.getPhone(), member.getPhone())) {
+                throw new PhoneAlreadyExistsException();
+            }
+        }
 
         String encryptedPassword = null;
         MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
@@ -117,6 +130,12 @@ public class MemberService {
                 .build();
 
         member.edit(memberEditor);
+
+        System.out.println(member.getEmail());
+        System.out.println(member.getNickname());
+        System.out.println(member.getPassword());
+        System.out.println(member.getName());
+        System.out.println(member.getPhone());
     }
 
     @Transactional

@@ -35,6 +35,12 @@ export default defineConfig({
             '/my-backend-api/profile': {
                 target: 'http://localhost:8080',
                 rewrite: (path) => path.replace(/^\/my-backend-api/, '')
+            }, '/my-backend-api/profilesettings': {
+                target: 'http://localhost:8080',
+                rewrite: (path) => path.replace(/^\/my-backend-api/, '')
+            }, '/my-backend-api/editmember': {
+                target: 'http://localhost:8080',
+                rewrite: (path) => path.replace(/^\/my-backend-api/, '')
             },
         }
     }

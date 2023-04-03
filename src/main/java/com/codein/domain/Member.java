@@ -23,6 +23,10 @@ public class Member {
     @Setter
     @NotNull
     private String email;
+    @Column(unique = true)
+    @Setter
+    @NotNull
+    private String nickname;
     @Setter
     @NotNull
     private String password;
@@ -51,8 +55,9 @@ public class Member {
     private Role role = Role.MEMBER;
 
     @Builder
-    public Member(String email, String password, String name, String phone, String birth, String sex) {
+    public Member(String email, String nickname, String password, String name, String phone, String birth, String sex) {
         this.email = email;
+        this.nickname = nickname;
         this.password = password;
         this.name = name;
         this.phone = phone;
@@ -63,7 +68,12 @@ public class Member {
     }
 
     public MemberResponseDto changeMemberResponse() {
-        return new MemberResponseDto(this);
+        return MemberResponseDto.builder()
+                .id(this.getId())
+                .email(this.getEmail())
+                .name(this.getName())
+                .phone(this.getPhone())
+                .build();
     }
 
     public void deleteSession(Session session) {
@@ -76,6 +86,7 @@ public class Member {
     public MemberEditor.MemberEditorBuilder toEditor() {
         return MemberEditor.builder()
                 .email(email)
+                .nickname(nickname)
                 .password(password)
                 .name(name)
                 .phone(phone);
@@ -83,6 +94,7 @@ public class Member {
 
     public void edit(MemberEditor memberEditor) {
         this.email = memberEditor.getEmail();
+        this.nickname = memberEditor.getNickname();
         this.password = memberEditor.getPassword();
         this.name = memberEditor.getName();
         this.phone = memberEditor.getPhone();

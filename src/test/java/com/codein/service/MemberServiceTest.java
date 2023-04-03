@@ -45,7 +45,8 @@ class MemberServiceTest {
         PasswordEncoder passwordEncoder = new PasswordEncoder();
 
         SignupDto signupDto = SignupDto.builder()
-                .name("데일리")
+                .name("김동하")
+                .nickname("데일이")
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .birth("2000-01-01")
@@ -70,7 +71,8 @@ class MemberServiceTest {
     void test2() {
         // given
         SignupDto signupDto = SignupDto.builder()
-                .name("데일리")
+                .name("김동하")
+                .nickname("데일이")
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .birth("2000-01-01")
@@ -98,7 +100,8 @@ class MemberServiceTest {
     void test3() {
         // given
         SignupDto signupDto = SignupDto.builder()
-                .name("데일리")
+                .name("김동하")
+                .nickname("데일이")
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .birth("2000-01-01")
@@ -126,7 +129,8 @@ class MemberServiceTest {
     void test4() {
         // given
         SignupDto signupDto = SignupDto.builder()
-                .name("데일리")
+                .name("김동하")
+                .nickname("데일이")
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .birth("2000-01-01")
@@ -145,6 +149,7 @@ class MemberServiceTest {
 
         EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha0528@gmail.com")
+                .nickname("데일이")
                 .phone("01044444444")
                 .name(null)
                 .password("11112222")
@@ -165,7 +170,8 @@ class MemberServiceTest {
     void test5() {
         // given
         SignupDto signupDto = SignupDto.builder()
-                .name("데일리")
+                .name("김동하")
+                .nickname("데일이")
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .birth("2000-01-01")

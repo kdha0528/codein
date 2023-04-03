@@ -23,22 +23,22 @@
         </div>
       </div>
       <el-row class="profileButton d-flex justify-content-around mt-4">
-        <el-button>
+        <button @click="this.$router.replace('/profilesettings')">
           <div class="d-flex flex-column align-items-center">
             <el-icon class="mb-2" :size="35">
               <Setting/>
             </el-icon>
             <div>프로필 설정</div>
           </div>
-        </el-button>
-        <el-button>
+        </button>
+        <button>
           <div class="d-flex flex-column align-items-center">
             <el-icon class="mb-2" :size="35">
               <ChatDotRound/>
             </el-icon>
             <div>대화방 보기</div>
           </div>
-        </el-button>
+        </button>
       </el-row>
     </div>
   </div>
@@ -132,6 +132,14 @@ const {circleUrl, squareUrl, sizeList} = toRefs(state)
 .profileButton {
   .el-button {
     border: none;
+  }
+
+  button {
+    border-radius: 3px;
+    border: none;
+    background: none;
+    cursor: pointer;
+
   }
 }
 </style>

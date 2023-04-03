@@ -16,6 +16,8 @@ public class EditMemberDto {
 
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
+    @Pattern(regexp = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,8}$", message = "2자 이상, 16자 이하, 영어 또는 숫자 또는 한글로 입력해주세요.")
+    private String nickname;
     @Pattern(regexp = "^[a-zA-Z0-9]{8,20}$", message = "비밀번호는 소문자, 대문자, 숫자를 이용하여 8~20글자 입력해주세요.")
     private String password;
     @Size(min = 2, max = 10)
@@ -24,8 +26,9 @@ public class EditMemberDto {
     private String phone;
 
     @Builder
-    public EditMemberDto(String email, String password, String name, String phone) {
+    public EditMemberDto(String email, String nickname, String password, String name, String phone) {
         this.email = email;
+        this.nickname = nickname;
         this.password = password;
         this.name = name;
         this.phone = phone;
@@ -34,6 +37,7 @@ public class EditMemberDto {
     public EditMemberServiceDto toMemberServiceDto() {
         return EditMemberServiceDto.builder()
                 .email(this.email)
+                .nickname(this.nickname)
                 .password(this.password)
                 .name(this.name)
                 .phone(this.phone)

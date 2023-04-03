@@ -17,6 +17,9 @@ public class SignupDto {
     @NotBlank(message = "이메일을 입력해주세요.")
     @Email(message = "이메일 형식을 맞춰주세요.")
     private String email;
+    @NotBlank(message = "닉네임을 입력해주세요.")
+    @Pattern(regexp = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$", message = "2자 이상, 16자 이하, 영어 또는 숫자 또는 한글로 입력해주세요.")
+    private String nickname;
     @NotBlank(message = "비밀번호를 입력해주세요.")
     @Pattern(regexp = "^[a-zA-Z0-9]{8,20}$", message = "비밀번호는 소문자, 대문자, 숫자를 이용하여 8~20글자 입력해주세요.")
     private String password;
@@ -34,8 +37,9 @@ public class SignupDto {
     private String sex;
 
     @Builder
-    public SignupDto(String email, String password, String name, String phone, String birth, String sex) {
+    public SignupDto(String email, String nickname, String password, String name, String phone, String birth, String sex) {
         this.email = email;
+        this.nickname = nickname;
         this.password = password;
         this.name = name;
         this.phone = phone;
@@ -46,6 +50,7 @@ public class SignupDto {
     public Member toEntity() {
         return Member.builder()
                 .email(email)
+                .nickname(nickname)
                 .password(password)
                 .name(name)
                 .phone(phone)

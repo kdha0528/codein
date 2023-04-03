@@ -25,7 +25,6 @@ import router from "@/router";
 import { authStorage } from "@/stores/auth"
 import { useRouter } from "vue-router";
 
-
 const auth = authStorage();
 const route = useRouter();
 

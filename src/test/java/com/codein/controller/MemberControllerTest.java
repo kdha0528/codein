@@ -51,6 +51,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com") // email 형식
+                .nickname("데일이") // 한글, 영어, 숫자 2~16
                 .password("123a1A34")   // 8~20 숫자, 소문자, 대문자
                 .name("데일이")    // 2~10글자
                 .phone("01075444357")   // 전화번호 형식 '-'제외
@@ -71,6 +72,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto1 = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -84,6 +86,7 @@ class MemberControllerTest {
 
         SignupDto signupDto2 = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01044444444")
@@ -106,6 +109,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto1 = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -119,6 +123,7 @@ class MemberControllerTest {
 
         SignupDto signupDto2 = SignupDto.builder()
                 .email("kdha1234@gmail.com")
+                .nickname("데일리")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -140,6 +145,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha1234@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("010-7544-4357") // "-" 없어야됨
@@ -161,6 +167,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234@@")
                 .name("데일이")
                 .phone("01075444357")
@@ -182,6 +189,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -203,6 +211,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("1234123412351235123512351235123") // 20글자 까지
                 .name("데일이")
                 .phone("01075444357")
@@ -224,6 +233,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -254,6 +264,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -285,6 +296,7 @@ class MemberControllerTest {
         //given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -316,6 +328,7 @@ class MemberControllerTest {
         SignupDto signupDto = SignupDto.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .phone("01075444357")
                 .birth("1996-05-28")
@@ -351,6 +364,7 @@ class MemberControllerTest {
         SignupDto signupDto = SignupDto.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .phone("01075444357")
                 .birth("1996-05-28")
@@ -388,6 +402,7 @@ class MemberControllerTest {
         SignupDto signupDto = SignupDto.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .phone("01075444357")
                 .birth("1996-05-28")
@@ -411,6 +426,7 @@ class MemberControllerTest {
 
         EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha0528@gmail.com")
+                .nickname("데일이")
                 .password("11112222")
                 .name(null)
                 .phone("01012341234")
@@ -431,6 +447,7 @@ class MemberControllerTest {
         // given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -454,6 +471,7 @@ class MemberControllerTest {
 
         EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha4585")  // email 양식 틀림
+                .nickname("데일이")
                 .phone(null)
                 .name(null)
                 .password("12345678")
@@ -474,6 +492,7 @@ class MemberControllerTest {
         // given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -497,6 +516,7 @@ class MemberControllerTest {
 
         EditMemberDto editMemberDto = EditMemberDto.builder()    // 전부 null인 경우
                 .email(null)
+                .nickname(null)
                 .password(null)
                 .name(null)
                 .phone(null)
@@ -509,7 +529,6 @@ class MemberControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
-
     }
 
     @Test
@@ -518,6 +537,7 @@ class MemberControllerTest {
         // given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -541,6 +561,7 @@ class MemberControllerTest {
 
         EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -562,6 +583,7 @@ class MemberControllerTest {
         // given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")
@@ -596,6 +618,7 @@ class MemberControllerTest {
         // given
         SignupDto signupDto = SignupDto.builder()
                 .email("kdha4585@gmail.com")
+                .nickname("데일이")
                 .password("12341234")
                 .name("데일이")
                 .phone("01075444357")

@@ -34,7 +34,6 @@ public class MemberController {
     @GetMapping("/home")
     public List<MemberResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto, RedirectAttributes redirect, HttpServletResponse response) {
         List<MemberResponseDto> members = memberService.getMemberList(pageSizeDto);
-        redirect.addFlashAttribute("members", members); // addFlashAttribute 는 휘발성, addAttribute는 새로고침해도 안사라짐
         return members;
     }
 
@@ -59,6 +58,7 @@ public class MemberController {
         memberService.logout(cookie.getValue());
         return "redirect:/home";
     }
+
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/editmember")
