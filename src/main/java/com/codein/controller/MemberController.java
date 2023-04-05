@@ -9,7 +9,8 @@ import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.SignupDto;
-import com.codein.responsedto.MemberResponseDto;
+import com.codein.responsedto.LoginResponseDto;
+import com.codein.responsedto.ProfileResponseDto;
 import com.codein.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,8 +33,8 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/home")
-    public List<MemberResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto, RedirectAttributes redirect, HttpServletResponse response) {
-        List<MemberResponseDto> members = memberService.getMemberList(pageSizeDto);
+    public List<LoginResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto, RedirectAttributes redirect, HttpServletResponse response) {
+        List<LoginResponseDto> members = memberService.getMemberList(pageSizeDto);
         return members;
     }
 
@@ -44,7 +45,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public MemberResponseDto login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
+    public LoginResponseDto login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         String accessToken = memberService.login(loginDto.toMemberServiceDto());
         response.addHeader(HttpHeaders.SET_COOKIE, memberService.buildResponseCookie(accessToken).toString());
         response.addHeader(HttpHeaders.AUTHORIZATION, accessToken);
@@ -56,6 +57,12 @@ public class MemberController {
     public String logout(@CookieValue(value = "accesstoken") Cookie cookie) {
         memberService.logout(cookie.getValue());
         return "redirect:/home";
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @GetMapping("/getprofile")
+    public ProfileResponseDto getProfile(@CookieValue(value = "accesstoken") Cookie cookie) {
+        return memberRepository.findByAccessToken(cookie.getValue()).changeProfileResponse();
     }
 
     @MySecured(role = Role.MEMBER)

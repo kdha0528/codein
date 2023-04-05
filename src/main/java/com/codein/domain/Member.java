@@ -1,7 +1,8 @@
 package com.codein.domain;
 
 import com.codein.error.exception.MemberNotLoginException;
-import com.codein.responsedto.MemberResponseDto;
+import com.codein.responsedto.LoginResponseDto;
+import com.codein.responsedto.ProfileResponseDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -67,13 +68,22 @@ public class Member {
         this.point = 0L;
     }
 
-    public MemberResponseDto changeMemberResponse() {
-        return MemberResponseDto.builder()
+    public LoginResponseDto changeMemberResponse() {
+        return LoginResponseDto.builder()
                 .id(this.getId())
                 .email(this.getEmail())
                 .nickname(this.getNickname())
                 .point(this.getPoint())
                 .role(this.getRole())
+                .build();
+    }
+
+    public ProfileResponseDto changeProfileResponse() {
+        return ProfileResponseDto.builder()
+                .email(this.getEmail())
+                .name(this.getName())
+                .nickname(this.getNickname())
+                .phone(this.getPhone())
                 .build();
     }
 

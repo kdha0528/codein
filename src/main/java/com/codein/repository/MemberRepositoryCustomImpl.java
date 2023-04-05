@@ -3,7 +3,7 @@ package com.codein.repository;
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.requestdto.PageSizeDto;
-import com.codein.responsedto.MemberResponseDto;
+import com.codein.responsedto.LoginResponseDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
     private final PasswordEncoder passwordEncoder;
 
-    public List<MemberResponseDto> getMemberResponseList(PageSizeDto pageSizeDto) {
+    public List<LoginResponseDto> getMemberResponseList(PageSizeDto pageSizeDto) {
         List<Member> memberList = jpaQueryFactory.selectFrom(member)
                 .limit(pageSizeDto.getSize())
                 .offset(pageSizeDto.getOffset())

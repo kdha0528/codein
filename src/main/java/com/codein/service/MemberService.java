@@ -13,7 +13,7 @@ import com.codein.repository.SessionRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestservicedto.EditMemberServiceDto;
 import com.codein.requestservicedto.LoginServiceDto;
-import com.codein.responsedto.MemberResponseDto;
+import com.codein.responsedto.LoginResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -81,7 +81,7 @@ public class MemberService {
     }
 
 
-    public List<MemberResponseDto> getMemberList(PageSizeDto pageSizeDto) {
+    public List<LoginResponseDto> getMemberList(PageSizeDto pageSizeDto) {
         return memberRepository.getMemberResponseList(pageSizeDto);
     }
 

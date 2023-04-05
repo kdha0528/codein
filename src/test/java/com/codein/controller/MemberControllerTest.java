@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -646,6 +647,39 @@ class MemberControllerTest {
         // expected
         mockMvc.perform(post("/deletemember").cookie(cookies))
                 .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("프로필 가져오기: 성공")
+    void Test6_1() throws Exception {
+        // given
+        SignupDto signupDto = SignupDto.builder()
+                .email("kdha4585@gmail.com")
+                .nickname("데일이")
+                .password("12341234")
+                .name("김동하")
+                .phone("01012341234")
+                .birth("1996-05-28")
+                .sex("male")
+                .build();
+        mockMvc.perform(post("/signup")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signupDto)));
+
+        LoginDto loginDto = LoginDto.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        MvcResult loginResult = mockMvc.perform(post("/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andReturn();
+        Cookie[] cookies = loginResult.getResponse().getCookies();
+
+        // expected
+        mockMvc.perform(get("/getprofile").cookie(cookies))
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 }

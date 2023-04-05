@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class MemberResponseDto {
+public class LoginResponseDto {
 
     private Long id;
     private String email;
@@ -17,7 +17,7 @@ public class MemberResponseDto {
 
 
     // 생성자 오버로딩
-    public MemberResponseDto(Member member) {
+    public LoginResponseDto(Member member) {
         this.id = member.getId();
         this.email = member.getEmail();
         this.nickname = member.getNickname();
@@ -26,7 +26,7 @@ public class MemberResponseDto {
     }
 
     @Builder
-    public MemberResponseDto(Long id, String email, String nickname, Long point, Role role) {
+    public LoginResponseDto(Long id, String email, String nickname, Long point, Role role) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
