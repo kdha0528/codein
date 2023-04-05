@@ -26,20 +26,20 @@ public class EditMemberDto {
     private String phone;
 
     @Builder
-    public EditMemberDto(String email, String nickname, String password, String name, String phone) {
+    public EditMemberDto(String email, String password, String name, String nickname, String phone) {
         this.email = email;
-        this.nickname = nickname;
         this.password = password;
         this.name = name;
+        this.nickname = nickname;
         this.phone = phone;
     }
 
-    public EditMemberServiceDto toMemberServiceDto() {
+    public EditMemberServiceDto toEditMemberServiceDto() {
         return EditMemberServiceDto.builder()
                 .email(this.email)
-                .nickname(this.nickname)
                 .password(this.password)
                 .name(this.name)
+                .nickname(this.nickname)
                 .phone(this.phone)
                 .build();
     }

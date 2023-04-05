@@ -1,7 +1,7 @@
 export interface Profile {
-    id: Number | null,
-    email: String | null,
-    nickname: String | null,
-    point: Number | null,
-    role: String | null,
+    id: Number,
+    email: String,
+    nickname: String,
+    point: Number,
+    role: String,
 }

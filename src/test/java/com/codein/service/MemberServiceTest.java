@@ -155,7 +155,7 @@ class MemberServiceTest {
                 .password("11112222")
                 .build();
         // when
-        memberService.editMember(accessToken, editMemberDto.toMemberServiceDto());
+        memberService.editMember(accessToken, editMemberDto.toEditMemberServiceDto());
 
         // then
         Member editedMember = memberRepository.findByEmail(editMemberDto.getEmail());

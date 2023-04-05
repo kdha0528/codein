@@ -21,7 +21,11 @@
             <li>팔로우 팔로워</li>
           </ul>
         </div>
+        <div class="ms-auto mt-auto">
+          <el-button type="danger" @click="deleteMember()">회원탈퇴</el-button>
+        </div>
       </div>
+
       <el-row class="profileButton d-flex justify-content-around mt-4">
         <button @click="this.$router.replace('/profilesettings')">
           <div class="d-flex flex-column align-items-center">
@@ -47,6 +51,10 @@
 import Header from '@/components/Header.vue';
 import { reactive, ref, toRefs } from "vue";
 import { authStorage } from "@/stores/auth";
+import axios from "axios";
+import { useRouter } from "vue-router";
+
+const route = useRouter();
 
 const state = reactive({
   circleUrl:
@@ -65,7 +73,19 @@ const profile = ref({
   point: String(getProfile.point),
   role: String(getProfile.role),
 });
-
+const deleteMember = function () {
+  axios.post("/my-backend-api/deletemember", {}).then(() => {
+    auth.logout();
+    alert("회원탈퇴가 완료되었습니다.");
+    route.replace({name: "home"});
+  }).catch(
+      error => {
+        console.log(error);
+        alert("오류가 발생했습니다.");
+        route.replace({name: "home"});
+      }
+  )
+}
 </script>
 
 <style scoped lang="scss">

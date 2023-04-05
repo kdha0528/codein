@@ -12,7 +12,9 @@ public interface MemberRepositoryCustom {
 
     Member findByEmail(String email);
 
-    Member findByPhone(String email);
+    Member findByPhone(String phone);
+
+    Member findByNickname(String nickname);
 
     Member findByAccessToken(String accessToken);
 

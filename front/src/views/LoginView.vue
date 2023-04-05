@@ -88,12 +88,12 @@ const login = function () {
   }).catch(error => {
     if (error.response.data.code == "M002") {
       alert("이메일/비밀번호가 올바르지 않습니다.");
+    } else if (error.response.data.code == "C001") {
+      alert("로그인 양식에 맞지 않습니다.");
     } else {
       alert(error);
     }
     console.error(error);
-    email.value = '';
-    password.value = '';
     route.replace("login");
   })
 };

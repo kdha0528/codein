@@ -22,6 +22,7 @@ public enum ErrorCode {
     UNAUTHORIZED_ACCESS(403, "M005", "Access is unauthorized"),
     ACCESS_TOKEN_INVALID(401, "M006", "Access token is invalid"),
     PHONE_ALREADY_EXISTS(400, "M007", "Phone is already exists"),
+    NICKNAME_ALREADY_EXISTS(400, "M008", "Nickname is already exists"),
     // Post
 
 

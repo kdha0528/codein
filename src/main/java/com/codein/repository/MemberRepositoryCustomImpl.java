@@ -46,9 +46,16 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .fetchOne();
     }
 
+    public Member findByNickname(String nickname) {
+        return jpaQueryFactory.selectFrom(member)
+                .where(member.nickname.eq(nickname))
+                .fetchOne();
+    }
+
     public Member findByAccessToken(String accessToken) {
         return jpaQueryFactory.selectFrom(member)
                 .where(member.sessions.any().accessToken.eq(accessToken))
                 .fetchOne();
     }
+
 }

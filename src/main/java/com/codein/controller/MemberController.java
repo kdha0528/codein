@@ -67,14 +67,15 @@ public class MemberController {
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/editmember")
-    public String editMember(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EditMemberDto editMemberDto) {
-        memberService.editMember(cookie.getValue(), editMemberDto.toMemberServiceDto());
-        return "redirect:/logout";
+    public String editMember(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EditMemberDto editMemberDto, HttpServletResponse response) {
+        memberService.editMember(cookie.getValue(), editMemberDto.toEditMemberServiceDto());
+        memberService.logout(cookie.getValue());
+        return "redirect:/home";
     }
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/deletemember")
-    public String deleteMember(@CookieValue(value = "accesstoken") Cookie cookie) {
+    public String deleteMember(@CookieValue(value = "accesstoken") Cookie cookie, HttpServletResponse response) {
         memberService.deleteMember(cookie.getValue());
         return "redirect:/home";
     }

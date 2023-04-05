@@ -50,7 +50,7 @@
 
       <el-form-item>
         <el-button type="primary" @click="signup()">Sign up</el-button>
-        <el-button @click="resetForm()">Reset</el-button>
+        <el-button type="danger" @click="resetForm()">Reset</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -177,9 +177,11 @@ const signup = function () {
     if (error.response.data.code == "C001") {
       alert("회원가입 양식에 맞지 않습니다.");
     } else if (error.response.data.code == "M001") {
-      alert("이미 존재하는 이메일 입니다.");
+      alert("이미 존재하는 이메일입니다.");
     } else if (error.response.data.code == "M007") {
-      alert("이미 존재하는 전화번호 입니다.");
+      alert("이미 존재하는 전화번호입니다.");
+    } else if (error.response.data.code == "M008") {
+      alert("이미 존재하는 닉네임입니다.");
     } else {
       alert(error);
     }

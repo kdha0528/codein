@@ -4,10 +4,7 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.domain.MemberEditor;
 import com.codein.domain.Session;
-import com.codein.error.exception.EmailAlreadyExistsException;
-import com.codein.error.exception.InvalidLoginInputException;
-import com.codein.error.exception.MemberNotLoginException;
-import com.codein.error.exception.PhoneAlreadyExistsException;
+import com.codein.error.exception.*;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
 import com.codein.requestdto.PageSizeDto;
@@ -35,13 +32,12 @@ public class MemberService {
     @Transactional
     public void signup(Member member) {
 
-        Member emailMember = memberRepository.findByEmail(member.getEmail());
-        Member phoneMember = memberRepository.findByPhone(member.getPhone());
-
-        if (emailMember != null) {
+        if (memberRepository.findByEmail(member.getEmail()) != null) {
             throw new EmailAlreadyExistsException();
-        } else if (phoneMember != null) {
+        } else if (memberRepository.findByPhone(member.getPhone()) != null) {
             throw new PhoneAlreadyExistsException();
+        } else if (memberRepository.findByNickname(member.getNickname()) != null) {
+            throw new NicknameAlreadyExistsException();
         }
         member.encryptPassword(passwordEncoder.encrypt(member.getPassword()));
         memberRepository.save(member);
@@ -92,9 +88,6 @@ public class MemberService {
                 .orElseThrow(MemberNotLoginException::new);
 
         sessionRepository.delete(session);
-        Member nullMember = memberRepository.findByAccessToken(accessToken);
-        if (nullMember != null) System.out.println("member is not null = " + nullMember.getEmail());
-
     }
 
     @Transactional
@@ -116,26 +109,28 @@ public class MemberService {
                 throw new PhoneAlreadyExistsException();
             }
         }
+        if (editMemberServiceDto.getNickname() != null) {
+            Member nicknameMember = memberRepository.findByNickname(editMemberServiceDto.getNickname());
+            if (nicknameMember != null && !Objects.equals(nicknameMember.getNickname(), member.getNickname())) {
+                throw new NicknameAlreadyExistsException();
+            }
+        }
 
         String encryptedPassword = null;
         MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
         if (editMemberServiceDto.getPassword() != null) {
             encryptedPassword = passwordEncoder.encrypt(editMemberServiceDto.getPassword());
         }
+
         MemberEditor memberEditor = memberEditorBuilder
                 .email(editMemberServiceDto.getEmail())
                 .password(encryptedPassword)
                 .name(editMemberServiceDto.getName())
+                .nickname(editMemberServiceDto.getNickname())
                 .phone(editMemberServiceDto.getPhone())
                 .build();
 
         member.edit(memberEditor);
-
-        System.out.println(member.getEmail());
-        System.out.println(member.getNickname());
-        System.out.println(member.getPassword());
-        System.out.println(member.getName());
-        System.out.println(member.getPhone());
     }
 
     @Transactional

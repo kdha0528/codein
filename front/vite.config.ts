@@ -31,14 +31,13 @@ export default defineConfig({
             '/my-backend-api/logout': {
                 target: 'http://localhost:8080',
                 rewrite: (path) => path.replace(/^\/my-backend-api/, '')
-            },
-            '/my-backend-api/profile': {
-                target: 'http://localhost:8080',
-                rewrite: (path) => path.replace(/^\/my-backend-api/, '')
-            }, '/my-backend-api/profilesettings': {
+            }, '/my-backend-api/getprofile': {
                 target: 'http://localhost:8080',
                 rewrite: (path) => path.replace(/^\/my-backend-api/, '')
             }, '/my-backend-api/editmember': {
+                target: 'http://localhost:8080',
+                rewrite: (path) => path.replace(/^\/my-backend-api/, '')
+            }, '/my-backend-api/deletemember': {
                 target: 'http://localhost:8080',
                 rewrite: (path) => path.replace(/^\/my-backend-api/, '')
             },
