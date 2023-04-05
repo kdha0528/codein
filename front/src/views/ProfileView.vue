@@ -16,8 +16,8 @@
         </div>
         <div class="simpleProfile">
           <ul>
-            <li>닉네임</li>
-            <li>등급</li>
+            <li>{{ profile.nickname }}</li>
+            <li>{{ profile.role }}</li>
             <li>팔로우 팔로워</li>
           </ul>
         </div>
@@ -45,7 +45,8 @@
 </template>
 <script lang="ts" setup>
 import Header from '@/components/Header.vue';
-import { reactive, toRefs } from "vue";
+import { reactive, ref, toRefs } from "vue";
+import { authStorage } from "@/stores/auth";
 
 const state = reactive({
   circleUrl:
@@ -54,8 +55,17 @@ const state = reactive({
       'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
   sizeList: ['small', '', 'large'] as const,
 })
-
 const {circleUrl, squareUrl, sizeList} = toRefs(state)
+const auth = authStorage();
+
+
+const getProfile = auth.getProfile;
+const profile = ref({
+  nickname: String(getProfile.nickname),
+  point: String(getProfile.point),
+  role: String(getProfile.role),
+});
+
 </script>
 
 <style scoped lang="scss">

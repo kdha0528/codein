@@ -43,13 +43,12 @@ public class MemberController {
         return "redirect:/home";
     }
 
-
     @PostMapping("/login")
-    public String login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
+    public MemberResponseDto login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         String accessToken = memberService.login(loginDto.toMemberServiceDto());
         response.addHeader(HttpHeaders.SET_COOKIE, memberService.buildResponseCookie(accessToken).toString());
         response.addHeader(HttpHeaders.AUTHORIZATION, accessToken);
-        return "redirect:/home";
+        return memberRepository.findByAccessToken(accessToken).changeMemberResponse();
     }
 
     @MySecured(role = Role.MEMBER)
@@ -58,7 +57,6 @@ public class MemberController {
         memberService.logout(cookie.getValue());
         return "redirect:/home";
     }
-
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/editmember")

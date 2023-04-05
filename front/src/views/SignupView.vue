@@ -18,6 +18,9 @@
       <el-form-item label="Name" prop="name">
         <el-input v-model="name"/>
       </el-form-item>
+      <el-form-item label="Nickname" prop="nickname">
+        <el-input v-model="nickname"/>
+      </el-form-item>
       <div class="d-flex justify-content-start">
         <el-form-item label="Birth" prop="birth">
           <div class="demo-date-picker">
@@ -67,6 +70,7 @@ const email = ref('');
 const password = ref('');
 const checkPassword = ref('');
 const name = ref('');
+const nickname = ref('');
 const birth = ref('2000-01-01');
 const sex = ref('male');
 const phone = ref('');
@@ -92,6 +96,14 @@ const validatePassword2 = (rule: any, value: any, callback: any) => {
     callback(new Error('Please input the password again'));
   } else if (checkPassword.value !== password.value) {
     callback(new Error("Two inputs don't match!"));
+  } else {
+    callback();
+  }
+};
+
+const checkNickname = (rule: any, value: any, callback: any) => {
+  if (nickname.value === '') {
+    callback(new Error('Please input your nick name'));
   } else {
     callback();
   }
@@ -134,6 +146,7 @@ const ruleForm = reactive({
   password: '',
   checkPassword: '',
   name: '',
+  nickname: '',
   birth: '',
   phone: '',
 });
@@ -143,6 +156,7 @@ const rules = reactive<FormRules>({
   password: [{validator: validatePassword, trigger: 'blur'}],
   checkPassword: [{validator: validatePassword2, trigger: 'blur'}],
   name: [{validator: checkName, trigger: 'blur'}],
+  nickname: [{validator: checkNickname, trigger: 'blur'}],
   birth: [{validator: checkAge, trigger: 'blur'}],
   phone: [{validator: checkPhone, trigger: 'blur'}],
 });
@@ -152,6 +166,7 @@ const signup = function () {
     email: email.value,
     password: password.value,
     name: name.value,
+    nickname: nickname.value,
     birth: birth.value,
     sex: sex.value,
     phone: phone.value,
@@ -172,6 +187,7 @@ const signup = function () {
     password.value = '';
     checkPassword.value = '';
     name.value = '';
+    nickname.value = '';
     birth.value = '2000-01-01';
     sex.value = 'male';
     phone.value = '';
@@ -184,6 +200,7 @@ const resetForm = function () {
   password.value = '';
   checkPassword.value = '';
   name.value = '';
+  nickname.value = '';
   birth.value = '2000-01-01';
   phone.value = '';
   sex.value = 'male';

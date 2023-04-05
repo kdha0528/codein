@@ -34,32 +34,28 @@ import { useRouter } from "vue-router";
 
 const auth = authStorage();
 const route = useRouter();
+const profile = auth.getProfile;
 
+const profileSettings = ref({
+  id: profile.id,
+  email: profile.email,
+  nickname: profile.nickname,
+  point: profile.point,
+  role: profile.role,
+})
 
-const email = ref('');
-const password = ref('');
-const name = ref('');
-const phone = ref('');
 
 const validateEmail = (rule: any, value: any, callback: any) => {
-  if (email.value === '') {
+  if (profile.email === '') {
     callback(new Error('Please input the email'));
   } else {
     callback();
   }
 };
 
-const validatePassword = (rule: any, value: any, callback: any) => {
-  if (password.value === '') {
-    callback(new Error('Please input the password'));
-  } else {
-    callback();
-  }
-};
-
-const checkName = (rule: any, value: any, callback: any) => {
-  if (name.value === '') {
-    callback(new Error('Please input your name'));
+const checkNickname = (rule: any, value: any, callback: any) => {
+  if (profile.nickname === '') {
+    callback(new Error('Please input your nickname'));
   } else {
     callback();
   }
@@ -74,11 +70,13 @@ const checkPhone = (rule: any, value: any, callback: any) => {
 };
 
 
-const resetForm = function () {
-  email.value = auth.email || '';
-  password.value = '';
-  name.value = '';
-  phone.value = '';
+if (profile != null) {
+  const resetForm = function () {
+    email.value = profile.value.member.email
+    password.value = '';
+    name.value = '';
+    phone.value = '';
+  }
 }
 
 const ruleForm = reactive({
@@ -95,9 +93,6 @@ const rules = reactive<FormRules>({
   phone: [{validator: checkPhone, trigger: 'blur'}],
 });
 
-axios.get("/my-backend-api/profilesettings").then((response) => {
-
-});
 
 const edit = function () {
   axios.post('/my-backend-api/editmember', {

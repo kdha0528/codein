@@ -26,6 +26,7 @@ import type { FormRules } from 'element-plus';
 import axios from 'axios';
 import { authStorage } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import type { Profile } from "@/components/props/profile";
 
 const auth = authStorage();
 const route = useRouter();
@@ -60,15 +61,29 @@ const rules = reactive<FormRules>({
   password: [{validator: validatePassword, trigger: 'blur'}],
 });
 
+
 const login = function () {
   axios.post('/my-backend-api/login', {
     email: email.value,
     password: password.value,
   }).then((res: any) => {
-    const token = res.headers.getAuthorization();
-    if (token != null) {
-      auth.login(email.value, token);
+    const member: Profile = {
+      id: res.data.id,
+      email: res.data.email,
+      nickname: res.data.nickname,
+      point: res.data.point,
+      role: res.data.role
     }
+
+    const token = res.headers.getAuthorization();
+
+    if (token != null) {
+      auth.login(member, token);
+    } else {
+      alert("권한이 없습니다.");
+      route.replace("login");
+    }
+
     route.replace("home");
   }).catch(error => {
     if (error.response.data.code == "M002") {

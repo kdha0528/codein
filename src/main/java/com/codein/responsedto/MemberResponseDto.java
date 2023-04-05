@@ -12,7 +12,6 @@ public class MemberResponseDto {
     private Long id;
     private String email;
     private String nickname;
-    private String name;
     private Long point;
     private String role;
 
@@ -22,17 +21,15 @@ public class MemberResponseDto {
         this.id = member.getId();
         this.email = member.getEmail();
         this.nickname = member.getNickname();
-        this.name = member.getName();
         this.point = member.getPoint();
         this.role = member.getRole().getRole();
     }
 
     @Builder
-    public MemberResponseDto(Long id, String email, String nickname, String name, Long point, Role role) {
+    public MemberResponseDto(Long id, String email, String nickname, Long point, Role role) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;
-        this.name = name;
         this.point = point;
         this.role = role.getRole();
     }

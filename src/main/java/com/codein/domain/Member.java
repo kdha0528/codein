@@ -71,8 +71,9 @@ public class Member {
         return MemberResponseDto.builder()
                 .id(this.getId())
                 .email(this.getEmail())
-                .name(this.getName())
-                .phone(this.getPhone())
+                .nickname(this.getNickname())
+                .point(this.getPoint())
+                .role(this.getRole())
                 .build();
     }
 
