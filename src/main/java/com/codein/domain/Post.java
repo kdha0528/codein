@@ -22,7 +22,7 @@ public class Post {
     @ManyToOne
     private Member member;
     @NotNull
-    private String category;
+    private Category category;
     @NotNull
     private String title;
     @NotNull
@@ -37,7 +37,7 @@ public class Post {
     private LocalDateTime createdAt;
 
     @Builder
-    public Post(Member member, String category, String title, String contents) {
+    public Post(Member member, Category category, String title, String contents) {
         this.member = member;
         this.category = category;
         this.title = title;

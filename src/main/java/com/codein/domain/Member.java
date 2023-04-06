@@ -21,20 +21,18 @@ public class Member {
     private Long id;
 
     @Column(unique = true)
-    @Setter
     @NotNull
     private String email;
     @Setter
     @NotNull
     private String password;
-    @Setter
+
     @NotNull
     private String name;
     @Column(unique = true)
-    @Setter
     @NotNull
     private String nickname;
-    @Setter
+
     @NotNull
     @Column(unique = true)
     private String phone;
@@ -46,7 +44,6 @@ public class Member {
     @NotNull
     private LocalDateTime createdAt;
 
-    @Setter
     private Integer point;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.LAZY)
