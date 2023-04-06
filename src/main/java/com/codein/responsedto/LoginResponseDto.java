@@ -12,7 +12,7 @@ public class LoginResponseDto {
     private Long id;
     private String email;
     private String nickname;
-    private Long point;
+    private Integer point;
     private String role;
 
 
@@ -26,7 +26,7 @@ public class LoginResponseDto {
     }
 
     @Builder
-    public LoginResponseDto(Long id, String email, String nickname, Long point, Role role) {
+    public LoginResponseDto(Long id, String email, String nickname, Integer point, Role role) {
         this.id = id;
         this.email = email;
         this.nickname = nickname;

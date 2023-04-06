@@ -4,7 +4,7 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
 import com.codein.domain.MemberEditor;
 import com.codein.domain.Session;
-import com.codein.error.exception.*;
+import com.codein.error.exception.member.*;
 import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
 import com.codein.requestdto.PageSizeDto;

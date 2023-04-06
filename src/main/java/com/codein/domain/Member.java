@@ -1,6 +1,6 @@
 package com.codein.domain;
 
-import com.codein.error.exception.MemberNotLoginException;
+import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.responsedto.LoginResponseDto;
 import com.codein.responsedto.ProfileResponseDto;
 import jakarta.persistence.*;
@@ -47,7 +47,7 @@ public class Member {
     private LocalDateTime createdAt;
 
     @Setter
-    private Long point;
+    private Integer point;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.LAZY)
     private final List<Session> sessions = new ArrayList<>();
@@ -65,7 +65,7 @@ public class Member {
         this.birth = birth;
         this.sex = sex;
         this.createdAt = LocalDateTime.now();
-        this.point = 0L;
+        this.point = 0;
     }
 
     public LoginResponseDto changeMemberResponse() {
