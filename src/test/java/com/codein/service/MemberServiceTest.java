@@ -2,13 +2,13 @@ package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
-import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
 import com.codein.requestdto.SignupDto;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ class MemberServiceTest {
     private PasswordEncoder passwordEncoder;
 
 
-    @AfterEach
+    @BeforeEach
     void clean() {
         memberRepository.deleteAll();
     }

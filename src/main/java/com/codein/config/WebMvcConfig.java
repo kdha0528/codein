@@ -1,7 +1,7 @@
 package com.codein.config;
 
-import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

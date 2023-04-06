@@ -1,4 +1,4 @@
-package com.codein.repository;
+package com.codein.repository.member;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;

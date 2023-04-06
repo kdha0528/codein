@@ -5,8 +5,8 @@ import com.codein.domain.Member;
 import com.codein.domain.MemberEditor;
 import com.codein.domain.Session;
 import com.codein.error.exception.member.*;
-import com.codein.repository.MemberRepository;
 import com.codein.repository.SessionRepository;
+import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestservicedto.EditMemberServiceDto;
 import com.codein.requestservicedto.LoginServiceDto;
@@ -103,6 +103,7 @@ public class MemberService {
                 throw new EmailAlreadyExistsException();
             }
         }
+
         if (editMemberServiceDto.getPhone() != null) {
             Member phoneMember = memberRepository.findByPhone(editMemberServiceDto.getPhone());
             if (phoneMember != null && !Objects.equals(phoneMember.getPhone(), member.getPhone())) {
@@ -140,4 +141,5 @@ public class MemberService {
         Member member = session.getMember();
         memberRepository.delete(member);
     }
+
 }

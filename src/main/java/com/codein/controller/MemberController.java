@@ -3,8 +3,8 @@ package com.codein.controller;
 
 import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.Role;
-import com.codein.repository.MemberRepositoryCustom;
 import com.codein.repository.SessionRepository;
+import com.codein.repository.member.MemberRepositoryCustom;
 import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
 import com.codein.requestdto.PageSizeDto;

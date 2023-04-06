@@ -21,7 +21,7 @@ public class Session {
     private String accessToken;
 
     @NotNull
-    @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @Builder

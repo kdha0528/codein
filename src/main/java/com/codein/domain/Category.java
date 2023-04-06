@@ -17,4 +17,10 @@ public enum Category {
     public String getCategory() {
         return category;
     }
+
+    public String getValue() {
+        return this.name();
+    }
+
+
 }

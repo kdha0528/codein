@@ -2,14 +2,14 @@ package com.codein.controller;
 
 import com.codein.domain.Member;
 import com.codein.domain.Role;
-import com.codein.repository.MemberRepository;
+import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
 import com.codein.requestdto.SignupDto;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ class MemberControllerTest {
     private MemberService memberService;
 
 
-    @AfterEach
+    @BeforeEach
     void clean() {
         memberRepository.deleteAll();
     }
