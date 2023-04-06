@@ -10,6 +10,7 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestservicedto.EditMemberServiceDto;
 import com.codein.requestservicedto.LoginServiceDto;
+import com.codein.requestservicedto.SignupServiceDto;
 import com.codein.responsedto.LoginResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,17 +31,17 @@ public class MemberService {
     private final SessionRepository sessionRepository;
 
     @Transactional
-    public void signup(Member member) {
+    public void signup(SignupServiceDto signupServiceDto) {
 
-        if (memberRepository.findByEmail(member.getEmail()) != null) {
+        if (memberRepository.findByEmail(signupServiceDto.getEmail()) != null) {
             throw new EmailAlreadyExistsException();
-        } else if (memberRepository.findByPhone(member.getPhone()) != null) {
+        } else if (memberRepository.findByPhone(signupServiceDto.getPhone()) != null) {
             throw new PhoneAlreadyExistsException();
-        } else if (memberRepository.findByNickname(member.getNickname()) != null) {
+        } else if (memberRepository.findByNickname(signupServiceDto.getNickname()) != null) {
             throw new NicknameAlreadyExistsException();
         }
-        member.encryptPassword(passwordEncoder.encrypt(member.getPassword()));
-        memberRepository.save(member);
+
+        memberRepository.save(signupServiceDto.toEntity());
     }
 
 

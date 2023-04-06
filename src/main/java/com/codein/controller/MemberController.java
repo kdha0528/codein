@@ -40,7 +40,7 @@ public class MemberController {
 
     @PostMapping("/signup")
     public String signup(@RequestBody @Valid SignupDto signupDto) {
-        memberService.signup(signupDto.toEntity());
+        memberService.signup(signupDto.toSignupServiceDto());
         return "redirect:/home";
     }
 
@@ -49,7 +49,7 @@ public class MemberController {
         String accessToken = memberService.login(loginDto.toMemberServiceDto());
         response.addHeader(HttpHeaders.SET_COOKIE, memberService.buildResponseCookie(accessToken).toString());
         response.addHeader(HttpHeaders.AUTHORIZATION, accessToken);
-        return memberRepository.findByAccessToken(accessToken).changeMemberResponse();
+        return memberRepository.findByAccessToken(accessToken).toMemberResponse();
     }
 
     @MySecured(role = Role.MEMBER)
@@ -62,7 +62,7 @@ public class MemberController {
     @MySecured(role = Role.MEMBER)
     @GetMapping("/getprofile")
     public ProfileResponseDto getProfile(@CookieValue(value = "accesstoken") Cookie cookie) {
-        return memberRepository.findByAccessToken(cookie.getValue()).changeProfileResponse();
+        return memberRepository.findByAccessToken(cookie.getValue()).toProfileResponse();
     }
 
     @MySecured(role = Role.MEMBER)

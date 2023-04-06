@@ -65,7 +65,7 @@ public class Member {
         this.point = 0;
     }
 
-    public LoginResponseDto changeMemberResponse() {
+    public LoginResponseDto toMemberResponse() {
         return LoginResponseDto.builder()
                 .id(this.getId())
                 .email(this.getEmail())
@@ -75,7 +75,7 @@ public class Member {
                 .build();
     }
 
-    public ProfileResponseDto changeProfileResponse() {
+    public ProfileResponseDto toProfileResponse() {
         return ProfileResponseDto.builder()
                 .email(this.getEmail())
                 .name(this.getName())
@@ -108,7 +108,5 @@ public class Member {
         this.phone = memberEditor.getPhone();
     }
 
-    public void encryptPassword(String encryptedPassword) {
-        this.password = encryptedPassword;
-    }
+
 }

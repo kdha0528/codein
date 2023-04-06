@@ -1,29 +1,19 @@
 package com.codein.responsedto;
 
-import com.codein.domain.Member;
 import com.codein.domain.Role;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 @Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoginResponseDto {
 
-    private Long id;
-    private String email;
-    private String nickname;
-    private Integer point;
-    private String role;
-
-
-    // 생성자 오버로딩
-    public LoginResponseDto(Member member) {
-        this.id = member.getId();
-        this.email = member.getEmail();
-        this.nickname = member.getNickname();
-        this.point = member.getPoint();
-        this.role = member.getRole().getRole();
-    }
+    private final Long id;
+    private final String email;
+    private final String nickname;
+    private final Integer point;
+    private final String role;
 
     @Builder
     public LoginResponseDto(Long id, String email, String nickname, Integer point, Role role) {

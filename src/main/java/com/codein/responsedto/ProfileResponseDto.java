@@ -1,27 +1,17 @@
 package com.codein.responsedto;
 
-import com.codein.domain.Member;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
 @Getter
-@Setter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@ToString
 public class ProfileResponseDto {
 
-
-    private String email;
-    private String name;
-    private String nickname;
-    private String phone;
-
-
-    // 생성자 오버로딩
-    public ProfileResponseDto(Member member) {
-        this.email = member.getEmail();
-        this.name = member.getName();
-        this.nickname = member.getNickname();
-        this.phone = member.getPhone();
-    }
+    private final String email;
+    private final String name;
+    private final String nickname;
+    private final String phone;
 
     @Builder
     public ProfileResponseDto(String email, String name, String nickname, String phone) {

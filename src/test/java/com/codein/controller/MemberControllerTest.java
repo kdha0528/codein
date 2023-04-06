@@ -6,7 +6,6 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
 import com.codein.requestdto.SignupDto;
-import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,9 +35,6 @@ class MemberControllerTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @Autowired
-    private MemberService memberService;
 
 
     @BeforeEach

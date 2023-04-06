@@ -44,7 +44,7 @@ class PostServiceTest {
                 .sex("male")
                 .phone("01012341234")
                 .build();
-        memberService.signup(signupDto.toEntity());
+        memberService.signup(signupDto.toSignupServiceDto());
 
         LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")

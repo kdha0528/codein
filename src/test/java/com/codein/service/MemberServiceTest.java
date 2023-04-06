@@ -55,7 +55,7 @@ class MemberServiceTest {
                 .build();
 
         // when
-        memberService.signup(signupDto.toEntity());
+        memberService.signup(signupDto.toSignupServiceDto());
 
 
         // then
@@ -79,7 +79,7 @@ class MemberServiceTest {
                 .sex("male")
                 .phone("01012341234")
                 .build();
-        memberService.signup(signupDto.toEntity());
+        memberService.signup(signupDto.toSignupServiceDto());
 
         LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
@@ -108,7 +108,7 @@ class MemberServiceTest {
                 .sex("male")
                 .phone("01012341234")
                 .build();
-        memberService.signup(signupDto.toEntity());
+        memberService.signup(signupDto.toSignupServiceDto());
 
         LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
@@ -137,7 +137,7 @@ class MemberServiceTest {
                 .sex("male")
                 .phone("01012341234")
                 .build();
-        memberService.signup(signupDto.toEntity());
+        memberService.signup(signupDto.toSignupServiceDto());
 
         LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")
@@ -178,7 +178,7 @@ class MemberServiceTest {
                 .sex("male")
                 .phone("01012341234")
                 .build();
-        memberService.signup(signupDto.toEntity());
+        memberService.signup(signupDto.toSignupServiceDto());
 
         LoginDto login = LoginDto.builder()
                 .email("kdha4585@gmail.com")

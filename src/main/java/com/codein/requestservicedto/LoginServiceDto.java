@@ -2,15 +2,13 @@ package com.codein.requestservicedto;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
 @ToString
 public class LoginServiceDto {
-    private String email;
-    private String password;
+    private final String email;
+    private final String password;
 
 
     @Builder
