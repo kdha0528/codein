@@ -2,13 +2,12 @@ package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Member;
-import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.EditMemberDto;
 import com.codein.requestdto.LoginDto;
 import com.codein.requestdto.SignupDto;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +25,10 @@ class MemberServiceTest {
     private MemberService memberService;
 
     @Autowired
-    private SessionRepository sessionRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
 
-    @BeforeEach
+    @AfterEach
     void clean() {
         memberRepository.deleteAll();
     }
@@ -115,7 +111,7 @@ class MemberServiceTest {
                 .password("12341234")
                 .build();
         String accessToken = memberService.login(login.toMemberServiceDto());
-        ResponseCookie responseCookie = memberService.buildResponseCookie(accessToken);
+
         // when
         memberService.logout(accessToken);
 
@@ -145,7 +141,6 @@ class MemberServiceTest {
                 .build();
 
         String accessToken = memberService.login(login.toMemberServiceDto());
-        ResponseCookie responseCookie = memberService.buildResponseCookie(accessToken);
 
         EditMemberDto editMemberDto = EditMemberDto.builder()
                 .email("kdha0528@gmail.com")
@@ -186,7 +181,7 @@ class MemberServiceTest {
                 .build();
 
         String accessToken = memberService.login(login.toMemberServiceDto());
-        ResponseCookie responseCookie = memberService.buildResponseCookie(accessToken);
+
         // when
         memberService.deleteMember(accessToken);
 

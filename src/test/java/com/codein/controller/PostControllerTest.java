@@ -1,12 +1,18 @@
 package com.codein.controller;
 
+import com.codein.domain.Member;
+import com.codein.domain.Session;
+import com.codein.error.exception.member.MemberNotExistsException;
+import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.post.PostRepository;
 import com.codein.requestdto.LoginDto;
 import com.codein.requestdto.PostingDto;
 import com.codein.requestdto.SignupDto;
+import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,17 +37,13 @@ class PostControllerTest {
     private MemberRepository memberRepository;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private SessionRepository sessionRepository;
 
     @BeforeEach
-    void clean() {
-        memberRepository.deleteAll();
-        postRepository.deleteAll();
-    }
-
-    @Test
-    @DisplayName("글 등록: 성공")
-    void test1_1() throws Exception {
-        //given
+    void signupLogin() {
         SignupDto signupDto = SignupDto.builder()
                 .name("데일이")
                 .email("kdha4585@gmail.com")
@@ -52,21 +53,34 @@ class PostControllerTest {
                 .birth("1996-05-28")
                 .sex("male")
                 .build();
-        mockMvc.perform(post("/signup")
-                .content(objectMapper.writeValueAsString(signupDto))
-                .contentType(APPLICATION_JSON));
+        memberService.signup(signupDto.toSignupServiceDto());
 
         LoginDto loginDto = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        MvcResult result = mockMvc.perform(post("/login")
-                        .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDto)))
-                .andReturn();
+        memberService.login(loginDto.toMemberServiceDto());
+    }
 
-        Cookie[] cookies = result.getResponse().getCookies();
+    @AfterEach
+    void clean() {
+        memberRepository.deleteAll();
+        postRepository.deleteAll();
+    }
 
+    Cookie getCookie() {
+        Member member = memberRepository.findByEmail("kdha4585@gmail.com");
+        Session session = sessionRepository.findByMember(member)
+                .orElseThrow(MemberNotExistsException::new);
+        String token = session.getAccessToken();
+
+        return new Cookie("accesstoken", token);
+    }
+
+    @Test
+    @DisplayName("글 등록: 성공")
+    void test1_1() throws Exception {
+        //given
         PostingDto postingDto = PostingDto.builder()
                 .category("NOTICE")
                 .title("제목")
@@ -74,13 +88,12 @@ class PostControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/writepost").cookie(cookies)
+        mockMvc.perform(post("/writepost").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(postingDto))
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
-
     }
 
 }
