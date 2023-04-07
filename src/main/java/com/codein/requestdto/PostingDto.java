@@ -1,7 +1,6 @@
 package com.codein.requestdto;
 
 import com.codein.requestservicedto.PostingServiceDto;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -20,7 +19,7 @@ public class PostingDto {
     private final String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
-    @Min(1)
+    @Size(min = 1)
     private final String content;
 
     @Builder

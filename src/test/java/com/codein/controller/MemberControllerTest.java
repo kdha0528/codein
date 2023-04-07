@@ -273,7 +273,6 @@ class MemberControllerTest {
                 .content(objectMapper.writeValueAsString(signupDto))
                 .contentType(APPLICATION_JSON));
 
-
         LoginDto loginDto = LoginDto.builder()
                 .email("kdha4585@gmail.com")
                 .password("12345678")
