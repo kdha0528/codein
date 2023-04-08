@@ -1,4 +1,4 @@
-package com.codein.domain;
+package com.codein.domain.post;
 
 public enum Category {
 

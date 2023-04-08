@@ -1,7 +1,7 @@
 package com.codein.repository;
 
-import com.codein.domain.Member;
 import com.codein.domain.Session;
+import com.codein.domain.member.Member;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

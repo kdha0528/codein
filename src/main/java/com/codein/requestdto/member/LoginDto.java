@@ -1,6 +1,6 @@
-package com.codein.requestdto;
+package com.codein.requestdto.member;
 
-import com.codein.requestservicedto.LoginServiceDto;
+import com.codein.requestservicedto.member.LoginServiceDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

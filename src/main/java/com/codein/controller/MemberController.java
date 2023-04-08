@@ -2,13 +2,13 @@ package com.codein.controller;
 
 
 import com.codein.config.SecurityConfig.MySecured;
-import com.codein.domain.Role;
+import com.codein.domain.member.Role;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepositoryCustom;
-import com.codein.requestdto.EditMemberDto;
-import com.codein.requestdto.LoginDto;
 import com.codein.requestdto.PageSizeDto;
-import com.codein.requestdto.SignupDto;
+import com.codein.requestdto.member.EditMemberDto;
+import com.codein.requestdto.member.LoginDto;
+import com.codein.requestdto.member.SignupDto;
 import com.codein.responsedto.LoginResponseDto;
 import com.codein.responsedto.ProfileResponseDto;
 import com.codein.service.MemberService;
@@ -29,7 +29,6 @@ import java.util.List;
 public class MemberController {
     private final MemberRepositoryCustom memberRepository;
     private final SessionRepository sessionRepository;
-
     private final MemberService memberService;
 
     @GetMapping("/home")

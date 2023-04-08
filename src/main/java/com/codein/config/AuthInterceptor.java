@@ -1,9 +1,9 @@
 package com.codein.config;
 
 import com.codein.config.SecurityConfig.MySecured;
-import com.codein.domain.Member;
-import com.codein.domain.Role;
 import com.codein.domain.Session;
+import com.codein.domain.member.Member;
+import com.codein.domain.member.Role;
 import com.codein.error.exception.InvalidAccessTokenException;
 import com.codein.error.exception.UnauthorizedException;
 import com.codein.repository.SessionRepository;

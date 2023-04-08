@@ -1,5 +1,6 @@
-package com.codein.domain;
+package com.codein.domain.post;
 
+import com.codein.domain.member.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -45,6 +46,12 @@ public class Post {
         this.commentNum = 0;
         this.likeNum = 0;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public void edit(PostEditor postEditor) {
+        this.category = Category.valueOf(postEditor.getCategory());
+        this.title = postEditor.getTitle();
+        this.content = postEditor.getContent();
     }
 
 }

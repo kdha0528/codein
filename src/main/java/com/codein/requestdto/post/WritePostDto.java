@@ -1,9 +1,6 @@
-package com.codein.requestservicedto;
+package com.codein.requestdto.post;
 
-import com.codein.domain.Category;
-import com.codein.domain.Member;
-import com.codein.domain.Post;
-import jakarta.validation.constraints.Min;
+import com.codein.requestservicedto.post.WritePostServiceDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -12,7 +9,8 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class PostingServiceDto {
+public class WritePostDto {
+
     @NotBlank(message = "카테고리를 입력해주세요.")
     private final String category;
 
@@ -21,23 +19,21 @@ public class PostingServiceDto {
     private final String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
-    @Min(1)
+    @Size(min = 1)
     private final String content;
 
     @Builder
-    public PostingServiceDto(String category, String title, String content) {
+    public WritePostDto(String category, String title, String content) {
         this.category = category;
         this.title = title;
         this.content = content;
     }
 
-    public Post toEntity(Member member) {
-        return Post.builder()
-                .member(member)
-                .category(Category.valueOf(this.category))
+    public WritePostServiceDto toWritePostServiceDto() {
+        return WritePostServiceDto.builder()
+                .category(this.category)
                 .title(this.title)
                 .content(this.content)
                 .build();
-
     }
 }

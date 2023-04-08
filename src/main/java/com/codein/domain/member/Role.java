@@ -1,4 +1,4 @@
-package com.codein.domain;
+package com.codein.domain.member;
 
 public enum Role {
 

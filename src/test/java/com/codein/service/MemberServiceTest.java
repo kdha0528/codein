@@ -1,11 +1,11 @@
 package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
-import com.codein.domain.Member;
+import com.codein.domain.member.Member;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.EditMemberDto;
-import com.codein.requestdto.LoginDto;
-import com.codein.requestdto.SignupDto;
+import com.codein.requestdto.member.EditMemberDto;
+import com.codein.requestdto.member.LoginDto;
+import com.codein.requestdto.member.SignupDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

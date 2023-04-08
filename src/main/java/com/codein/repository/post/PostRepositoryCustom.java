@@ -1,9 +1,12 @@
 package com.codein.repository.post;
 
-import com.codein.domain.Member;
-import com.codein.domain.Post;
+import com.codein.domain.member.Member;
+import com.codein.domain.post.Post;
+
+import java.util.List;
 
 public interface PostRepositoryCustom {
 
-    Post findByMember(Member member);
+    List<Post> findByMember(Member member);
+
 }

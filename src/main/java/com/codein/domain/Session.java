@@ -1,5 +1,6 @@
 package com.codein.domain;
 
+import com.codein.domain.member.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;

@@ -1,5 +1,6 @@
-package com.codein.domain;
+package com.codein.domain.member;
 
+import com.codein.domain.Session;
 import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.responsedto.LoginResponseDto;
 import com.codein.responsedto.ProfileResponseDto;

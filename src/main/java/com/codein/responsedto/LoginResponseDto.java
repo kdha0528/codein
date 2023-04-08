@@ -1,6 +1,6 @@
 package com.codein.responsedto;
 
-import com.codein.domain.Role;
+import com.codein.domain.member.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;

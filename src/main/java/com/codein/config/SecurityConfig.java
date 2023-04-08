@@ -1,7 +1,7 @@
 package com.codein.config;
 
 
-import com.codein.domain.Role;
+import com.codein.domain.member.Role;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

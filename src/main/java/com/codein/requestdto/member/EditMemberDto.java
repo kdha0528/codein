@@ -1,6 +1,6 @@
-package com.codein.requestdto;
+package com.codein.requestdto.member;
 
-import com.codein.requestservicedto.EditMemberServiceDto;
+import com.codein.requestservicedto.member.EditMemberServiceDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

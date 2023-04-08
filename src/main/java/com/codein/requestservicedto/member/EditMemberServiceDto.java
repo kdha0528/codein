@@ -1,4 +1,4 @@
-package com.codein.requestservicedto;
+package com.codein.requestservicedto.member;
 
 import lombok.Builder;
 import lombok.Getter;

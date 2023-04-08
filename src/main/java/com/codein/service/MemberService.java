@@ -1,16 +1,16 @@
 package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
-import com.codein.domain.Member;
-import com.codein.domain.MemberEditor;
 import com.codein.domain.Session;
+import com.codein.domain.member.Member;
+import com.codein.domain.member.MemberEditor;
 import com.codein.error.exception.member.*;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.PageSizeDto;
-import com.codein.requestservicedto.EditMemberServiceDto;
-import com.codein.requestservicedto.LoginServiceDto;
-import com.codein.requestservicedto.SignupServiceDto;
+import com.codein.requestservicedto.member.EditMemberServiceDto;
+import com.codein.requestservicedto.member.LoginServiceDto;
+import com.codein.requestservicedto.member.SignupServiceDto;
 import com.codein.responsedto.LoginResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -104,7 +104,6 @@ public class MemberService {
                 throw new EmailAlreadyExistsException();
             }
         }
-
         if (editMemberServiceDto.getPhone() != null) {
             Member phoneMember = memberRepository.findByPhone(editMemberServiceDto.getPhone());
             if (phoneMember != null && !Objects.equals(phoneMember.getPhone(), member.getPhone())) {

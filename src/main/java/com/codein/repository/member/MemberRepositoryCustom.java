@@ -1,6 +1,6 @@
 package com.codein.repository.member;
 
-import com.codein.domain.Member;
+import com.codein.domain.member.Member;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.responsedto.LoginResponseDto;
 

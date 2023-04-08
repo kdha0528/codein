@@ -1,18 +1,21 @@
 package com.codein.service;
 
-import com.codein.domain.Member;
-import com.codein.domain.Post;
 import com.codein.domain.Session;
+import com.codein.domain.member.Member;
+import com.codein.domain.post.Post;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.post.PostRepository;
-import com.codein.requestdto.LoginDto;
-import com.codein.requestdto.PostingDto;
-import com.codein.requestdto.SignupDto;
+import com.codein.requestdto.member.LoginDto;
+import com.codein.requestdto.member.SignupDto;
+import com.codein.requestdto.post.EditPostDto;
+import com.codein.requestdto.post.WritePostDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 @SpringBootTest
 class PostServiceTest {
@@ -65,21 +68,56 @@ class PostServiceTest {
     void test1() {
         // given
         String accessToken = getToken();
-        PostingDto postingDto = PostingDto.builder()
+        WritePostDto writePostDto = WritePostDto.builder()
                 .category("NOTICE")
                 .title("제목")
                 .content("내용")
                 .build();
         // when
-        postService.post(postingDto.toPostingServiceDto(), accessToken);
+        postService.writePost(writePostDto.toWritePostServiceDto(), accessToken);
 
         //then
         Member member = memberRepository.findByAccessToken(accessToken);
-        Post post = postRepository.findByMember(member);
+        List<Post> posts = postRepository.findByMember(member);
+        Post post = posts.get(0);
 
-        Assertions.assertEquals(postingDto.getCategory(), post.getCategory().getValue());
-        Assertions.assertEquals(postingDto.getTitle(), post.getTitle());
-        Assertions.assertEquals(postingDto.getContent(), post.getContent());
+        Assertions.assertEquals(writePostDto.getCategory(), post.getCategory().getValue());
+        Assertions.assertEquals(writePostDto.getTitle(), post.getTitle());
+        Assertions.assertEquals(writePostDto.getContent(), post.getContent());
+    }
+
+    @Test
+    @DisplayName("글 수정 성공")
+    void test2() {
+        // given
+        String accessToken = getToken();
+
+        WritePostDto writePostDto = WritePostDto.builder()
+                .category("NOTICE")
+                .title("제목")
+                .content("내용")
+                .build();
+        postService.writePost(writePostDto.toWritePostServiceDto(), accessToken);
+
+        Member member = memberRepository.findByAccessToken(accessToken);
+        List<Post> posts = postRepository.findByMember(member);
+        Post post = posts.get(0);
+
+        EditPostDto editPostDto = EditPostDto.builder()
+                .category("COMMUNITY")
+                .title("타이틀")
+                .content("내용")
+                .build();
+        // when
+        postService.editPost(post.getId(), editPostDto.toEditPostServiceDto());
+
+        //then
+        List<Post> editedPosts = postRepository.findByMember(member);
+        Post editedPost = editedPosts.get(0);
+
+        Assertions.assertEquals(editPostDto.getCategory(), editedPost.getCategory().getValue());
+        Assertions.assertEquals(editPostDto.getTitle(), editedPost.getTitle());
+        Assertions.assertEquals(editPostDto.getContent(), editedPost.getContent());
     }
 
 }

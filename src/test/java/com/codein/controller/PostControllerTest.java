@@ -1,14 +1,14 @@
 package com.codein.controller;
 
-import com.codein.domain.Member;
 import com.codein.domain.Session;
+import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.post.PostRepository;
-import com.codein.requestdto.LoginDto;
-import com.codein.requestdto.PostingDto;
-import com.codein.requestdto.SignupDto;
+import com.codein.requestdto.member.LoginDto;
+import com.codein.requestdto.member.SignupDto;
+import com.codein.requestdto.post.WritePostDto;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -78,10 +78,10 @@ class PostControllerTest {
     }
 
     @Test
-    @DisplayName("글 등록: 성공")
+    @DisplayName("글 등록 성공")
     void test1_1() throws Exception {
         //given
-        PostingDto postingDto = PostingDto.builder()
+        WritePostDto writePostDto = WritePostDto.builder()
                 .category("NOTICE")
                 .title("제목")
                 .content("내용")
@@ -90,10 +90,47 @@ class PostControllerTest {
         // expected
         mockMvc.perform(post("/writepost").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(postingDto))
+                        .content(objectMapper.writeValueAsString(writePostDto))
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("글 등록 실패: 제목 없음")
+    void test1_2() throws Exception {
+        //given
+        WritePostDto writePostDto = WritePostDto.builder()
+                .category("NOTICE")
+                .title("")
+                .content("내용")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/writepost").cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(writePostDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 등록 실패: 내용 없음")
+    void test1_3() throws Exception {
+        //given
+        WritePostDto writePostDto = WritePostDto.builder()
+                .category("NOTICE")
+                .title("제목")
+                .content("")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/writepost").cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(writePostDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
 }

@@ -1,7 +1,7 @@
-package com.codein.requestservicedto;
+package com.codein.requestservicedto.member;
 
 import com.codein.crypto.PasswordEncoder;
-import com.codein.domain.Member;
+import com.codein.domain.member.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;

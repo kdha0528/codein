@@ -1,14 +1,14 @@
 package com.codein.controller;
 
-import com.codein.domain.Member;
-import com.codein.domain.Role;
 import com.codein.domain.Session;
+import com.codein.domain.member.Member;
+import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.EditMemberDto;
-import com.codein.requestdto.LoginDto;
-import com.codein.requestdto.SignupDto;
+import com.codein.requestdto.member.EditMemberDto;
+import com.codein.requestdto.member.LoginDto;
+import com.codein.requestdto.member.SignupDto;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;

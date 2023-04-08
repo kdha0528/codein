@@ -1,6 +1,6 @@
 package com.codein.controller;
 
-import com.codein.requestdto.PostingDto;
+import com.codein.requestdto.post.WritePostDto;
 import com.codein.service.PostService;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
@@ -18,8 +18,8 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("/writepost")
-    public String writePost(@RequestBody @Valid PostingDto postingDto, @CookieValue(value = "accesstoken") Cookie cookie) {
-        postService.post(postingDto.toPostingServiceDto(), cookie.getValue());
+    public String writePost(@RequestBody @Valid WritePostDto writePostDto, @CookieValue(value = "accesstoken") Cookie cookie) {
+        postService.writePost(writePostDto.toWritePostServiceDto(), cookie.getValue());
         return "redirect:/home";
     }
 }
