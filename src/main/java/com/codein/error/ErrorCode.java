@@ -25,7 +25,7 @@ public enum ErrorCode {
     NICKNAME_ALREADY_EXISTS(400, "M008", "Nickname is already exists"),
 
     // Post
-    POST_NOT_EXISTS(400, "C001", "Post is not exists."),
+    ARTICLE_NOT_EXISTS(400, "C001", "Article is not exists."),
 
     // Comment
 

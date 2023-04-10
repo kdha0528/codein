@@ -1,7 +1,7 @@
 package com.codein.controller;
 
-import com.codein.requestdto.post.WritePostDto;
-import com.codein.service.PostService;
+import com.codein.requestdto.post.NewArticleDto;
+import com.codein.service.ArticleService;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class PostController {
-    private final PostService postService;
+public class ArticleController {
+    private final ArticleService articleService;
 
-    @PostMapping("/writepost")
-    public String writePost(@RequestBody @Valid WritePostDto writePostDto, @CookieValue(value = "accesstoken") Cookie cookie) {
-        postService.writePost(writePostDto.toWritePostServiceDto(), cookie.getValue());
+    @PostMapping(value = {"/{category}/new", "/articles/new"})
+    public String newArticle(@RequestBody @Valid NewArticleDto newArticleDto, @CookieValue(value = "accesstoken") Cookie cookie) {
+        articleService.newArticle(newArticleDto.toWritePostServiceDto(), cookie.getValue());
         return "redirect:/home";
     }
+
+
 }

@@ -4,11 +4,11 @@ import com.codein.domain.Session;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
+import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.repository.post.PostRepository;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
-import com.codein.requestdto.post.WritePostDto;
+import com.codein.requestdto.post.NewArticleDto;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class PostControllerTest {
+class ArticleControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -36,7 +36,7 @@ class PostControllerTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private PostRepository postRepository;
+    private ArticleRepository articleRepository;
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -65,7 +65,7 @@ class PostControllerTest {
     @AfterEach
     void clean() {
         memberRepository.deleteAll();
-        postRepository.deleteAll();
+        articleRepository.deleteAll();
     }
 
     Cookie getCookie() {
@@ -81,16 +81,16 @@ class PostControllerTest {
     @DisplayName("글 등록 성공")
     void test1_1() throws Exception {
         //given
-        WritePostDto writePostDto = WritePostDto.builder()
+        NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
                 .title("제목")
                 .content("내용")
                 .build();
 
         // expected
-        mockMvc.perform(post("/writepost").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(writePostDto))
+                        .content(objectMapper.writeValueAsString(newArticleDto))
                 )
                 .andExpect(status().isOk())
                 .andDo(print());
@@ -100,16 +100,16 @@ class PostControllerTest {
     @DisplayName("글 등록 실패: 제목 없음")
     void test1_2() throws Exception {
         //given
-        WritePostDto writePostDto = WritePostDto.builder()
+        NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
                 .title("")
                 .content("내용")
                 .build();
 
         // expected
-        mockMvc.perform(post("/writepost").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(writePostDto))
+                        .content(objectMapper.writeValueAsString(newArticleDto))
                 )
                 .andExpect(status().isBadRequest())
                 .andDo(print());
@@ -119,14 +119,14 @@ class PostControllerTest {
     @DisplayName("글 등록 실패: 내용 없음")
     void test1_3() throws Exception {
         //given
-        WritePostDto writePostDto = WritePostDto.builder()
+        NewArticleDto writePostDto = NewArticleDto.builder()
                 .category("NOTICE")
                 .title("제목")
                 .content("")
                 .build();
 
         // expected
-        mockMvc.perform(post("/writepost").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(writePostDto))
                 )

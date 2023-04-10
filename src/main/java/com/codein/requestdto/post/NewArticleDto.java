@@ -1,6 +1,6 @@
 package com.codein.requestdto.post;
 
-import com.codein.requestservicedto.post.WritePostServiceDto;
+import com.codein.requestservicedto.article.NewArticleServiceDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class WritePostDto {
+public class NewArticleDto {
 
     @NotBlank(message = "카테고리를 입력해주세요.")
     private final String category;
@@ -23,14 +23,14 @@ public class WritePostDto {
     private final String content;
 
     @Builder
-    public WritePostDto(String category, String title, String content) {
+    public NewArticleDto(String category, String title, String content) {
         this.category = category;
         this.title = title;
         this.content = content;
     }
 
-    public WritePostServiceDto toWritePostServiceDto() {
-        return WritePostServiceDto.builder()
+    public NewArticleServiceDto toWritePostServiceDto() {
+        return NewArticleServiceDto.builder()
                 .category(this.category)
                 .title(this.title)
                 .content(this.content)

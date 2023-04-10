@@ -1,16 +1,16 @@
 package com.codein.service;
 
 import com.codein.domain.Session;
+import com.codein.domain.article.Article;
 import com.codein.domain.member.Member;
-import com.codein.domain.post.Post;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
+import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.repository.post.PostRepository;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
-import com.codein.requestdto.post.EditPostDto;
-import com.codein.requestdto.post.WritePostDto;
+import com.codein.requestdto.post.EditArticleDto;
+import com.codein.requestdto.post.NewArticleDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,17 +18,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @SpringBootTest
-class PostServiceTest {
+class ArticleServiceTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private PostRepository postRepository;
+    private ArticleRepository articleRepository;
     @Autowired
     private SessionRepository sessionRepository;
     @Autowired
     private MemberService memberService;
     @Autowired
-    private PostService postService;
+    private ArticleService articleService;
 
     @BeforeEach
     void signupLogin() {
@@ -53,7 +53,7 @@ class PostServiceTest {
     @AfterEach
     void clean() {
         memberRepository.deleteAll();
-        postRepository.deleteAll();
+        articleRepository.deleteAll();
     }
 
     String getToken() {
@@ -68,22 +68,22 @@ class PostServiceTest {
     void test1() {
         // given
         String accessToken = getToken();
-        WritePostDto writePostDto = WritePostDto.builder()
+        NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
                 .title("제목")
                 .content("내용")
                 .build();
         // when
-        postService.writePost(writePostDto.toWritePostServiceDto(), accessToken);
+        articleService.newArticle(newArticleDto.toWritePostServiceDto(), accessToken);
 
         //then
         Member member = memberRepository.findByAccessToken(accessToken);
-        List<Post> posts = postRepository.findByMember(member);
-        Post post = posts.get(0);
+        List<Article> articles = articleRepository.findByMember(member);
+        Article article = articles.get(0);
 
-        Assertions.assertEquals(writePostDto.getCategory(), post.getCategory().getValue());
-        Assertions.assertEquals(writePostDto.getTitle(), post.getTitle());
-        Assertions.assertEquals(writePostDto.getContent(), post.getContent());
+        Assertions.assertEquals(newArticleDto.getCategory(), article.getCategory().getValue());
+        Assertions.assertEquals(newArticleDto.getTitle(), article.getTitle());
+        Assertions.assertEquals(newArticleDto.getContent(), article.getContent());
     }
 
     @Test
@@ -92,32 +92,32 @@ class PostServiceTest {
         // given
         String accessToken = getToken();
 
-        WritePostDto writePostDto = WritePostDto.builder()
+        NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
                 .title("제목")
                 .content("내용")
                 .build();
-        postService.writePost(writePostDto.toWritePostServiceDto(), accessToken);
+        articleService.newArticle(newArticleDto.toWritePostServiceDto(), accessToken);
 
         Member member = memberRepository.findByAccessToken(accessToken);
-        List<Post> posts = postRepository.findByMember(member);
-        Post post = posts.get(0);
+        List<Article> articles = articleRepository.findByMember(member);
+        Article article = articles.get(0);
 
-        EditPostDto editPostDto = EditPostDto.builder()
+        EditArticleDto editArticleDto = EditArticleDto.builder()
                 .category("COMMUNITY")
                 .title("타이틀")
                 .content("내용")
                 .build();
         // when
-        postService.editPost(post.getId(), editPostDto.toEditPostServiceDto());
+        articleService.editArticle(article.getId(), editArticleDto.toEditPostServiceDto());
 
         //then
-        List<Post> editedPosts = postRepository.findByMember(member);
-        Post editedPost = editedPosts.get(0);
+        List<Article> editedArticles = articleRepository.findByMember(member);
+        Article editedArticle = editedArticles.get(0);
 
-        Assertions.assertEquals(editPostDto.getCategory(), editedPost.getCategory().getValue());
-        Assertions.assertEquals(editPostDto.getTitle(), editedPost.getTitle());
-        Assertions.assertEquals(editPostDto.getContent(), editedPost.getContent());
+        Assertions.assertEquals(editArticleDto.getCategory(), editedArticle.getCategory().getValue());
+        Assertions.assertEquals(editArticleDto.getTitle(), editedArticle.getTitle());
+        Assertions.assertEquals(editArticleDto.getContent(), editedArticle.getContent());
     }
 
 }

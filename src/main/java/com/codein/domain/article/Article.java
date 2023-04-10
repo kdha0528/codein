@@ -1,4 +1,4 @@
-package com.codein.domain.post;
+package com.codein.domain.article;
 
 import com.codein.domain.member.Member;
 import jakarta.persistence.*;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Post {
+public class Article {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +37,7 @@ public class Post {
 
 
     @Builder
-    public Post(Member member, Category category, String title, String content) {
+    public Article(Member member, Category category, String title, String content) {
         this.member = member;
         this.category = category;
         this.title = title;
@@ -48,10 +48,10 @@ public class Post {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void edit(PostEditor postEditor) {
-        this.category = Category.valueOf(postEditor.getCategory());
-        this.title = postEditor.getTitle();
-        this.content = postEditor.getContent();
+    public void edit(ArticleEditor articleEditor) {
+        this.category = Category.valueOf(articleEditor.getCategory());
+        this.title = articleEditor.getTitle();
+        this.content = articleEditor.getContent();
     }
 
 }
