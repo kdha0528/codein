@@ -27,7 +27,7 @@
       </div>
 
       <el-row class="profileButton d-flex justify-content-around mt-4">
-        <button @click="this.$router.replace('/profilesettings')">
+        <button @click="this.$router.replace('/settings/account')">
           <div class="d-flex flex-column align-items-center">
             <el-icon class="mb-2" :size="35">
               <Setting/>
@@ -74,7 +74,7 @@ const profile = ref({
   role: String(getProfile.role),
 });
 const deleteMember = function () {
-  axios.post("/my-backend-api/deletemember", {}).then(() => {
+  axios.delete("/my-backend-api/settings/account/delete", {}).then(() => {
     auth.logout();
     alert("회원탈퇴가 완료되었습니다.");
     route.replace({name: "home"});

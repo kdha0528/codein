@@ -1,4 +1,4 @@
-package com.codein.requestdto.post;
+package com.codein.requestdto.article;
 
 import com.codein.requestservicedto.article.NewArticleServiceDto;
 import jakarta.validation.constraints.NotBlank;
@@ -15,11 +15,11 @@ public class NewArticleDto {
     private final String category;
 
     @NotBlank(message = "제목을 입력해주세요.")
-    @Size(min = 1, max = 50)
+    @Size(min = 5, max = 50, message = "제목을 5~50글자로 맞춰주세요.")
     private final String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
-    @Size(min = 1)
+    @Size(min = 5, message = "내용을 5글자 이상 입력해주세요.")
     private final String content;
 
     @Builder

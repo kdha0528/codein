@@ -1,14 +1,17 @@
 package com.codein.controller;
 
 import com.codein.domain.Session;
+import com.codein.domain.article.Article;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.article.EditArticleDto;
+import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
-import com.codein.requestdto.post.NewArticleDto;
+import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -20,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,9 +43,11 @@ class ArticleControllerTest {
     @Autowired
     private ArticleRepository articleRepository;
     @Autowired
+    private SessionRepository sessionRepository;
+    @Autowired
     private MemberService memberService;
     @Autowired
-    private SessionRepository sessionRepository;
+    private ArticleService articleService;
 
     @BeforeEach
     void signupLogin() {
@@ -77,14 +84,23 @@ class ArticleControllerTest {
         return new Cookie("accesstoken", token);
     }
 
+    void newArticle() {
+        NewArticleDto newArticleDto = NewArticleDto.builder()
+                .category("NOTICE")
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), getCookie().getValue());
+    }
+
     @Test
     @DisplayName("글 등록 성공")
     void test1_1() throws Exception {
         //given
         NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
-                .title("제목")
-                .content("내용")
+                .title("제목입니다.")
+                .content("내용입니다.")
                 .build();
 
         // expected
@@ -103,7 +119,7 @@ class ArticleControllerTest {
         NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
                 .title("")
-                .content("내용")
+                .content("내용입니다.")
                 .build();
 
         // expected
@@ -121,7 +137,7 @@ class ArticleControllerTest {
         //given
         NewArticleDto writePostDto = NewArticleDto.builder()
                 .category("NOTICE")
-                .title("제목")
+                .title("제목입니다.")
                 .content("")
                 .build();
 
@@ -129,6 +145,84 @@ class ArticleControllerTest {
         mockMvc.perform(post("/articles/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(writePostDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 수정 성공")
+    void test2_1() throws Exception {
+        //given
+        newArticle();
+
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        List<Article> articles = articleRepository.findByMember(member);
+        Article article = articles.get(0);
+        Long articleId = article.getId();
+
+        EditArticleDto editArticleDto = EditArticleDto.builder()
+                .category("COMMUNITY")
+                .title("타이틀입니다.")
+                .content("내용입니다.")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/articles/{articleId}/edit", articleId).cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editArticleDto))
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 수정 실패: 제목 글자 수 미달")
+    void test2_2() throws Exception {
+        //given
+        newArticle();
+
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        List<Article> articles = articleRepository.findByMember(member);
+        Article article = articles.get(0);
+        Long articleId = article.getId();
+
+        EditArticleDto editArticleDto = EditArticleDto.builder()
+                .category("COMMUNITY")
+                .title("타이틀")
+                .content("내용입니다.")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/articles/{articleId}/edit", articleId).cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editArticleDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 수정 실패: 내용 글자 수 미달")
+    void test2_3() throws Exception {
+        //given
+        newArticle();
+
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        List<Article> articles = articleRepository.findByMember(member);
+        Article article = articles.get(0);
+        Long articleId = article.getId();
+
+        EditArticleDto editArticleDto = EditArticleDto.builder()
+                .category("COMMUNITY")
+                .title("타이틀입니다.")
+                .content("내용")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/articles/{articleId}/edit", articleId).cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editArticleDto))
                 )
                 .andExpect(status().isBadRequest())
                 .andDo(print());

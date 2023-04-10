@@ -2,9 +2,11 @@ package com.codein.controller;
 
 
 import com.codein.config.SecurityConfig.MySecured;
+import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
+import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
-import com.codein.repository.member.MemberRepositoryCustom;
+import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.member.EditMemberDto;
 import com.codein.requestdto.member.LoginDto;
@@ -27,11 +29,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
-    private final MemberRepositoryCustom memberRepository;
+    private final MemberRepository memberRepository;
     private final SessionRepository sessionRepository;
     private final MemberService memberService;
 
-    @GetMapping("/home")
+    @GetMapping(value = {"/home", "/", "/index"})
     public List<LoginResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto, RedirectAttributes redirect, HttpServletResponse response) {
         List<LoginResponseDto> members = memberService.getMemberList(pageSizeDto);
         return members;
@@ -59,21 +61,22 @@ public class MemberController {
     }
 
     @MySecured(role = Role.MEMBER)
-    @GetMapping("/getprofile")
-    public ProfileResponseDto getProfile(@CookieValue(value = "accesstoken") Cookie cookie) {
-        return memberRepository.findByAccessToken(cookie.getValue()).toProfileResponse();
+    @GetMapping("/members/{id}")
+    public ProfileResponseDto getProfile(@PathVariable Long id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(MemberNotExistsException::new);
+        return member.toProfileResponse();
     }
 
     @MySecured(role = Role.MEMBER)
-    @PostMapping("/editmember")
-    public String editMember(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EditMemberDto editMemberDto, HttpServletResponse response) {
+    @PostMapping("/settings/account/edit")
+    public void editMember(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EditMemberDto editMemberDto, HttpServletResponse response) {
         memberService.editMember(cookie.getValue(), editMemberDto.toEditMemberServiceDto());
         memberService.logout(cookie.getValue());
-        return "redirect:/home";
     }
 
     @MySecured(role = Role.MEMBER)
-    @PostMapping("/deletemember")
+    @DeleteMapping("/settings/account/delete")
     public String deleteMember(@CookieValue(value = "accesstoken") Cookie cookie, HttpServletResponse response) {
         memberService.deleteMember(cookie.getValue());
         return "redirect:/home";

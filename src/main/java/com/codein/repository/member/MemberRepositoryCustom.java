@@ -18,4 +18,5 @@ public interface MemberRepositoryCustom {
 
     Member findByAccessToken(String accessToken);
 
+
 }

@@ -7,10 +7,10 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.article.EditArticleDto;
+import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
-import com.codein.requestdto.post.EditArticleDto;
-import com.codein.requestdto.post.NewArticleDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -74,7 +74,7 @@ class ArticleServiceTest {
                 .content("내용")
                 .build();
         // when
-        articleService.newArticle(newArticleDto.toWritePostServiceDto(), accessToken);
+        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
 
         //then
         Member member = memberRepository.findByAccessToken(accessToken);
@@ -97,7 +97,7 @@ class ArticleServiceTest {
                 .title("제목")
                 .content("내용")
                 .build();
-        articleService.newArticle(newArticleDto.toWritePostServiceDto(), accessToken);
+        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
 
         Member member = memberRepository.findByAccessToken(accessToken);
         List<Article> articles = articleRepository.findByMember(member);
@@ -109,7 +109,7 @@ class ArticleServiceTest {
                 .content("내용")
                 .build();
         // when
-        articleService.editArticle(article.getId(), editArticleDto.toEditPostServiceDto());
+        articleService.editArticle(article.getId(), editArticleDto.toEditArticleServiceDto());
 
         //then
         List<Article> editedArticles = articleRepository.findByMember(member);

@@ -30,14 +30,14 @@ public class ArticleService {
     }
 
     @Transactional
-    public void editArticle(Long postId, EditArticleServiceDto editArticleServiceDto) {
+    public void editArticle(Long articleId, EditArticleServiceDto editArticleServiceDto) {
         ArticleEditor articleEditor = ArticleEditor.builder()
                 .category(editArticleServiceDto.getCategory())
                 .title(editArticleServiceDto.getTitle())
                 .content(editArticleServiceDto.getContent())
                 .build();
 
-        Article article = articleRepository.findById(postId)
+        Article article = articleRepository.findById(articleId)
                 .orElseThrow(ArticlePostNotExistsException::new);
 
         article.edit(articleEditor);

@@ -22,8 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,10 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MemberControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
@@ -365,7 +362,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/editmember").cookie(getCookie())
+        mockMvc.perform(post("/settings/profile").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editMemberDto))
                 )
@@ -389,7 +386,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/editmember").cookie(getCookie())
+        mockMvc.perform(post("/settings/profile").cookie(getCookie())
                         .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
@@ -413,7 +410,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/editmember").cookie(getCookie())
+        mockMvc.perform(post("/settings/profile").cookie(getCookie())
                         .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
@@ -437,7 +434,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/editmember").cookie(getCookie())
+        mockMvc.perform(post("/settings/profile").cookie(getCookie())
                         .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
@@ -454,7 +451,7 @@ class MemberControllerTest {
         login();
 
         // expected
-        mockMvc.perform(post("/deletemember").cookie(getCookie()))
+        mockMvc.perform(delete("/settings/account").cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("redirect:/home"))
                 .andDo(print());
@@ -472,7 +469,7 @@ class MemberControllerTest {
         memberRepository.save(member);
 
         // expected
-        mockMvc.perform(post("/deletemember").cookie(getCookie()))
+        mockMvc.perform(delete("/settings/account").cookie(getCookie()))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
@@ -483,9 +480,11 @@ class MemberControllerTest {
         // given
         signup();
         login();
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Long memberId = member.getId();
 
         // expected
-        mockMvc.perform(get("/getprofile").cookie(getCookie()))
+        mockMvc.perform(get("/members/{memberId}", memberId).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
