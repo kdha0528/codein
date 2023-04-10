@@ -51,7 +51,7 @@ const profile = ref({
 });
 const checkPassword = ref(null as null | '');
 
-axios.get("/my-backend-api/getprofile").then((response) => {
+axios.get("/my-backend-api/members/{id}").then((response) => {
   profile.value.email = response.data.email;
   profile.value.name = response.data.name;
   profile.value.nickname = response.data.nickname;
@@ -84,7 +84,7 @@ const edit = function () {
     return;
   }
 
-  axios.post('/my-backend-api/editmember', {
+  axios.post('/my-backend-api/settings/profile', {
     email: profile.value.email,
     password: profile.value.password,
     name: profile.value.name,
