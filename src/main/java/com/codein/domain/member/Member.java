@@ -25,7 +25,6 @@ public class Member {
     @Column(unique = true)
     @NotNull
     private String email;
-    @Setter
     @NotNull
     private String password;
 
@@ -93,23 +92,6 @@ public class Member {
         if (!removed) {
             throw new MemberNotLoginException();
         }
-    }
-
-    public MemberEditor.MemberEditorBuilder toEditor() {
-        return MemberEditor.builder()
-                .email(email)
-                .password(password)
-                .name(name)
-                .nickname(nickname)
-                .phone(phone);
-    }
-
-    public void edit(MemberEditor memberEditor) {
-        this.email = memberEditor.getEmail();
-        this.password = memberEditor.getPassword();
-        this.name = memberEditor.getName();
-        this.nickname = memberEditor.getNickname();
-        this.phone = memberEditor.getPhone();
     }
 
     public ProfileEditor.ProfileEditorBuilder toProfileEditor() {

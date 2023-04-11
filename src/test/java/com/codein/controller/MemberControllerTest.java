@@ -375,103 +375,6 @@ class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("회원정보 수정 성공")
-    void test4_1() throws Exception {
-        // given
-        signup();
-        login();
-
-        EditMemberDto editMemberDto = EditMemberDto.builder()
-                .email("kdha0528@gmail.com")
-                .nickname("데일이")
-                .password("11112222")
-                .name(null)
-                .phone("01012341234")
-                .build();
-
-        // expected
-        mockMvc.perform(post("/settings/account").cookie(getCookie())
-                        .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(editMemberDto))
-                )
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("회원정보 수정 실패 : 이메일 형식 불일치")
-    void test4_2() throws Exception {
-        // given
-        signup();
-        login();
-
-        EditMemberDto editMemberDto = EditMemberDto.builder()
-                .email("kdha4585")  // email 양식 틀림
-                .nickname("데일이")
-                .phone(null)
-                .name(null)
-                .password("12345678")
-                .build();
-
-        // expected
-        mockMvc.perform(post("/settings/account").cookie(getCookie())
-                        .content(objectMapper.writeValueAsString(editMemberDto))
-                        .contentType(APPLICATION_JSON)
-                )
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("회원정보 수정 성공 : 전부 null인 경우")
-    void test4_3() throws Exception {
-        // given
-        signup();
-        login();
-
-        EditMemberDto editMemberDto = EditMemberDto.builder()    // 전부 null인 경우
-                .email(null)
-                .nickname(null)
-                .password(null)
-                .name(null)
-                .phone(null)
-                .build();
-
-        // expected
-        mockMvc.perform(post("/settings/account").cookie(getCookie())
-                        .content(objectMapper.writeValueAsString(editMemberDto))
-                        .contentType(APPLICATION_JSON)
-                )
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("회원정보 수정 성공 : 전부 그대로인 경우")
-    void test4_4() throws Exception {
-        // given
-        signup();
-        login();
-
-        EditMemberDto editMemberDto = EditMemberDto.builder()
-                .email("kdha4585@gmail.com")
-                .password("12341234")
-                .name("김동하")
-                .nickname("데일이")
-                .phone("01075444357")
-                .build();
-
-        // expected
-        mockMvc.perform(post("/settings/account").cookie(getCookie())
-                        .content(objectMapper.writeValueAsString(editMemberDto))
-                        .contentType(APPLICATION_JSON)
-                )
-                .andExpect(status().isOk())
-                .andDo(print());
-
-    }
-
-    @Test
     @DisplayName("회원탈퇴 성공")
     void test5_1() throws Exception {
         // given
@@ -680,7 +583,7 @@ class MemberControllerTest {
         EmailDto emailDto = EmailDto.builder()
                 .email("kdha0528@gmail.com")
                 .build();
-        
+
         // expected
         mockMvc.perform(post("/settings/account/email").cookie(getCookie())
                         .contentType(APPLICATION_JSON)

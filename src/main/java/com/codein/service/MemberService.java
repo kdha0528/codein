@@ -4,7 +4,6 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Session;
 import com.codein.domain.image.ProfileImage;
 import com.codein.domain.member.Member;
-import com.codein.domain.member.MemberEditor;
 import com.codein.domain.member.ProfileEditor;
 import com.codein.error.exception.member.*;
 import com.codein.error.exception.profileimage.ImageTooLargeException;
@@ -104,49 +103,6 @@ public class MemberService {
                 .orElseThrow(MemberNotLoginException::new);
 
         sessionRepository.delete(session);
-    }
-
-    @Transactional
-    public void editMember(String accessToken, EditMemberServiceDto editMemberServiceDto) {
-        Session session = sessionRepository.findByAccessToken(accessToken)
-                .orElseThrow(MemberNotLoginException::new);
-
-        Member member = session.getMember();
-
-        if (editMemberServiceDto.getEmail() != null) {
-            Member emailMember = memberRepository.findByEmail(editMemberServiceDto.getEmail());
-            if (emailMember != null && !Objects.equals(emailMember.getEmail(), member.getEmail())) {
-                throw new EmailAlreadyExistsException();
-            }
-        }
-        if (editMemberServiceDto.getPhone() != null) {
-            Member phoneMember = memberRepository.findByPhone(editMemberServiceDto.getPhone());
-            if (phoneMember != null && !Objects.equals(phoneMember.getPhone(), member.getPhone())) {
-                throw new PhoneAlreadyExistsException();
-            }
-        }
-        if (editMemberServiceDto.getNickname() != null) {
-            Member nicknameMember = memberRepository.findByNickname(editMemberServiceDto.getNickname());
-            if (nicknameMember != null && !Objects.equals(nicknameMember.getNickname(), member.getNickname())) {
-                throw new NicknameAlreadyExistsException();
-            }
-        }
-
-        String encryptedPassword = null;
-        MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
-        if (editMemberServiceDto.getPassword() != null) {
-            encryptedPassword = passwordEncoder.encrypt(editMemberServiceDto.getPassword());
-        }
-
-        MemberEditor memberEditor = memberEditorBuilder
-                .email(editMemberServiceDto.getEmail())
-                .password(encryptedPassword)
-                .name(editMemberServiceDto.getName())
-                .nickname(editMemberServiceDto.getNickname())
-                .phone(editMemberServiceDto.getPhone())
-                .build();
-
-        member.edit(memberEditor);
     }
 
     @Transactional

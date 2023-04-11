@@ -4,7 +4,6 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.member.Member;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
-import com.codein.requestdto.member.EditMemberDto;
 import com.codein.requestdto.member.EditProfileDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
@@ -132,45 +131,6 @@ class MemberServiceTest {
         Assertions.assertNull(nullMember);
     }
 
-    @Test
-    @DisplayName("회원정보 수정 성공")
-    void test4() {
-        // given
-        SignupDto signupDto = SignupDto.builder()
-                .name("김동하")
-                .nickname("데일이")
-                .email("kdha4585@gmail.com")
-                .password("12341234")
-                .birth("2000-01-01")
-                .sex("male")
-                .phone("01012341234")
-                .build();
-        memberService.signup(signupDto.toSignupServiceDto());
-
-        LoginDto login = LoginDto.builder()
-                .email("kdha4585@gmail.com")
-                .password("12341234")
-                .build();
-
-        String accessToken = memberService.login(login.toMemberServiceDto());
-
-        EditMemberDto editMemberDto = EditMemberDto.builder()
-                .email("kdha0528@gmail.com")
-                .nickname("데일이")
-                .phone("01044444444")
-                .name(null)
-                .password("11112222")
-                .build();
-        // when
-        memberService.editMember(accessToken, editMemberDto.toEditMemberServiceDto());
-
-        // then
-        Member editedMember = memberRepository.findByEmail(editMemberDto.getEmail());
-        Assertions.assertEquals(signupDto.getName(), editedMember.getName());
-        Assertions.assertEquals(editMemberDto.getEmail(), editedMember.getEmail());
-        Assertions.assertEquals(editMemberDto.getPhone(), editedMember.getPhone());
-        Assertions.assertTrue(passwordEncoder.matches(editMemberDto.getPassword(), editedMember.getPassword()));
-    }
 
     @Test
     @DisplayName("회원탈퇴 성공")
