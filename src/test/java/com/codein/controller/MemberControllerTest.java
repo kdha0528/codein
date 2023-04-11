@@ -7,10 +7,7 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepositoryCustom;
-import com.codein.requestdto.member.EditMemberDto;
-import com.codein.requestdto.member.EditProfileDto;
-import com.codein.requestdto.member.LoginDto;
-import com.codein.requestdto.member.SignupDto;
+import com.codein.requestdto.member.*;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -648,6 +645,67 @@ class MemberControllerTest {
                         .contentType(MULTIPART_FORM_DATA)
                         .accept(APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    void test8_1() throws Exception {
+        // given
+        signup();
+        login();
+
+        PasswordDto passwordDto = PasswordDto.builder()
+                .password("11112222")
+                .build();
+
+        System.out.println(memberRepository.findByAccessToken(getCookie().getValue()).getPassword());
+        // expected
+        mockMvc.perform(post("/settings/account/password").cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(passwordDto))
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("이메일 변경 성공")
+    void test9_1() throws Exception {
+        // given
+        signup();
+        login();
+
+        EmailDto emailDto = EmailDto.builder()
+                .email("kdha0528@gmail.com")
+                .build();
+        
+        // expected
+        mockMvc.perform(post("/settings/account/email").cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(emailDto))
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("전화번호 변경 성공")
+    void test10_1() throws Exception {
+        // given
+        signup();
+        login();
+
+        PhoneDto phoneDto = PhoneDto.builder()
+                .phone("01011112222")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/settings/account/phone").cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(phoneDto))
+                )
                 .andExpect(status().isOk())
                 .andDo(print());
     }

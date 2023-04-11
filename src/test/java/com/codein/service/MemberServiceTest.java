@@ -240,4 +240,5 @@ class MemberServiceTest {
         Assertions.assertEquals(editProfileDto.getName(), editedMember.getName());
         Assertions.assertEquals(editProfileDto.getNickname(), editedMember.getNickname());
     }
+
 }

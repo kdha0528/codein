@@ -73,27 +73,23 @@ public class MemberController {
     }
 
     @MySecured(role = Role.MEMBER)
-    @PostMapping("/settings/password/change")
-    public void changePassword(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody PasswordDto passwordDto) {
+    @PostMapping("/settings/account/password")
+    public void changePassword(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid PasswordDto passwordDto) {
         memberService.changePassword(cookie.getValue(), passwordDto.toPasswordServiceDto());
+        memberService.logout(cookie.getValue());
     }
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/settings/account/email")
-    public void changeEmail(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute EmailDto emailDto) {
+    public void changeEmail(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EmailDto emailDto) {
         memberService.changeEmail(cookie.getValue(), emailDto.toEmailServiceDto());
+        memberService.logout(cookie.getValue());
     }
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/settings/account/phone")
-    public void changePhone(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute PhoneDto phoneDto) {
+    public void changePhone(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid PhoneDto phoneDto) {
         memberService.changePhone(cookie.getValue(), phoneDto.toPhoneServiceDto());
-    }
-
-    @MySecured(role = Role.MEMBER)
-    @PostMapping("/settings/account")
-    public void editMember(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EditMemberDto editMemberDto) {
-        memberService.editMember(cookie.getValue(), editMemberDto.toEditMemberServiceDto());
         memberService.logout(cookie.getValue());
     }
 

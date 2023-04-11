@@ -156,12 +156,7 @@ public class MemberService {
 
         Member member = session.getMember();
 
-        String encryptedPassword = null;
-        MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
-        if (passwordServiceDto.getPassword() != null) {
-            encryptedPassword = passwordEncoder.encrypt(passwordServiceDto.getPassword());
-        }
-        member.setPassword(encryptedPassword);
+        member.setPassword(passwordEncoder.encrypt(passwordServiceDto.getPassword()));
     }
 
     @Transactional
