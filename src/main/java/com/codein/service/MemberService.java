@@ -6,17 +6,14 @@ import com.codein.domain.image.ProfileImage;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.MemberEditor;
 import com.codein.domain.member.ProfileEditor;
-import com.codein.error.exception.ImageTooLargeException;
-import com.codein.error.exception.InvalidImageException;
 import com.codein.error.exception.member.*;
+import com.codein.error.exception.profileimage.ImageTooLargeException;
+import com.codein.error.exception.profileimage.InvalidImageException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.PageSizeDto;
-import com.codein.requestservicedto.member.EditMemberServiceDto;
-import com.codein.requestservicedto.member.EditProfileServiceDto;
-import com.codein.requestservicedto.member.LoginServiceDto;
-import com.codein.requestservicedto.member.SignupServiceDto;
+import com.codein.requestservicedto.member.*;
 import com.codein.responsedto.LoginResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -151,6 +148,52 @@ public class MemberService {
 
         member.edit(memberEditor);
     }
+
+    @Transactional
+    public void changePassword(String accessToken, PasswordServiceDto passwordServiceDto) {
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(MemberNotLoginException::new);
+
+        Member member = session.getMember();
+
+        String encryptedPassword = null;
+        MemberEditor.MemberEditorBuilder memberEditorBuilder = member.toEditor();
+        if (passwordServiceDto.getPassword() != null) {
+            encryptedPassword = passwordEncoder.encrypt(passwordServiceDto.getPassword());
+        }
+        member.setPassword(encryptedPassword);
+    }
+
+    @Transactional
+    public void changeEmail(String accessToken, EmailServiceDto emailServiceDto) {
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(MemberNotLoginException::new);
+
+        Member member = session.getMember();
+
+        Member emailMember = memberRepository.findByEmail(emailServiceDto.getEmail());
+        if (emailMember != null && !Objects.equals(emailMember.getEmail(), member.getEmail())) {
+            throw new EmailAlreadyExistsException();
+        }
+
+        member.setEmail(emailServiceDto.getEmail());
+    }
+
+    @Transactional
+    public void changePhone(String accessToken, PhoneServiceDto phoneServiceDto) {
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(MemberNotLoginException::new);
+
+        Member member = session.getMember();
+
+        Member phoneMember = memberRepository.findByPhone(phoneServiceDto.getPhone());
+        if (phoneMember != null && !Objects.equals(phoneMember.getEmail(), member.getEmail())) {
+            throw new EmailAlreadyExistsException();
+        }
+
+        member.setPhone(phoneServiceDto.getPhone());
+    }
+
 
     @Transactional
     public void editProfile(String accessToken, EditProfileServiceDto editProfileServiceDto) {

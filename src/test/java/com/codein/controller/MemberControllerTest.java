@@ -650,7 +650,5 @@ class MemberControllerTest {
                         .characterEncoding("UTF-8"))
                 .andExpect(status().isOk())
                 .andDo(print());
-
-        System.out.println("stop");
     }
 }

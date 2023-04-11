@@ -8,10 +8,7 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.PageSizeDto;
-import com.codein.requestdto.member.EditMemberDto;
-import com.codein.requestdto.member.EditProfileDto;
-import com.codein.requestdto.member.LoginDto;
-import com.codein.requestdto.member.SignupDto;
+import com.codein.requestdto.member.*;
 import com.codein.responsedto.LoginResponseDto;
 import com.codein.responsedto.ProfileResponseDto;
 import com.codein.service.MemberService;
@@ -73,6 +70,24 @@ public class MemberController {
     @PostMapping("/settings/profile")
     public void editProfile(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute EditProfileDto editProfileDto) {
         memberService.editProfile(cookie.getValue(), editProfileDto.toEditProfileServiceDto());
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/settings/password/change")
+    public void changePassword(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody PasswordDto passwordDto) {
+        memberService.changePassword(cookie.getValue(), passwordDto.toPasswordServiceDto());
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/settings/account/email")
+    public void changeEmail(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute EmailDto emailDto) {
+        memberService.changeEmail(cookie.getValue(), emailDto.toEmailServiceDto());
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/settings/account/phone")
+    public void changePhone(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute PhoneDto phoneDto) {
+        memberService.changePhone(cookie.getValue(), phoneDto.toPhoneServiceDto());
     }
 
     @MySecured(role = Role.MEMBER)
