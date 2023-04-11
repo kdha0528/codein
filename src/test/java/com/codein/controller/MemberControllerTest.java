@@ -6,7 +6,9 @@ import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.repository.profileimage.ProfileImageRepositoryCustom;
 import com.codein.requestdto.member.EditMemberDto;
+import com.codein.requestdto.member.EditProfileDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
 import com.codein.service.MemberService;
@@ -16,12 +18,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,11 +49,32 @@ class MemberControllerTest {
     private SessionRepository sessionRepository;
     @Autowired
     private MemberService memberService;
+    @Value("${spring.servlet.multipart.location}")
+    private String uploadPath;
+    @Autowired
+    @Qualifier("profileImageRepository")
+    private ProfileImageRepositoryCustom profileImageRepository;
 
+    public void deleteOrphanProfileImage() {
+        File file = new File(uploadPath);
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                assert files != null;
+                for (File value : files) {
+                    if (profileImageRepository.findByName(value.getName()) == null) {
+                        if (value.delete()) System.out.println(value.getName() + "삭제 성공");
+                        else System.out.println(value.getName() + "삭제 실패");
+                    }
+                }
+            }
+        }
+    }
 
     @AfterEach
     void clean() {
         memberRepository.deleteAll();
+        deleteOrphanProfileImage();
     }
 
     void signup() {
@@ -362,7 +393,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/settings/profile").cookie(getCookie())
+        mockMvc.perform(post("/settings/account").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editMemberDto))
                 )
@@ -386,7 +417,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/settings/profile").cookie(getCookie())
+        mockMvc.perform(post("/settings/account").cookie(getCookie())
                         .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
@@ -410,7 +441,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/settings/profile").cookie(getCookie())
+        mockMvc.perform(post("/settings/account").cookie(getCookie())
                         .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
@@ -434,7 +465,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/settings/profile").cookie(getCookie())
+        mockMvc.perform(post("/settings/account").cookie(getCookie())
                         .content(objectMapper.writeValueAsString(editMemberDto))
                         .contentType(APPLICATION_JSON)
                 )
@@ -487,5 +518,139 @@ class MemberControllerTest {
         mockMvc.perform(get("/members/{memberId}", memberId).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("프로필 수정: 이미지가 없는 경우 성공")
+    void Test7_1() throws Exception {
+        // given
+        signup();
+        login();
+
+        EditProfileDto editProfileDto = EditProfileDto.builder()
+                .name("김복자")
+                .nickname("데일이")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/settings/profile")
+                        .cookie(getCookie())
+                        .content(objectMapper.writeValueAsString(editProfileDto))
+                        .contentType(APPLICATION_JSON)
+                        .accept(APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("프로필 수정: 이미지가 있는 경우 성공")
+    void Test7_2() throws Exception {
+        // given
+        signup();
+        login();
+
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test.png");
+        MockMultipartFile profileImage = new MockMultipartFile("profileImage", "test.png", "image/png", new FileInputStream(file.getPath()));
+        EditProfileDto editProfileDto = EditProfileDto.builder()
+                .name("김복자")
+                .nickname("데일이")
+                .build();
+
+        String content = objectMapper.writeValueAsString(editProfileDto);
+        MockMultipartFile json = new MockMultipartFile("edit-profile-dto", "jsondata", "application/json", content.getBytes(StandardCharsets.UTF_8));
+
+        // expected
+        mockMvc.perform(multipart("/settings/profile")
+                        .file(json)
+                        .file(profileImage)
+                        .cookie(getCookie())
+                        .contentType(MULTIPART_FORM_DATA)
+                        .accept(APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("프로필 수정 실패: 사진 용량 초과")
+    void Test7_3() throws Exception {
+        // given
+        signup();
+        login();
+
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test2.png");
+        MockMultipartFile profileImage = new MockMultipartFile("profileImage", "test2.png", "image/png", new FileInputStream(file.getPath()));
+        EditProfileDto editProfileDto = EditProfileDto.builder()
+                .name("김복자")
+                .nickname("데일이")
+                .build();
+
+        String content = objectMapper.writeValueAsString(editProfileDto);
+        MockMultipartFile json = new MockMultipartFile("editProfileDto", "jsondata", "application/json", content.getBytes(StandardCharsets.UTF_8));
+
+        // expected
+        mockMvc.perform(multipart("/settings/profile")
+                        .file(json)
+                        .file(profileImage)
+                        .cookie(getCookie())
+                        .contentType(MULTIPART_FORM_DATA)
+                        .accept(APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("프로필 수정 성공: 사진 변경 시 기존 사진 삭제")
+    void Test7_4() throws Exception {
+        // given
+        signup();
+        login();
+
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test.png");
+        MockMultipartFile profileImage = new MockMultipartFile("profileImage", "test.png", "image/png", new FileInputStream(file.getPath()));
+        EditProfileDto editProfileDto = EditProfileDto.builder()
+                .name("김복자")
+                .nickname("데일이")
+                .build();
+
+        String content = objectMapper.writeValueAsString(editProfileDto);
+        MockMultipartFile json = new MockMultipartFile("editProfileDto", "jsondata", "application/json", content.getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(multipart("/settings/profile")
+                        .file(json)
+                        .file(profileImage)
+                        .cookie(getCookie())
+                        .contentType(MULTIPART_FORM_DATA)
+                        .accept(APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        File file2 = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test3.jpg");
+        MockMultipartFile profileImage2 = new MockMultipartFile("profileImage", "test3.jpg", "image/jpg", new FileInputStream(file2.getPath()));
+        EditProfileDto editProfileDto2 = EditProfileDto.builder()
+                .name("김복자")
+                .nickname("데일이")
+                .build();
+
+        String content2 = objectMapper.writeValueAsString(editProfileDto2);
+        MockMultipartFile json2 = new MockMultipartFile("editProfileDto", "jsondata", "application/json", content2.getBytes(StandardCharsets.UTF_8));
+
+        // expected
+        mockMvc.perform(multipart("/settings/profile")
+                        .file(json2)
+                        .file(profileImage2)
+                        .cookie(getCookie())
+                        .contentType(MULTIPART_FORM_DATA)
+                        .accept(APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        System.out.println("stop");
     }
 }

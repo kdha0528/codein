@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.nio.file.AccessDeniedException;
 
@@ -86,5 +87,12 @@ public class GlobalExceptionHandler {
         log.error("handleEntityNotFoundException", e);
         final ErrorResponseDto response = ErrorResponseDto.of(ErrorCode.INTERNAL_SERVER_ERROR);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponseDto> handleMaxSizeException(MaxUploadSizeExceededException e) {
+        log.error("handleMaxSizeException", e);
+        final ErrorResponseDto response = ErrorResponseDto.of(ErrorCode.PAYLOAD_TOO_LARGE);
+        return new ResponseEntity<>(response, HttpStatus.PAYLOAD_TOO_LARGE);
     }
 }

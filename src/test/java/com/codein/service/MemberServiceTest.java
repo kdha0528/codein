@@ -3,7 +3,9 @@ package com.codein.service;
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.member.Member;
 import com.codein.repository.member.MemberRepository;
+import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.member.EditMemberDto;
+import com.codein.requestdto.member.EditProfileDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
 import org.junit.jupiter.api.AfterEach;
@@ -12,8 +14,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseCookie;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -26,6 +34,10 @@ class MemberServiceTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    ResourceLoader resourceLoader;
+    @Autowired
+    private ProfileImageRepository profileImageRepository;
 
 
     @AfterEach
@@ -187,5 +199,45 @@ class MemberServiceTest {
 
         // then
         Assertions.assertNull(memberRepository.findByEmail(signupDto.getEmail()));
+    }
+
+    @Test
+    @DisplayName("프로필 수정 성공")
+    void test6() throws IOException {
+        // given
+        SignupDto signupDto = SignupDto.builder()
+                .name("김동하")
+                .nickname("데일이")
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("01012341234")
+                .build();
+        memberService.signup(signupDto.toSignupServiceDto());
+
+        LoginDto login = LoginDto.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        String accessToken = memberService.login(login.toMemberServiceDto());
+
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test.png");
+        MultipartFile multipartFile = new MockMultipartFile("image", "test.png", "image/png", new FileInputStream(file));
+        System.out.println("getContentType = " + multipartFile.getContentType());
+
+        EditProfileDto editProfileDto = EditProfileDto.builder()
+                .name("김복자")
+                .nickname("데일이")
+                .profileImage(multipartFile)
+                .build();
+
+        // when
+        memberService.editProfile(accessToken, editProfileDto.toEditProfileServiceDto());
+
+        // then
+        Member editedMember = memberRepository.findByEmail("kdha4585@gmail.com");
+        Assertions.assertEquals(editProfileDto.getName(), editedMember.getName());
+        Assertions.assertEquals(editProfileDto.getNickname(), editedMember.getNickname());
     }
 }

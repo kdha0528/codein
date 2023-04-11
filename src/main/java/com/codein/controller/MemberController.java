@@ -9,6 +9,7 @@ import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.member.EditMemberDto;
+import com.codein.requestdto.member.EditProfileDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
 import com.codein.responsedto.LoginResponseDto;
@@ -69,14 +70,20 @@ public class MemberController {
     }
 
     @MySecured(role = Role.MEMBER)
-    @PostMapping("/settings/account/edit")
-    public void editMember(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EditMemberDto editMemberDto, HttpServletResponse response) {
+    @PostMapping("/settings/profile")
+    public void editProfile(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute EditProfileDto editProfileDto) {
+        memberService.editProfile(cookie.getValue(), editProfileDto.toEditProfileServiceDto());
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/settings/account")
+    public void editMember(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EditMemberDto editMemberDto) {
         memberService.editMember(cookie.getValue(), editMemberDto.toEditMemberServiceDto());
         memberService.logout(cookie.getValue());
     }
 
     @MySecured(role = Role.MEMBER)
-    @DeleteMapping("/settings/account/delete")
+    @DeleteMapping("/settings/account")
     public String deleteMember(@CookieValue(value = "accesstoken") Cookie cookie, HttpServletResponse response) {
         memberService.deleteMember(cookie.getValue());
         return "redirect:/home";

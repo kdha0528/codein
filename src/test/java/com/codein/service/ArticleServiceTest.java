@@ -81,7 +81,7 @@ class ArticleServiceTest {
         List<Article> articles = articleRepository.findByMember(member);
         Article article = articles.get(0);
 
-        Assertions.assertEquals(newArticleDto.getCategory(), article.getCategory().getValue());
+        Assertions.assertEquals(newArticleDto.getCategory(), article.getCategory().getName());
         Assertions.assertEquals(newArticleDto.getTitle(), article.getTitle());
         Assertions.assertEquals(newArticleDto.getContent(), article.getContent());
     }
@@ -115,7 +115,7 @@ class ArticleServiceTest {
         List<Article> editedArticles = articleRepository.findByMember(member);
         Article editedArticle = editedArticles.get(0);
 
-        Assertions.assertEquals(editArticleDto.getCategory(), editedArticle.getCategory().getValue());
+        Assertions.assertEquals(editArticleDto.getCategory(), editedArticle.getCategory().getName());
         Assertions.assertEquals(editArticleDto.getTitle(), editedArticle.getTitle());
         Assertions.assertEquals(editArticleDto.getContent(), editedArticle.getContent());
     }

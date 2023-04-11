@@ -4,7 +4,6 @@ spring:
     username: root
     password:
     driver-class-name: org.mariadb.jdbc.Driver
-
   jpa:
     defer-datasource-initialization: true
     generate-ddl: true
@@ -13,4 +12,10 @@ spring:
   sql:
     init:
       mode: always
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 1MB
+      location: C:\workspace\springboot\codein\image\profile\
+
 

@@ -1,6 +1,7 @@
 package com.codein.domain.member;
 
 import com.codein.domain.Session;
+import com.codein.domain.image.ProfileImage;
 import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.responsedto.LoginResponseDto;
 import com.codein.responsedto.ProfileResponseDto;
@@ -41,7 +42,6 @@ public class Member {
     private String birth;
     @NotNull
     private String sex;
-
     @NotNull
     private LocalDateTime createdAt;
 
@@ -52,6 +52,9 @@ public class Member {
 
     @Setter
     private Role role = Role.MEMBER;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private ProfileImage profileImage;
 
     @Builder
     public Member(String email, String password, String name, String nickname, String phone, String birth, String sex) {
@@ -107,6 +110,37 @@ public class Member {
         this.name = memberEditor.getName();
         this.nickname = memberEditor.getNickname();
         this.phone = memberEditor.getPhone();
+    }
+
+    public ProfileEditor.ProfileEditorBuilder toProfileEditor() {
+        if (profileImage == null) {
+            return ProfileEditor.builder()
+                    .name(name)
+                    .nickname(nickname)
+                    .imgFileName(null);
+        } else {
+            return ProfileEditor.builder()
+                    .name(name)
+                    .nickname(nickname)
+                    .imgFileName(profileImage.getImgFileName());
+        }
+    }
+
+    public void editProfile(ProfileEditor profileEditor) {
+        this.name = profileEditor.getName();
+        this.nickname = profileEditor.getNickname();
+        if (profileEditor.getImgFileName() != null) {
+            if (profileImage != null) {
+                this.setProfileImage(null);
+            }
+            this.profileImage = ProfileImage.builder()
+                    .imgFileName(profileEditor.getImgFileName())
+                    .build();
+        }
+    }
+
+    public void setProfileImage(ProfileImage profileImage) {
+        this.profileImage = profileImage;
     }
 
 

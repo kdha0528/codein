@@ -12,6 +12,11 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "C004", "Server Error"),
     INVALID_TYPE_VALUE(400, "C005", " Invalid Type Value"),
     HANDLE_ACCESS_DENIED(403, "C006", "Access is Denied"),
+    PAYLOAD_TOO_LARGE(400, "C007", "Payload is too large."),
+
+    // Image
+
+    IMAGE_INVALID(400, "I001", "Image is invalid"),
 
 
     // Member
