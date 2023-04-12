@@ -3,9 +3,10 @@
 
   <el-form
       status-icon
-      :rules="rules"
       label-width="120px"
       label-position="top"
+      method="post"
+      enctype="multipart/form-data"
       class="demo-ruleForm">
     <el-form-item label="이름" prop="name">
       <el-input v-model="profile.name"/>
@@ -13,86 +14,130 @@
     <el-form-item label="닉네임" prop="nickname">
       <el-input v-model="profile.nickname"/>
     </el-form-item>
+    <el-form-item prop="image" class="mt-5">
+      <el-upload
+          action="#"
+          method="get"
+          :show-file-list="false"
+          :on-success="handleAvatarSuccess"
+          :before-upload="beforeAvatarUpload"
+          accept="image/*"
+      >
+        <img v-if="imageUrl" :src="imageUrl"
+             class="ms-2"
+             style="max-width:5rem; max-height:5rem; width: 5rem; height: 5rem; border-radius: 100%; border: solid 1px black;"
+             alt=""/>
+        <el-icon v-else size="40" class="ms-2"
+                 style="width: 5rem;  height:5rem; border-radius: 100%; border:solid 1px black;">
+          <UserFilled/>
+        </el-icon>
+        <el-button type="primary" class="ms-4">Select</el-button>
+        <template #tip>
+          <div class="el-upload__tip text-danger mt-3">
+            jpg/png files with a size less than 2MB
+          </div>
+        </template>
+      </el-upload>
+    </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="edit()">저장</el-button>
+      <el-button type="primary" @click="edit()"
+                 style="margin:2rem 0 auto auto; width:5rem; height:2.5rem; font-size: 1.1rem;">저장
+      </el-button>
     </el-form-item>
   </el-form>
 </template>
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
-import type { FormRules } from 'element-plus';
+import { ref } from 'vue';
 import axios from 'axios';
 import { authStorage } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import type { UploadProps } from 'element-plus'
+import { ElMessage } from "element-plus";
 
 const auth = authStorage();
 const route = useRouter();
 
+const imageUrl = ref('')
 const profile = ref({
-  email: null as null | '',
   name: null as null | '',
-  password: null as null | '',
   nickname: null as null | '',
-  phone: null as null | '',
-});
-const checkPassword = ref(null as null | '');
+})
 
-axios.get("/my-backend-api/members/{id}").then((response) => {
-  profile.value.email = response.data.email;
+const formData = new FormData();
+
+let imageChanged = false;
+
+const handleAvatarSuccess: UploadProps['onSuccess'] = (
+    response,
+    uploadFile
+) => {
+  formData.set("profileImage", uploadFile.raw!)
+  imageChanged = true
+  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+}
+
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error('Profile picture size can not exceed 2MB!')
+    return false
+  }
+  return true
+}
+/*
+
+axios.get("/my-backend-api/settings/profile").then((response) => {
   profile.value.name = response.data.name;
   profile.value.nickname = response.data.nickname;
-  profile.value.phone = response.data.phone;
 });
+*/
 
-const validatePassword2 = (rule: any, value: any, callback: any) => {
-  if (checkPassword.value !== profile.value.password) {
-    callback(new Error("Two inputs don't match!"));
-  } else {
-    callback();
-  }
-};
-
-const rules = reactive<FormRules>({
-  checkPassword: [{validator: validatePassword2, trigger: 'blur'}],
-});
 
 const edit = function () {
 
-  if (profile.value.email === '') profile.value.email = null;
-  if (profile.value.password === '') profile.value.password = null;
-  if (checkPassword.value === '') checkPassword.value = null;
   if (profile.value.name === '') profile.value.name = null;
   if (profile.value.nickname === '') profile.value.nickname = null;
-  if (profile.value.phone === '') profile.value.phone = null;
 
-  if (profile.value.password !== checkPassword.value) {
-    alert("비밀번호가 일치하지 않습니다.");
-    return;
+  if (imageChanged) {
+    formData.append("name", JSON.stringify(profile.value.name))
+    formData.append("nickname", JSON.stringify(profile.value.nickname))
+
+    axios.post('/my-backend-api/settings/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    }).then(() => {
+      auth.logout();
+      route.replace("home");
+    }).catch(error => {
+      if (error.response.data.code == "C001") {
+        alert("양식에 맞지 않습니다.");
+      } else if (error.response.data.code == "M008") {
+        alert("이미 존재하는 닉네임입니다.");
+      } else if (error.response.data.code == "I001") {
+        alert("사진 용량 초과입니다.");
+      } else {
+        alert(error);
+      }
+      route.replace("/settings/profile");
+    })
+  } else {
+    axios.post('/my-backend-api/settings/profile', {
+      name: profile.value.name,
+      nickname: profile.value.nickname
+    }).then(() => {
+      auth.logout();
+      route.replace("home");
+    }).catch(error => {
+      if (error.response.data.code == "C001") {
+        alert("양식에 맞지 않습니다.");
+      } else if (error.response.data.code == "M008") {
+        alert("이미 존재하는 닉네임입니다.");
+      } else {
+        alert(error);
+      }
+      route.replace("/settings/profile");
+    })
   }
-
-  axios.post('/my-backend-api/settings/account/edit', {
-    email: profile.value.email,
-    password: profile.value.password,
-    name: profile.value.name,
-    nickname: profile.value.nickname,
-    phone: profile.value.phone,
-  }).then(() => {
-    auth.logout();
-    route.replace("home");
-  }).catch(error => {
-    if (error.response.data.code == "C001") {
-      alert("양식에 맞지 않습니다.");
-    } else if (error.response.data.code == "M001") {
-      alert("이미 존재하는 이메일입니다.");
-    } else if (error.response.data.code == "M007") {
-      alert("이미 존재하는 전화번호입니다.");
-    } else if (error.response.data.code == "M008") {
-      alert("이미 존재하는 닉네임입니다.");
-    } else {
-      alert(error);
-    }
-    route.replace("/settings/profile");
-  })
 
 
 };
