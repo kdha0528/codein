@@ -3,7 +3,7 @@
     <el-header>
       <el-menu mode="horizontal" router>
         <el-menu-item index="/home">Home</el-menu-item>
-        <el-menu-item index="/settings">개인정보</el-menu-item>
+        <el-menu-item index="/settings/profile">개인정보</el-menu-item>
         <el-menu-item index="/logout" @click="logout">로그아웃</el-menu-item>
       </el-menu>
     </el-header>

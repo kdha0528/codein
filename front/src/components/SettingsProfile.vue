@@ -9,10 +9,10 @@
       enctype="multipart/form-data"
       class="demo-ruleForm">
     <el-form-item label="이름" prop="name">
-      <el-input v-model="profile.name"/>
+      <el-input v-model='profile.name'/>
     </el-form-item>
     <el-form-item label="닉네임" prop="nickname">
-      <el-input v-model="profile.nickname"/>
+      <el-input v-model='profile.nickname'/>
     </el-form-item>
     <el-form-item prop="image" class="mt-5">
       <el-upload
@@ -59,8 +59,8 @@ const route = useRouter();
 
 const imageUrl = ref('')
 const profile = ref({
-  name: null as null | '',
-  nickname: null as null | '',
+  name: '',
+  nickname: '',
 })
 
 const formData = new FormData();
@@ -71,9 +71,9 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
     response,
     uploadFile
 ) => {
-  formData.set("profileImage", uploadFile.raw!)
   imageChanged = true
   imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+  formData.set("profileImage", uploadFile.raw!)
 }
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
@@ -83,19 +83,17 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   }
   return true
 }
-/*
 
 axios.get("/my-backend-api/settings/profile").then((response) => {
   profile.value.name = response.data.name;
   profile.value.nickname = response.data.nickname;
+  if (response.data.profileImage !== null) {
+    imageUrl.value = URL.createObjectURL(response.data.profileImage);
+  }
 });
-*/
 
 
 const edit = function () {
-
-  if (profile.value.name === '') profile.value.name = null;
-  if (profile.value.nickname === '') profile.value.nickname = null;
 
   if (imageChanged) {
     formData.append("name", JSON.stringify(profile.value.name))
@@ -126,7 +124,7 @@ const edit = function () {
       nickname: profile.value.nickname
     }).then(() => {
       auth.logout();
-      route.replace("home");
+      route.replace("/home");
     }).catch(error => {
       if (error.response.data.code == "C001") {
         alert("양식에 맞지 않습니다.");

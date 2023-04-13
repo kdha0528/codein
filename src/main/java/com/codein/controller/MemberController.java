@@ -11,6 +11,7 @@ import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.member.*;
 import com.codein.responsedto.LoginResponseDto;
 import com.codein.responsedto.ProfileResponseDto;
+import com.codein.responsedto.ProfileSettingsResponseDto;
 import com.codein.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -64,6 +66,17 @@ public class MemberController {
         Member member = memberRepository.findById(id)
                 .orElseThrow(MemberNotExistsException::new);
         return member.toProfileResponse();
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @GetMapping(value = "/settings/profile")
+    public ProfileSettingsResponseDto getProfileSettings(@CookieValue(value = "accesstoken") Cookie cookie) throws IOException {
+        Member member = memberRepository.findByAccessToken(cookie.getValue());
+        if (member != null) {
+            return member.toProfileSettingsResponse();
+        } else {
+            throw new MemberNotExistsException();
+        }
     }
 
     @MySecured(role = Role.MEMBER)

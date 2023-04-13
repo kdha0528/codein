@@ -5,10 +5,12 @@ import com.codein.domain.image.ProfileImage;
 import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.responsedto.LoginResponseDto;
 import com.codein.responsedto.ProfileResponseDto;
+import com.codein.responsedto.ProfileSettingsResponseDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +86,14 @@ public class Member {
                 .name(this.getName())
                 .nickname(this.getNickname())
                 .phone(this.getPhone())
+                .build();
+    }
+
+    public ProfileSettingsResponseDto toProfileSettingsResponse() throws IOException {
+        return ProfileSettingsResponseDto.builder()
+                .name(this.getName())
+                .nickname(this.getNickname())
+                .profileImage(this.getProfileImage())
                 .build();
     }
 

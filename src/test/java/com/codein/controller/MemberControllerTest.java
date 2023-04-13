@@ -6,7 +6,7 @@ import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.repository.profileimage.ProfileImageRepositoryCustom;
+import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.member.*;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,8 +48,7 @@ class MemberControllerTest {
     @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
     @Autowired
-    @Qualifier("profileImageRepository")
-    private ProfileImageRepositoryCustom profileImageRepository;
+    private ProfileImageRepository profileImageRepository;
 
     public void deleteOrphanProfileImage() {
         File file = new File(uploadPath);
@@ -548,6 +546,66 @@ class MemberControllerTest {
                         .contentType(MULTIPART_FORM_DATA)
                         .accept(APPLICATION_JSON)
                         .characterEncoding("UTF-8"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("프로필 수정 페이지 정보 가져오기 성공: 이미지 있을 때")
+    void Test7_5() throws Exception {
+        // given
+        signup();
+        login();
+
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test.png");
+        MockMultipartFile profileImage = new MockMultipartFile("profileImage", "test.png", "image/png", new FileInputStream(file.getPath()));
+        EditProfileDto editProfileDto = EditProfileDto.builder()
+                .name("김복자")
+                .nickname("데일이")
+                .build();
+
+        String content = objectMapper.writeValueAsString(editProfileDto);
+        MockMultipartFile json = new MockMultipartFile("editProfileDto", "jsondata", "application/json", content.getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(multipart("/settings/profile")
+                        .file(json)
+                        .file(profileImage)
+                        .cookie(getCookie())
+                        .contentType(MULTIPART_FORM_DATA)
+                        .accept(APPLICATION_JSON)
+                        .characterEncoding("UTF-8"))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        // expected
+        mockMvc.perform(get("/settings/profile")
+                        .cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("프로필 수정 페이지 정보 가져오기 성공: 이미지 없을 때")
+    void Test7_6() throws Exception {
+        // given
+        signup();
+        login();
+
+        EditProfileDto editProfileDto = EditProfileDto.builder()
+                .name("김복자")
+                .nickname("데일이")
+                .build();
+
+        mockMvc.perform(post("/settings/profile")
+                        .cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editProfileDto)))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        // expected
+        mockMvc.perform(get("/settings/profile")
+                        .cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
