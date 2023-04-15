@@ -39,6 +39,9 @@ export default defineConfig({
             '/my-backend-api/settings/profile': {
                 target: 'http://localhost:8080',
                 rewrite: (path) => path.replace(/^\/my-backend-api/, '')
+            }, '/image/profile/*': {
+                target: 'http://localhost:8080',
+                rewrite: (path) => path.replace(/^\/image/, '/images')
             },
             '/my-backend-api/settings/account': {
                 target: 'http://localhost:8080',

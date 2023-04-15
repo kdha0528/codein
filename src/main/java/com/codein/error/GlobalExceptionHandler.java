@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.nio.file.AccessDeniedException;
 
@@ -95,4 +96,12 @@ public class GlobalExceptionHandler {
         final ErrorResponseDto response = ErrorResponseDto.of(ErrorCode.PAYLOAD_TOO_LARGE);
         return new ResponseEntity<>(response, HttpStatus.PAYLOAD_TOO_LARGE);
     }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorResponseDto> noHandlerFoundHandle(NoHandlerFoundException e) {
+        log.error("noHandlerFoundHandleException", e);
+        final ErrorResponseDto response = ErrorResponseDto.of(ErrorCode.HANDLER_NOT_FOUND);
+        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatus()));
+    }
+
 }

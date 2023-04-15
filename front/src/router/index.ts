@@ -33,22 +33,20 @@ const router = createRouter({
             component: HomeView,
         },
         {
-            path: '/profile',
-            name: 'profile',
-            component: ProfileView,
-        },
-        {
             path: '/settings',
             name: 'settings',
             component: SettingsView,
             children: [{
                 path: '',
+                name: 'profile',
                 component: SettingsProfile,
             }, {
                 path: 'profile',
+                name: 'profile',
                 component: SettingsProfile,
             }, {
                 path: 'account',
+                name: 'account',
                 component: SettingsAccount,
             }]
         },

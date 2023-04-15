@@ -67,6 +67,7 @@ const formData = new FormData();
 
 let imageChanged = false;
 
+
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
     response,
     uploadFile
@@ -84,28 +85,27 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   return true
 }
 
-axios.get("/my-backend-api/settings/profile").then((response) => {
+axios({
+  method: 'get',
+  url: '/my-backend-api/settings/profile',
+}).then((response) => {
+  imageUrl.value = response.data.imagePath;
   profile.value.name = response.data.name;
   profile.value.nickname = response.data.nickname;
-  if (response.data.profileImage !== null) {
-    imageUrl.value = URL.createObjectURL(response.data.profileImage);
-  }
 });
-
 
 const edit = function () {
 
   if (imageChanged) {
-    formData.append("name", JSON.stringify(profile.value.name))
-    formData.append("nickname", JSON.stringify(profile.value.nickname))
+    formData.append("name", profile.value.name)
+    formData.append("nickname", profile.value.nickname)
 
     axios.post('/my-backend-api/settings/profile', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       }
     }).then(() => {
-      auth.logout();
-      route.replace("home");
+      route.back();
     }).catch(error => {
       if (error.response.data.code == "C001") {
         alert("양식에 맞지 않습니다.");
@@ -123,8 +123,7 @@ const edit = function () {
       name: profile.value.name,
       nickname: profile.value.nickname
     }).then(() => {
-      auth.logout();
-      route.replace("/home");
+      route.back();
     }).catch(error => {
       if (error.response.data.code == "C001") {
         alert("양식에 맞지 않습니다.");

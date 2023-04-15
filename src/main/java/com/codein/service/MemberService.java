@@ -2,7 +2,6 @@ package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.Session;
-import com.codein.domain.image.ProfileImage;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.ProfileEditor;
 import com.codein.error.exception.member.*;
@@ -167,21 +166,20 @@ public class MemberService {
                 .nickname(editProfileServiceDto.getNickname())
                 .imgFileName(imgFileName)
                 .build();
-
-        removeProfileImage(member.getProfileImage());
+        if (member.getProfileImage() != null) {
+            removeProfileImage(member.getProfileImage().getImgFileName());
+        }
         member.editProfile(profileEditor);
     }
 
     @Transactional
-    public void removeProfileImage(ProfileImage profileImage) {
-        if (profileImage != null) {
-            File file = new File(uploadPath + "\\" + profileImage.getImgFileName());
-            if (file.exists()) {
-                if (file.delete()) {
-                    System.out.println("파일 삭제 성공");
-                } else {
-                    System.out.println("파일 삭제 실패");
-                }
+    public void removeProfileImage(String imgFileName) {
+        File file = new File(uploadPath + "profile\\" + imgFileName);
+        if (file.exists()) {
+            if (file.delete()) {
+                System.out.println("파일 삭제 성공");
+            } else {
+                System.out.println("파일 삭제 실패");
             }
         }
     }
@@ -195,11 +193,11 @@ public class MemberService {
         }
 
         if (file.getSize() > 1000000) throw new ImageTooLargeException(); // 사진 크기가 1MB 넘어가면 Exception
-
+        String extension = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));
         UUID uuid = UUID.randomUUID();
-        String imageFileName = uuid + "_" + file.getOriginalFilename();
-
-        Path imageFilePath = Paths.get(uploadPath + imageFileName);
+        String imageFileName = uuid + extension;
+        System.out.println(uploadPath);
+        Path imageFilePath = Paths.get(uploadPath + "profile\\" + imageFileName);
 
         try {
             Files.write(imageFilePath, file.getBytes());
@@ -215,7 +213,9 @@ public class MemberService {
         Session session = sessionRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
         Member member = session.getMember();
-        removeProfileImage(member.getProfileImage());
+        if (member.getProfileImage() != null) {
+            removeProfileImage(member.getProfileImage().getImgFileName());
+        }
         memberRepository.delete(member);
     }
 

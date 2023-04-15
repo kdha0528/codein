@@ -11,7 +11,9 @@ import com.codein.requestdto.member.*;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ class MemberControllerTest {
     private ProfileImageRepository profileImageRepository;
 
     public void deleteOrphanProfileImage() {
-        File file = new File(uploadPath);
+        File file = new File(uploadPath + "profile\\");
         if (file.exists()) {
             if (file.isDirectory()) {
                 File[] files = file.listFiles();
@@ -70,6 +72,12 @@ class MemberControllerTest {
     void clean() {
         memberRepository.deleteAll();
         deleteOrphanProfileImage();
+    }
+
+    @BeforeEach
+    void clean2() {
+        memberRepository.deleteAll();
+
     }
 
     void signup() {
@@ -448,7 +456,7 @@ class MemberControllerTest {
         signup();
         login();
 
-        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test.png");
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/test/images/test.png");
         MockMultipartFile profileImage = new MockMultipartFile("profileImage", "test.png", "image/png", new FileInputStream(file.getPath()));
         EditProfileDto editProfileDto = EditProfileDto.builder()
                 .name("김복자")
@@ -478,7 +486,7 @@ class MemberControllerTest {
         signup();
         login();
 
-        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test2.png");
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/test/images/test2.png");
         MockMultipartFile profileImage = new MockMultipartFile("profileImage", "test2.png", "image/png", new FileInputStream(file.getPath()));
         EditProfileDto editProfileDto = EditProfileDto.builder()
                 .name("김복자")
@@ -508,7 +516,7 @@ class MemberControllerTest {
         signup();
         login();
 
-        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test.png");
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/test/images/test.png");
         MockMultipartFile profileImage = new MockMultipartFile("profileImage", "test.png", "image/png", new FileInputStream(file.getPath()));
         EditProfileDto editProfileDto = EditProfileDto.builder()
                 .name("김복자")
@@ -528,7 +536,7 @@ class MemberControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
 
-        File file2 = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test3.jpg");
+        File file2 = new File(new File("").getAbsolutePath() + "/src/main/resources/test/images/test3.jpg");
         MockMultipartFile profileImage2 = new MockMultipartFile("profileImage", "test3.jpg", "image/jpg", new FileInputStream(file2.getPath()));
         EditProfileDto editProfileDto2 = EditProfileDto.builder()
                 .name("김복자")
@@ -552,12 +560,13 @@ class MemberControllerTest {
 
     @Test
     @DisplayName("프로필 수정 페이지 정보 가져오기 성공: 이미지 있을 때")
+    @Transactional
     void Test7_5() throws Exception {
         // given
         signup();
         login();
 
-        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test.png");
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/test/images/test.png");
         MockMultipartFile profileImage = new MockMultipartFile("profileImage", "test.png", "image/png", new FileInputStream(file.getPath()));
         EditProfileDto editProfileDto = EditProfileDto.builder()
                 .name("김복자")
@@ -578,10 +587,13 @@ class MemberControllerTest {
                 .andDo(print());
 
         // expected
-        mockMvc.perform(get("/settings/profile")
-                        .cookie(getCookie()))
+        Member member = memberRepository.findByEmail("kdha4585@gmail.com");
+        String imagePath = member.toProfileSettingsResponse().getImagePath();
+
+        mockMvc.perform(get(imagePath))
                 .andExpect(status().isOk())
                 .andDo(print());
+
     }
 
     @Test

@@ -13,6 +13,7 @@ public enum ErrorCode {
     INVALID_TYPE_VALUE(400, "C005", " Invalid Type Value"),
     HANDLE_ACCESS_DENIED(403, "C006", "Access is Denied"),
     PAYLOAD_TOO_LARGE(400, "C007", "Payload is too large."),
+    HANDLER_NOT_FOUND(404, "C007", "Handler is not founded."),
 
     // Image
 

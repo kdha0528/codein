@@ -182,7 +182,7 @@ class MemberServiceTest {
                 .build();
         String accessToken = memberService.login(login.toMemberServiceDto());
 
-        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/images/test.png");
+        File file = new File(new File("").getAbsolutePath() + "/src/main/resources/test/images/test.png");
         MultipartFile multipartFile = new MockMultipartFile("image", "test.png", "image/png", new FileInputStream(file));
         System.out.println("getContentType = " + multipartFile.getContentType());
 

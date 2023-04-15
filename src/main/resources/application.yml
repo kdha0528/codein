@@ -16,6 +16,13 @@ spring:
     multipart:
       max-file-size: 1MB
       max-request-size: 1MB
-      location: C:\workspace\springboot\codein\image\profile\
+      location: C:\Users\kdha0\Documents\GitHub\codein\front\public\images\
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
+
 
 

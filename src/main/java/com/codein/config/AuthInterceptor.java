@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
 import java.util.function.Function;
 
@@ -29,12 +30,15 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         // 형 변환하기
+        if (handler instanceof ResourceHttpRequestHandler) {
+            return true;
+        }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
 
         // @MySecured 받아오기
         MySecured mySecured = handlerMethod.getMethodAnnotation(MySecured.class);
 
-        // method에 @MySecured가 없는 경우, 즉 인증이 필료 없는 요청
+        // method에 @MySecured가 없는 경우, 즉 인증이 필요 없는 요청
         if (mySecured == null) {
             return true;
         }
