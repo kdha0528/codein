@@ -87,10 +87,10 @@ public class MemberService {
                 .secure(false)
                 .maxAge(Duration.ofMinutes(30))
                 .sameSite("Strict")
+                .domain(".loca.lt")
                 .build();
     }
-
-
+    
     public List<LoginResponseDto> getMemberList(PageSizeDto pageSizeDto) {
         return memberRepository.getMemberResponseList(pageSizeDto);
     }

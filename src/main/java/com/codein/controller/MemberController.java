@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -48,7 +49,8 @@ public class MemberController {
     @PostMapping("/login")
     public LoginResponseDto login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         String accessToken = memberService.login(loginDto.toMemberServiceDto());
-        response.addHeader(HttpHeaders.SET_COOKIE, memberService.buildResponseCookie(accessToken).toString());
+        ResponseCookie cookie = memberService.buildResponseCookie(accessToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         response.addHeader(HttpHeaders.AUTHORIZATION, accessToken);
         return memberRepository.findByAccessToken(accessToken).toMemberResponse();
     }
@@ -71,6 +73,7 @@ public class MemberController {
     @MySecured(role = Role.MEMBER)
     @GetMapping(value = "/settings/profile")
     public ProfileSettingsResponseDto getProfileSettings(@CookieValue(value = "accesstoken") Cookie cookie) throws IOException {
+        System.out.println("cookie = " + cookie.getValue());
         Member member = memberRepository.findByAccessToken(cookie.getValue());
         if (member != null) {
             return member.toProfileSettingsResponse();

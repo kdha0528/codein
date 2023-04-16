@@ -20,6 +20,7 @@
     "bootstrap": "^5.3.0-alpha1",
     "element-plus": "^2.3.0",
     "file-loader": "^6.2.0",
+    "http-proxy-middleware": "^2.0.6",
     "normalize.css": "^8.0.1",
     "pinia": "^2.0.32",
     "pinia-plugin-persistedstate": "^3.1.0",

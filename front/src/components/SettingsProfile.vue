@@ -95,11 +95,9 @@ axios({
 });
 
 const edit = function () {
-
+  formData.append("name", profile.value.name)
+  formData.append("nickname", profile.value.nickname)
   if (imageChanged) {
-    formData.append("name", profile.value.name)
-    formData.append("nickname", profile.value.nickname)
-
     axios.post('/my-backend-api/settings/profile', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -119,9 +117,10 @@ const edit = function () {
       route.replace("/settings/profile");
     })
   } else {
-    axios.post('/my-backend-api/settings/profile', {
-      name: profile.value.name,
-      nickname: profile.value.nickname
+    axios.post('/my-backend-api/settings/profile', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
     }).then(() => {
       route.back();
     }).catch(error => {
@@ -135,8 +134,6 @@ const edit = function () {
       route.replace("/settings/profile");
     })
   }
-
-
 };
 const cancel = function () {
   route.replace("/settings/profile");

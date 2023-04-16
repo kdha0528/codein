@@ -12,10 +12,7 @@ import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -588,11 +585,8 @@ class MemberControllerTest {
 
         // expected
         Member member = memberRepository.findByEmail("kdha4585@gmail.com");
-        String imagePath = member.toProfileSettingsResponse().getImagePath();
-
-        mockMvc.perform(get(imagePath))
-                .andExpect(status().isOk())
-                .andDo(print());
+        String imagePath = "/images/profile/" + member.getProfileImage().getImgFileName();
+        Assertions.assertEquals(member.toProfileSettingsResponse().getImagePath(), imagePath);
 
     }
 

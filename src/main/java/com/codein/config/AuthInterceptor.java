@@ -43,16 +43,8 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
-
-        // @MySecured가 있는 경우, session은 cookies에 담겨 있으므로 cookies가 null인지 검사
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies == null || cookies[0].getValue().equals("")) {
-            log.error("쿠키가 존재하지 않습니다.");
-            return false;
-        }
-
         // cookies에서 session이 있는 쿠키를 반환하는 메소드
+        Cookie[] cookies = request.getCookies();
         Function<Cookie[], Cookie> validateSessionCookie = cookieList -> {
             for (Cookie cookie : cookieList) {
                 if (cookie.getName().equals("accesstoken")) {

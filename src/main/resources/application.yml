@@ -23,6 +23,3 @@ spring:
     resources:
       add-mappings: false
 
-
-
-
