@@ -1,12 +1,13 @@
 package com.codein.config;
 
 import com.codein.config.SecurityConfig.MySecured;
-import com.codein.domain.Session;
+import com.codein.domain.auth.Token;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
-import com.codein.error.exception.InvalidAccessTokenException;
-import com.codein.error.exception.UnauthorizedException;
-import com.codein.repository.SessionRepository;
+import com.codein.error.exception.auth.AccessTokenNullException;
+import com.codein.error.exception.auth.InvalidAccessTokenException;
+import com.codein.error.exception.auth.UnauthorizedException;
+import com.codein.repository.TokenRepository;
 import com.codein.repository.member.MemberRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ import java.util.function.Function;
 @Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
 
-    private final SessionRepository sessionRepository;
+    private final TokenRepository tokenRepository;
     private final MemberRepository memberRepository;
 
     @Override
@@ -51,14 +52,14 @@ public class AuthInterceptor implements HandlerInterceptor {
                     return cookie;
                 }
             }
-            throw new NullPointerException();
+            throw new AccessTokenNullException();
         };
 
         // validateSessionCookie 실행 후 반환된 cookie의 value를 accessToken에 저장
         String accessToken = validateSessionCookie.apply(cookies).getValue();
-        System.out.println("request access token = " + accessToken);
+
         // accessToken이 존재하면 유효한 세션인지 확인
-        Session session = sessionRepository.findByAccessToken(accessToken)
+        Token token = tokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(InvalidAccessTokenException::new);
 
         // 유효한 세션이라면 해당 유저 가져오기

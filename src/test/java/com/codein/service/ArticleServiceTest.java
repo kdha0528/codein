@@ -1,10 +1,10 @@
 package com.codein.service;
 
-import com.codein.domain.Session;
 import com.codein.domain.article.Article;
+import com.codein.domain.auth.Token;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
-import com.codein.repository.SessionRepository;
+import com.codein.repository.TokenRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.EditArticleDto;
@@ -24,7 +24,7 @@ class ArticleServiceTest {
     @Autowired
     private ArticleRepository articleRepository;
     @Autowired
-    private SessionRepository sessionRepository;
+    private TokenRepository tokenRepository;
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -58,9 +58,9 @@ class ArticleServiceTest {
 
     String getToken() {
         Member member = memberRepository.findByEmail("kdha4585@gmail.com");
-        Session session = sessionRepository.findByMember(member)
+        Token token = tokenRepository.findByMember(member)
                 .orElseThrow(MemberNotExistsException::new);
-        return session.getAccessToken();
+        return token.getAccessToken();
     }
 
     @Test

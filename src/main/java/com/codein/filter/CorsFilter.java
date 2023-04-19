@@ -23,8 +23,11 @@ public class CorsFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
         String origin = request.getHeader("origin");
-        System.out.println("origin = " + origin);
-        response.setHeader("Access-Control-Allow-Origin", "https://localhost:codein.loca.lt");
+        if (origin == null) {
+            response.setHeader("Access-Control-Allow-Origin", "https://codein.loca.lt");
+        } else if (origin.endsWith("codein.loca.lt") || origin.endsWith("localhost:5173")) {
+            response.setHeader("Access-Control-Allow-Origin", origin);
+        }
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "*");
         response.setHeader("Access-Control-Max-Age", "1800");

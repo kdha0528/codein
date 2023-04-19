@@ -5,13 +5,14 @@ import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
-import com.codein.repository.SessionRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.member.*;
 import com.codein.responsedto.LoginResponseDto;
+import com.codein.responsedto.MemberListResponseDto;
 import com.codein.responsedto.ProfileResponseDto;
 import com.codein.responsedto.ProfileSettingsResponseDto;
+import com.codein.service.AuthService;
 import com.codein.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -31,13 +33,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberRepository memberRepository;
-    private final SessionRepository sessionRepository;
+    private final AuthService authService;
     private final MemberService memberService;
 
     @GetMapping(value = {"/home", "/", "/index"})
-    public List<LoginResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto, RedirectAttributes redirect, HttpServletResponse response) {
-        List<LoginResponseDto> members = memberService.getMemberList(pageSizeDto);
-        return members;
+    public List<MemberListResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto, RedirectAttributes redirect, HttpServletResponse response) {
+        return memberService.getMemberList(pageSizeDto);
     }
 
     @PostMapping("/signup")
@@ -48,11 +49,12 @@ public class MemberController {
 
     @PostMapping("/login")
     public LoginResponseDto login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
-        String accessToken = memberService.login(loginDto.toMemberServiceDto());
-        ResponseCookie cookie = memberService.buildResponseCookie(accessToken);
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        response.addHeader(HttpHeaders.AUTHORIZATION, accessToken);
-        return memberRepository.findByAccessToken(accessToken).toMemberResponse();
+        ArrayList<String> tokens = memberService.login(loginDto.toMemberServiceDto());
+        ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(0));
+        ResponseCookie accessCookie = authService.RefreshTokenToCookie(tokens.get(1));
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        return memberRepository.findByAccessToken(tokens.get(1)).toLoginResponse();
     }
 
     @MySecured(role = Role.MEMBER)

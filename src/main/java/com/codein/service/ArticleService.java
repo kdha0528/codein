@@ -1,12 +1,12 @@
 package com.codein.service;
 
-import com.codein.domain.Session;
 import com.codein.domain.article.Article;
 import com.codein.domain.article.ArticleEditor;
+import com.codein.domain.auth.Token;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.article.ArticlePostNotExistsException;
 import com.codein.error.exception.member.MemberNotLoginException;
-import com.codein.repository.SessionRepository;
+import com.codein.repository.TokenRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.requestservicedto.article.EditArticleServiceDto;
 import com.codein.requestservicedto.article.NewArticleServiceDto;
@@ -19,13 +19,13 @@ import org.springframework.stereotype.Service;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-    private final SessionRepository sessionRepository;
+    private final TokenRepository tokenRepository;
 
     @Transactional
     public void newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
-        Session session = sessionRepository.findByAccessToken(accesstoken)
+        Token token = tokenRepository.findByAccessToken(accesstoken)
                 .orElseThrow(MemberNotLoginException::new);
-        Member member = session.getMember();
+        Member member = token.getMember();
         articleRepository.save(newArticleServiceDto.toEntity(member));
     }
 

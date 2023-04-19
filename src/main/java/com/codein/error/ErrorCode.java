@@ -19,14 +19,18 @@ public enum ErrorCode {
 
     IMAGE_INVALID(400, "I001", "Image is invalid"),
 
+    // Auth
+    ACCESS_TOKEN_NULL(401, "A001", "Accesstoken is null."),
+    REFRESH_TOKEN_NULL(401, "A002", "Refreshtoken is null."),
+    INVALID_ACCESS_TOKEN(401, "A003", "Access token is invalid."),
+    INVALID_REFRESH_TOKEN(401, "A004", "Refresh token is invalid."),
+    UNAUTHORIZED_ACCESS(403, "A005", "Access is forbidden."),
 
     // Member
     EMAIL_ALREADY_EXISTS(400, "M001", "Email is already exists"),
     LOGIN_INPUT_INVALID(400, "M002", "Login input is invalid"),
     MEMBER_NOT_EXISTS(400, "M003", "Member is not exists"),
     MEMBER_NOT_LOGIN(400, "M004", "Member is not login yet"),
-    UNAUTHORIZED_ACCESS(403, "M005", "Access is unauthorized"),
-    ACCESS_TOKEN_INVALID(401, "M006", "Access token is invalid"),
     PHONE_ALREADY_EXISTS(400, "M007", "Phone is already exists"),
     NICKNAME_ALREADY_EXISTS(400, "M008", "Nickname is already exists"),
 

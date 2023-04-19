@@ -1,22 +1,21 @@
 package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
-import com.codein.domain.Session;
+import com.codein.domain.auth.Token;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.ProfileEditor;
 import com.codein.error.exception.member.*;
 import com.codein.error.exception.profileimage.ImageTooLargeException;
 import com.codein.error.exception.profileimage.InvalidImageException;
-import com.codein.repository.SessionRepository;
+import com.codein.repository.TokenRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestservicedto.member.*;
-import com.codein.responsedto.LoginResponseDto;
+import com.codein.responsedto.MemberListResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -37,7 +36,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final SessionRepository sessionRepository;
+    private final TokenRepository tokenRepository;
     private final ProfileImageRepository profileImageRepository;
 
     @Value("${spring.servlet.multipart.location}")
@@ -59,7 +58,7 @@ public class MemberService {
 
 
     @Transactional
-    public String login(LoginServiceDto loginServiceDto) {
+    public ArrayList<String> login(LoginServiceDto loginServiceDto) {
 
         Member member = memberRepository.findByEmail(loginServiceDto.getEmail());
 
@@ -71,55 +70,46 @@ public class MemberService {
             throw new InvalidLoginInputException();
         }
 
-        Session session = Session.builder()
+        Token token = Token.builder()
                 .member(member)
                 .build();
 
-        return session.getAccessToken();
+        ArrayList<String> tokens = new ArrayList<>();
+        tokens.add(token.getRefreshToken());
+        tokens.add(token.getAccessToken());
+        return tokens;
     }
 
-    @Transactional
-    public ResponseCookie buildResponseCookie(String token) {
-        return ResponseCookie.from("accesstoken", token)
-                .domain("localhost")
-                .path("/")
-                .httpOnly(true)
-                .secure(false)
-                .maxAge(Duration.ofMinutes(30))
-                .sameSite("Strict")
-                .domain(".loca.lt")
-                .build();
-    }
-    
-    public List<LoginResponseDto> getMemberList(PageSizeDto pageSizeDto) {
+
+    public List<MemberListResponseDto> getMemberList(PageSizeDto pageSizeDto) {
         return memberRepository.getMemberResponseList(pageSizeDto);
     }
 
     @Transactional
     public void logout(String accessToken) {
 
-        Session session = sessionRepository.findByAccessToken(accessToken)
+        Token token = tokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        sessionRepository.delete(session);
+        tokenRepository.delete(token);
     }
 
     @Transactional
     public void changePassword(String accessToken, PasswordServiceDto passwordServiceDto) {
-        Session session = sessionRepository.findByAccessToken(accessToken)
+        Token token = tokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = session.getMember();
+        Member member = token.getMember();
 
         member.setPassword(passwordEncoder.encrypt(passwordServiceDto.getPassword()));
     }
 
     @Transactional
     public void changeEmail(String accessToken, EmailServiceDto emailServiceDto) {
-        Session session = sessionRepository.findByAccessToken(accessToken)
+        Token token = tokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = session.getMember();
+        Member member = token.getMember();
 
         Member emailMember = memberRepository.findByEmail(emailServiceDto.getEmail());
         if (emailMember != null && !Objects.equals(emailMember.getEmail(), member.getEmail())) {
@@ -131,10 +121,10 @@ public class MemberService {
 
     @Transactional
     public void changePhone(String accessToken, PhoneServiceDto phoneServiceDto) {
-        Session session = sessionRepository.findByAccessToken(accessToken)
+        Token token = tokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = session.getMember();
+        Member member = token.getMember();
 
         Member phoneMember = memberRepository.findByPhone(phoneServiceDto.getPhone());
         if (phoneMember != null && !Objects.equals(phoneMember.getEmail(), member.getEmail())) {
@@ -147,10 +137,10 @@ public class MemberService {
 
     @Transactional
     public void editProfile(String accessToken, EditProfileServiceDto editProfileServiceDto) {
-        Session session = sessionRepository.findByAccessToken(accessToken)
+        Token token = tokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = session.getMember();
+        Member member = token.getMember();
 
         if (editProfileServiceDto.getNickname() != null) {  // 닉네임 중복 검사
             Member nicknameMember = memberRepository.findByNickname(editProfileServiceDto.getNickname());
@@ -174,7 +164,7 @@ public class MemberService {
 
     @Transactional
     public void removeProfileImage(String imgFileName) {
-        File file = new File(uploadPath + "profile\\" + imgFileName);
+        File file = new File(uploadPath + imgFileName);
         if (file.exists()) {
             if (file.delete()) {
                 System.out.println("파일 삭제 성공");
@@ -197,7 +187,7 @@ public class MemberService {
         UUID uuid = UUID.randomUUID();
         String imageFileName = uuid + extension;
         System.out.println(uploadPath);
-        Path imageFilePath = Paths.get(uploadPath + "profile\\" + imageFileName);
+        Path imageFilePath = Paths.get(uploadPath + imageFileName);
 
         try {
             Files.write(imageFilePath, file.getBytes());
@@ -210,9 +200,9 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(String accessToken) {
-        Session session = sessionRepository.findByAccessToken(accessToken)
+        Token token = tokenRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
-        Member member = session.getMember();
+        Member member = token.getMember();
         if (member.getProfileImage() != null) {
             removeProfileImage(member.getProfileImage().getImgFileName());
         }

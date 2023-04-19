@@ -1,9 +1,9 @@
 package com.codein.domain.member;
 
-import com.codein.domain.Session;
+import com.codein.domain.auth.Token;
 import com.codein.domain.image.ProfileImage;
-import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.responsedto.LoginResponseDto;
+import com.codein.responsedto.MemberListResponseDto;
 import com.codein.responsedto.ProfileResponseDto;
 import com.codein.responsedto.ProfileSettingsResponseDto;
 import jakarta.persistence.*;
@@ -49,7 +49,7 @@ public class Member {
     private Integer point;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.LAZY)
-    private final List<Session> sessions = new ArrayList<>();
+    private final List<Token> tokens = new ArrayList<>();
 
     @Setter
     private Role role = Role.MEMBER;
@@ -70,13 +70,21 @@ public class Member {
         this.point = 0;
     }
 
-    public LoginResponseDto toMemberResponse() {
+    public MemberListResponseDto toMemberResponse() {
+        return MemberListResponseDto.builder()
+                .id(this.getId())
+                .email(this.getEmail())
+                .name(this.getName())
+                .build();
+    }
+
+    public LoginResponseDto toLoginResponse() {
         return LoginResponseDto.builder()
                 .id(this.getId())
                 .email(this.getEmail())
                 .nickname(this.getNickname())
+                .role(this.getRole().getRole())
                 .point(this.getPoint())
-                .role(this.getRole())
                 .build();
     }
 
@@ -97,12 +105,6 @@ public class Member {
                 .build();
     }
 
-    public void deleteSession(Session session) {
-        boolean removed = sessions.removeIf(s -> s.equals(session));
-        if (!removed) {
-            throw new MemberNotLoginException();
-        }
-    }
 
     public ProfileEditor.ProfileEditorBuilder toProfileEditor() {
         if (profileImage == null) {
@@ -146,5 +148,6 @@ public class Member {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
 
 }

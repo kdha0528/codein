@@ -1,10 +1,10 @@
 package com.codein.controller;
 
-import com.codein.domain.Session;
+import com.codein.domain.auth.Token;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
-import com.codein.repository.SessionRepository;
+import com.codein.repository.TokenRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.member.*;
@@ -12,7 +12,10 @@ import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -41,7 +44,7 @@ class MemberControllerTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private SessionRepository sessionRepository;
+    private TokenRepository tokenRepository;
     @Autowired
     private MemberService memberService;
     @Value("${spring.servlet.multipart.location}")
@@ -50,7 +53,7 @@ class MemberControllerTest {
     private ProfileImageRepository profileImageRepository;
 
     public void deleteOrphanProfileImage() {
-        File file = new File(uploadPath + "profile\\");
+        File file = new File(uploadPath);
         if (file.exists()) {
             if (file.isDirectory()) {
                 File[] files = file.listFiles();
@@ -69,12 +72,6 @@ class MemberControllerTest {
     void clean() {
         memberRepository.deleteAll();
         deleteOrphanProfileImage();
-    }
-
-    @BeforeEach
-    void clean2() {
-        memberRepository.deleteAll();
-
     }
 
     void signup() {
@@ -100,9 +97,9 @@ class MemberControllerTest {
 
     Cookie getCookie() {
         Member member = memberRepository.findByEmail("kdha4585@gmail.com");
-        Session session = sessionRepository.findByMember(member)
+        Token tokens = tokenRepository.findByMember(member)
                 .orElseThrow(MemberNotExistsException::new);
-        String token = session.getAccessToken();
+        String token = tokens.getAccessToken();
 
         return new Cookie("accesstoken", token);
     }
@@ -585,7 +582,7 @@ class MemberControllerTest {
 
         // expected
         Member member = memberRepository.findByEmail("kdha4585@gmail.com");
-        String imagePath = "/images/profile/" + member.getProfileImage().getImgFileName();
+        String imagePath = "/my-backend-api/images/profile/" + member.getProfileImage().getImgFileName();
         Assertions.assertEquals(member.toProfileSettingsResponse().getImagePath(), imagePath);
 
     }

@@ -8,7 +8,7 @@ spring:
     defer-datasource-initialization: true
     generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   sql:
     init:
       mode: always
@@ -16,7 +16,7 @@ spring:
     multipart:
       max-file-size: 1MB
       max-request-size: 1MB
-      location: C:\Users\kdha0\Documents\GitHub\codein\front\public\images\
+      location: C:\workspace\springboot\codein\images\profile\
   mvc:
     throw-exception-if-no-handler-found: true
   web:

@@ -20,7 +20,7 @@ public class ProfileSettingsResponseDto {
         this.name = name;
         this.nickname = nickname;
         if (profileImage != null) {
-            this.imagePath = "/images/profile/" + profileImage.getImgFileName();
+            this.imagePath = "/my-backend-api/images/profile/" + profileImage.getImgFileName();
         } else {
             this.imagePath = null;
         }

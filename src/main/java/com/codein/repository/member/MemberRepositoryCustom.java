@@ -2,13 +2,13 @@ package com.codein.repository.member;
 
 import com.codein.domain.member.Member;
 import com.codein.requestdto.PageSizeDto;
-import com.codein.responsedto.LoginResponseDto;
+import com.codein.responsedto.MemberListResponseDto;
 
 import java.util.List;
 
 public interface MemberRepositoryCustom {
 
-    List<LoginResponseDto> getMemberResponseList(PageSizeDto pageSizeDto);
+    List<MemberListResponseDto> getMemberResponseList(PageSizeDto pageSizeDto);
 
     Member findByEmail(String email);
 
@@ -17,6 +17,8 @@ public interface MemberRepositoryCustom {
     Member findByNickname(String nickname);
 
     Member findByAccessToken(String accessToken);
+
+    Member findByRefreshToken(String refreshToken);
 
 
 }

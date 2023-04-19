@@ -1,6 +1,6 @@
 package com.codein.config;
 
-import com.codein.repository.SessionRepository;
+import com.codein.repository.TokenRepository;
 import com.codein.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -17,25 +17,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final SessionRepository sessionRepository;
+    private final TokenRepository tokenRepository;
     private final MemberRepository memberRepository;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new AuthResolver(sessionRepository));
+        resolvers.add(new AuthResolver(tokenRepository));
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthInterceptor(sessionRepository, memberRepository))
+        registry.addInterceptor(new AuthInterceptor(tokenRepository, memberRepository))
                 .addPathPatterns("/**")
                 .excludePathPatterns("/error", "/favicon.ico"); // 인증없이 접근 가능하게
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String resourceLocation = "file:src/main/resources/static/images/profile/";
-        registry.addResourceHandler("/image/profile/**")
+        String resourceLocation = "file:///C:/workspace/springboot/codein/images/profile/";
+        registry.addResourceHandler("/images/profile/**")
                 .addResourceLocations(resourceLocation)
                 .setCachePeriod(3600)
                 .resourceChain(true)

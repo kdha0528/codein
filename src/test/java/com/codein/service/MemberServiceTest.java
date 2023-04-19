@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 @SpringBootTest
 class MemberServiceTest {
@@ -37,6 +38,8 @@ class MemberServiceTest {
     ResourceLoader resourceLoader;
     @Autowired
     private ProfileImageRepository profileImageRepository;
+    @Autowired
+    private AuthService authService;
 
 
     @AfterEach
@@ -94,11 +97,13 @@ class MemberServiceTest {
                 .build();
 
         // when
-        String accessToken = memberService.login(login.toMemberServiceDto());
-        ResponseCookie responseCookie = memberService.buildResponseCookie(accessToken);
+        ArrayList<String> tokens = memberService.login(login.toMemberServiceDto());
+        ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(0));
+        ResponseCookie accessCookie = authService.AccessTokenToCookie(tokens.get(1));
 
         // then
-        Assertions.assertNotNull(responseCookie);
+        Assertions.assertNotNull(refreshCookie);
+        Assertions.assertNotNull(accessCookie);
     }
 
 
@@ -121,13 +126,13 @@ class MemberServiceTest {
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        String accessToken = memberService.login(login.toMemberServiceDto());
+        ArrayList<String> tokens = memberService.login(login.toMemberServiceDto());
 
         // when
-        memberService.logout(accessToken);
+        memberService.logout(tokens.get(1));
 
         // then
-        Member nullMember = memberRepository.findByAccessToken(accessToken);
+        Member nullMember = memberRepository.findByAccessToken(tokens.get(1));
         Assertions.assertNull(nullMember);
     }
 
@@ -152,10 +157,10 @@ class MemberServiceTest {
                 .password("12341234")
                 .build();
 
-        String accessToken = memberService.login(login.toMemberServiceDto());
+        ArrayList<String> tokens = memberService.login(login.toMemberServiceDto());
 
         // when
-        memberService.deleteMember(accessToken);
+        memberService.deleteMember(tokens.get(1));
 
         // then
         Assertions.assertNull(memberRepository.findByEmail(signupDto.getEmail()));
@@ -180,7 +185,7 @@ class MemberServiceTest {
                 .email("kdha4585@gmail.com")
                 .password("12341234")
                 .build();
-        String accessToken = memberService.login(login.toMemberServiceDto());
+        ArrayList<String> tokens = memberService.login(login.toMemberServiceDto());
 
         File file = new File(new File("").getAbsolutePath() + "/src/main/resources/test/images/test.png");
         MultipartFile multipartFile = new MockMultipartFile("image", "test.png", "image/png", new FileInputStream(file));
@@ -193,7 +198,7 @@ class MemberServiceTest {
                 .build();
 
         // when
-        memberService.editProfile(accessToken, editProfileDto.toEditProfileServiceDto());
+        memberService.editProfile(tokens.get(1), editProfileDto.toEditProfileServiceDto());
 
         // then
         Member editedMember = memberRepository.findByEmail("kdha4585@gmail.com");
