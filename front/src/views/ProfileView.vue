@@ -50,7 +50,7 @@
 <script lang="ts" setup>
 import Header from '@/components/Header.vue';
 import { reactive, ref, toRefs } from "vue";
-import { authStorage } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import { useRouter } from "vue-router";
 
@@ -64,7 +64,7 @@ const state = reactive({
   sizeList: ['small', '', 'large'] as const,
 })
 const {circleUrl, squareUrl, sizeList} = toRefs(state)
-const auth = authStorage();
+const auth = useAuthStore();
 
 
 const getProfile = auth.getProfile;

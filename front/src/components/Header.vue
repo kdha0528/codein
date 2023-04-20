@@ -22,10 +22,10 @@
 import axios from "axios";
 import { ref } from "vue";
 import router from "@/router";
-import { authStorage } from "@/stores/auth"
+import { useAuthStore } from "@/stores/auth"
 import { useRouter } from "vue-router";
 
-const auth = authStorage();
+const auth = useAuthStore();
 const route = useRouter();
 
 const isUserLogin = ref(auth.isLoggedIn);

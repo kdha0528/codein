@@ -1,34 +1,27 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia';
 import type { Profile } from "@/components/props/profile";
 
-export const authStorage = defineStore('token', {
+export const useAuthStore = defineStore("auth", {
     state: () => ({
-        member: null as Profile | any,
-        accesstoken: null as String | any,
+        member: null as Profile | any
     }),
     getters: {
         isLoggedIn: (state) => {
-            return state.accesstoken != null;
+            return state.member != null;
         },
         getProfile: (state) => {
             return state.member;
         },
-        getToken: (state) => {
-            return state.accesstoken;
-        }
     },
     actions: {
-        login(m: Profile, token: any) {
+        login(m: Profile) {
             this.member = m;
-            this.accesstoken = token;
         },
         logout() {
             this.member = null;
-            this.accesstoken = null;
         }
     },
     persist: {
         storage: sessionStorage,
-    }
-});
-
+    },
+})

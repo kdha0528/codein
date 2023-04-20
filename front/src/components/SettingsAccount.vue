@@ -1,32 +1,35 @@
 <template>
-  <h2>회원정보</h2>
+  <h2>비밀번호</h2>
+  <el-button type="danger" href="/password" :icon="Message">비밀번호 변경</el-button>
 
+  <el-divider/>
+
+  <h2>이메일</h2>
   <el-form
       status-icon
-      :rules="rules"
-      label-width="120px"
+      method="post"
       class="demo-ruleForm">
-    <el-form-item label="Email" prop="email">
+    <el-form-item prop="email">
       <el-input v-model="profile.email"/>
     </el-form-item>
-    <el-form-item label="Password" prop="password">
-      <el-input v-model="profile.password" show-password/>
+    <el-form-item>
+      <el-button type="info" @click="changeEmail()" :icon="Email">이메일 변경</el-button>
     </el-form-item>
-    <el-form-item label="Confirm" prop="checkPassword">
-      <el-input v-model="checkPassword" show-password autocomplete="off"/>
-    </el-form-item>
-    <el-form-item label="Name" prop="name">
-      <el-input v-model="profile.name"/>
-    </el-form-item>
-    <el-form-item label="Nickname" prop="nickname">
-      <el-input v-model="profile.nickname"/>
-    </el-form-item>
-    <el-form-item label="Phone" prop="phone">
+  </el-form>
+
+
+  <el-divider/>
+
+  <h2>전화번호</h2>
+  <el-form
+      status-icon
+      method="post"
+      class="demo-ruleForm">
+    <el-form-item prop="phone">
       <el-input v-model="profile.phone"/>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="edit()">수정완료</el-button>
-      <el-button type="danger" @click="cancel()">취소</el-button>
+      <el-button type="info" @click="changePhone()" :icon="Iphone">전화번호 변경</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -34,10 +37,10 @@
 import { reactive, ref } from 'vue';
 import type { FormRules } from 'element-plus';
 import axios from 'axios';
-import { authStorage } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 
-const auth = authStorage();
+const auth = useAuthStore();
 const route = useRouter();
 
 const profile = ref({

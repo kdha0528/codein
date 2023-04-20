@@ -49,12 +49,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import axios from 'axios';
-import { authStorage } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import type { UploadProps } from 'element-plus'
 import { ElMessage } from "element-plus";
 
-const auth = authStorage();
+const auth = useAuthStore();
 const route = useRouter();
 
 const imageUrl = ref('')

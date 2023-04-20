@@ -24,11 +24,11 @@ import Header from '@/components/Header.vue';
 import { reactive, ref } from 'vue';
 import type { FormRules } from 'element-plus';
 import axios from 'axios';
-import { authStorage } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import type { Profile } from "@/components/props/profile";
 
-const auth = authStorage();
+const auth = useAuthStore();
 const route = useRouter();
 
 const email = ref('');
@@ -72,29 +72,24 @@ const login = function () {
       email: res.data.email,
       nickname: res.data.nickname,
       point: res.data.point,
-      role: res.data.role
+      role: res.data.role,
     }
 
-    const token = res.headers.getAuthorization();
+    auth.login(member);
 
-    if (token != null) {
-      auth.login(member, token);
-    } else {
-      alert("권한이 없습니다.");
-      route.replace("login");
-    }
-
-    route.replace("home");
+    route.push('/home')
   }).catch(error => {
-    if (error.response.data.code == "M002") {
-      alert("이메일/비밀번호가 올바르지 않습니다.");
-    } else if (error.response.data.code == "C001") {
-      alert("로그인 양식에 맞지 않습니다.");
-    } else {
-      alert(error);
+    if (error !== null) {
+      
+      if (error.response.data.code === "M002") {
+        alert("이메일/비밀번호가 올바르지 않습니다.");
+      } else if (error.response.code === "C001") {
+        alert("로그인 양식에 맞지 않습니다.");
+      } else {
+        alert(error);
+      }
     }
-    console.error(error);
-    route.replace("login");
+    route.push('/home')
   })
 };
 

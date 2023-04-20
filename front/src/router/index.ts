@@ -6,6 +6,8 @@ import ProfileView from "@/views/ProfileView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import SettingsProfile from "@/components/SettingsProfile.vue";
 import SettingsAccount from "@/components/SettingsAccount.vue";
+import { useAuthStore } from "@/stores/auth";
+
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,31 +33,64 @@ const router = createRouter({
             path: '/logout',
             name: 'logout',
             component: HomeView,
+            meta: {
+                authRequire: true
+            },
         },
         {
             path: '/settings',
             name: 'settings',
             component: SettingsView,
+            meta: {
+                authRequire: true
+            },
             children: [{
                 path: '',
                 name: 'profile',
                 component: SettingsProfile,
+                meta: {
+                    authRequire: true
+                },
             }, {
                 path: 'profile',
                 name: 'profile',
                 component: SettingsProfile,
+                meta: {
+                    authRequire: true
+                },
             }, {
                 path: 'account',
                 name: 'account',
                 component: SettingsAccount,
+                meta: {
+                    authRequire: true
+                },
             }]
         },
         {
             path: '/members/:id',
             name: 'members',
             component: ProfileView,
+            meta: {
+                authRequire: true
+            },
         },
     ],
 });
 
 export default router;
+
+router.beforeEach(function (to, from, next) {
+    const auth = useAuthStore();
+
+    if (!auth.isLoggedIn) {
+        if (to.meta.authRequire) {
+            alert("로그인이 필요합니다.");
+            next('/login');
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+})

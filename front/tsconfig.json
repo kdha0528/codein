@@ -14,6 +14,9 @@
   "compilerOptions": {
     "target": "ES6",
     "strict": true,
-    "module": "ES6"
-  }
+    "module": "ES6",
+    "types": [
+      "pinia-plugin-persist"
+    ]
+  },
 }
