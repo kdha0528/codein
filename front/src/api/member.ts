@@ -7,3 +7,15 @@ export async function refreshToken() {
         return error;
     }
 }
+
+export async function signup(data: any) {
+    try {
+        return await apiController({
+            url: '/signup',
+            method: 'post',
+            data: data,
+        })
+    } catch (error) {
+        return error;
+    }
+}

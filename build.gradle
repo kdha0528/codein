@@ -19,10 +19,10 @@ configurations {
 repositories {
     mavenCentral()
 }
-
 ext {
     asciidocVersion = "3.0.0"
     snippetsDir = file('build/generated-snippets')
+    queryDslVersion = "5.0.0"
 }
 
 dependencies {
@@ -33,7 +33,8 @@ dependencies {
     implementation 'org.springframework.security:spring-security-crypto'
 
 
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
 
     asciidoctorExt "org.springframework.restdocs:spring-restdocs-asciidoctor:${asciidocVersion}"

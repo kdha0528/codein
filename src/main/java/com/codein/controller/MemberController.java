@@ -50,8 +50,8 @@ public class MemberController {
     @PostMapping("/login")
     public LoginResponseDto login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         ArrayList<String> tokens = memberService.login(loginDto.toMemberServiceDto());
-        ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(0));
-        ResponseCookie accessCookie = authService.RefreshTokenToCookie(tokens.get(1));
+        ResponseCookie accessCookie = authService.RefreshTokenToCookie(tokens.get(0));
+        ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(1));
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         return memberRepository.findByAccessToken(tokens.get(1)).toLoginResponse();

@@ -46,7 +46,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         // cookies에서 session이 있는 쿠키를 반환하는 메소드
         Cookie[] cookies = request.getCookies();
-        Function<Cookie[], Cookie> validateSessionCookie = cookieList -> {
+        Function<Cookie[], Cookie> validateAccessCookie = cookieList -> {
             for (Cookie cookie : cookieList) {
                 if (cookie.getName().equals("accesstoken")) {
                     return cookie;
@@ -56,7 +56,8 @@ public class AuthInterceptor implements HandlerInterceptor {
         };
 
         // validateSessionCookie 실행 후 반환된 cookie의 value를 accessToken에 저장
-        String accessToken = validateSessionCookie.apply(cookies).getValue();
+        String accessToken = validateAccessCookie.apply(cookies).getValue();
+        System.out.println("accesstoken = " + accessToken);
 
         // accessToken이 존재하면 유효한 세션인지 확인
         Token token = tokenRepository.findByAccessToken(accessToken)

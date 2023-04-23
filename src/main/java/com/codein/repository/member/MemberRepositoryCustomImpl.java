@@ -23,6 +23,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
     private final PasswordEncoder passwordEncoder;
 
+
     public List<MemberListResponseDto> getMemberResponseList(PageSizeDto pageSizeDto) {
         List<Member> memberList = jpaQueryFactory.selectFrom(member)
                 .limit(pageSizeDto.getSize())
