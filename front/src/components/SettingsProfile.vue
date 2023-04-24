@@ -47,15 +47,17 @@
   </el-form>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import axios from 'axios';
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import type { UploadProps } from 'element-plus'
 import { ElMessage } from "element-plus";
+import {getSettingsProfile} from "@/api/member";
+import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();
-const route = useRouter();
+const router = useRouter();
 
 const imageUrl = ref('')
 const profile = ref({
@@ -85,14 +87,25 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   return true
 }
 
-axios({
-  method: 'get',
-  url: '/my-backend-api/settings/profile',
-}).then((response) => {
-  imageUrl.value = response.data.imagePath;
-  profile.value.name = response.data.name;
-  profile.value.nickname = response.data.nickname;
-});
+onMounted(()=>{onGetSettingsProfile()})
+const onGetSettingsProfile = async function (){
+    const response = await getSettingsProfile()
+        .then((response:any)=>{
+            imageUrl.value = response.data.imagePath;
+            profile.value.name = response.data.name;
+            profile.value.nickname = response.data.nickname;
+        })
+        .catch((error) => {
+            const resStore = useResponseStore();
+            console.log("res type = " + !resStore.isError)
+            console.log("error = " + error)
+            if(resStore.isError) {
+                alert(error);
+                auth.logout()
+                router.replace("home");
+            }
+        });
+}
 
 const edit = function () {
   formData.append("name", profile.value.name)
@@ -103,7 +116,7 @@ const edit = function () {
         'Content-Type': 'multipart/form-data',
       }
     }).then(() => {
-      route.back();
+      router.back();
     }).catch(error => {
       if (error.response.data.code == "C001") {
         alert("양식에 맞지 않습니다.");
@@ -114,7 +127,7 @@ const edit = function () {
       } else {
         alert(error);
       }
-      route.replace("/settings/profile");
+      router.replace("/settings/profile");
     })
   } else {
     axios.post('/my-backend-api/settings/profile', formData, {
@@ -122,7 +135,7 @@ const edit = function () {
         'Content-Type': 'multipart/form-data',
       }
     }).then(() => {
-      route.back();
+      router.back();
     }).catch(error => {
       if (error.response.data.code == "C001") {
         alert("양식에 맞지 않습니다.");
@@ -131,12 +144,12 @@ const edit = function () {
       } else {
         alert(error);
       }
-      route.replace("/settings/profile");
+      router.replace("/settings/profile");
     })
   }
 };
 const cancel = function () {
-  route.replace("/settings/profile");
+  router.replace("/settings/profile");
 }
 </script>
 

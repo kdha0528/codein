@@ -152,32 +152,35 @@ const rules = reactive<FormRules>({
 });
 
 const onSignup = async function () {
-    const response = await signup(signupForm.value);
-    const resStore = useResponseStore();
-    console.log("res type = " + !resStore.isError)
-    console.log("response = " + response)
-    if(resStore.isError) {
-        switch (resStore.getErrorCode) {
-            case "C001":
-                alert("회원가입 양식에 맞지 않습니다.");
-                break;
-            case "MOO1":
-                alert("이미 존재하는 이메일입니다.");
-                break;
-            case "M007":
-                alert("이미 존재하는 전화번호입니다.");
-                break;
-            case "M008":
-                alert("이미 존재하는 닉네임입니다.");
-                break;
-            default:
-                alert("Error Code : "+ response);
-                break;
-        }
-        await router.replace("signup");
-    }else {
-        await router.replace("home");
-    }
+    const response = await signup(signupForm.value)
+        .then(()=>{
+            alert("회원가입이 성공적으로 완료되었습니다.")
+            router.push("home");
+        }).catch((error)=>{
+            const resStore = useResponseStore();
+            console.log("res type = " + !resStore.isError)
+            console.log("error = " + error)
+            if(resStore.isError) {
+                switch (resStore.getErrorCode) {
+                    case "C001":
+                        alert("회원가입 양식에 맞지 않습니다.");
+                        break;
+                    case "MOO1":
+                        alert("이미 존재하는 이메일입니다.");
+                        break;
+                    case "M007":
+                        alert("이미 존재하는 전화번호입니다.");
+                        break;
+                    case "M008":
+                        alert("이미 존재하는 닉네임입니다.");
+                        break;
+                    default:
+                        alert("Error Code : "+ response);
+                        break;
+                }
+                router.replace("signup");
+            }
+        })
 };
 
 </script>

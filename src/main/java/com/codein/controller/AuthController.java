@@ -27,11 +27,10 @@ public class AuthController {
             throw new RefreshTokenNullException();
         } else {
             ArrayList<String> tokens = authService.validateRefreshToken(cookie.getValue());
-            ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(0));
-            ResponseCookie accessCookie = authService.RefreshTokenToCookie(tokens.get(1));
+            ResponseCookie accessCookie = authService.RefreshTokenToCookie(tokens.get(0));
+            ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(1));
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
             response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-
         }
     }
 }

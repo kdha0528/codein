@@ -1,8 +1,8 @@
-import {defineStore} from "pinia";
-export const useResponseStore = defineStore("auth", {
+import { defineStore } from 'pinia';
+export const useResponseStore = defineStore("response", {
     state: () => ({
         type: true as boolean,
-        errorCode: ''
+        errorCode: '',
     }),
     getters: {
         isError: (state) => {
@@ -13,12 +13,12 @@ export const useResponseStore = defineStore("auth", {
         }
     },
     actions: {
-        setResponseType(type: boolean){
+        async setResponseType(type: boolean){
             this.type = type;
         },
-        setErrorCode(code:string){
+        async setErrorCode(code:string){
             this.errorCode = code;
-        }
+        },
     },
     persist: {
         storage: sessionStorage,

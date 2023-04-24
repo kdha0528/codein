@@ -3,6 +3,7 @@ package com.codein.service;
 import com.codein.domain.auth.Token;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.auth.InvalidRefreshTokenException;
+import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokenRepository;
 import com.codein.repository.member.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -24,9 +25,13 @@ public class AuthService {
         Token token = tokenRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(InvalidRefreshTokenException::new);
 
-        Member member = memberRepository.findByAccessToken(token.getRefreshToken());
+        Member member = memberRepository.findByRefreshToken(token.getRefreshToken());
 
         tokenRepository.delete(token);
+
+        if(member == null){
+            throw new MemberNotExistsException();
+        }
 
         Token newToken = Token.builder()
                 .member(member)
@@ -57,7 +62,7 @@ public class AuthService {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .maxAge(Duration.ofMinutes(30))
+                .maxAge(Duration.ofMinutes(1))
                 .sameSite("Strict")
                 .domain(".loca.lt")
                 .build();

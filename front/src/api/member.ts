@@ -16,6 +16,19 @@ export async function signup(data: any) {
             data: data,
         })
     } catch (error) {
+        console.log("api member error here")
+        return error;
+    }
+}
+
+export async function getSettingsProfile() {
+    try {
+        return await apiController({
+            url: '/settings/profile',
+            method: 'get',
+        })
+    } catch (error) {
+        console.log("api member error here")
         return error;
     }
 }

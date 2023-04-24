@@ -82,12 +82,12 @@ export default router;
 router.beforeEach(function (to, from, next) {
     const auth = useAuthStore();
 
-    if (!auth.isLoggedIn) {
-        if (to.meta.authRequire) {
+    if (to.meta.authRequire) {
+        if (auth.isLoggedIn) {
+            next();
+        } else {
             alert("로그인이 필요합니다.");
             next('/login');
-        } else {
-            next();
         }
     } else {
         next();

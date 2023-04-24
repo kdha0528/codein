@@ -9,35 +9,35 @@ const apiController = axios.create({
 
 apiController.interceptors.request.use(
     function (config) {
-
+        console.log("request is fine")
         return config;
     },
     function (error) {
-
+        console.log("request error")
         return Promise.reject(error);
     }
 );
 
 apiController.interceptors.response.use(
-    function (response) {
-        const resType = useResponseStore();
-        resType.setResponseType(true);
+
+    async function (response) {
+        await useResponseStore().setResponseType(true);
+        await useResponseStore().setErrorCode('');
+        console.log("response is fine")
         return response;
     }, async function (error) {
         const errorAPI = error.config;
-        const resType = useResponseStore();
         console.log("error code = ", error.response.data.code)
-        if (error.respons.data.code === 'A001' && errorAPI.retry === undefined) {
+        if (error.response.data.code === 'A001' && errorAPI.retry === undefined) {
             errorAPI.retry = true;
             console.log('token invalid')
             await refreshToken();
             return await axios(errorAPI);
         }
-        console.log("----")
 
-        resType.setResponseType(false);
-        resType.setErrorCode(error.response.data.code);
-        return Promise.reject(error);
+        await useResponseStore().setResponseType(false);
+        await useResponseStore().setErrorCode(error.response.data.code);
+        return await Promise.reject(error);
     }
 );
 

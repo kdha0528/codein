@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "localtunnel": "^2.0.2",
     "node": "^16.15.1"
   }
 }
