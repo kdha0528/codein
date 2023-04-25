@@ -40,7 +40,7 @@
       </el-upload>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="edit()"
+      <el-button type="primary" @click="onEdit()"
                  style="margin:2rem 0 auto auto; width:5rem; height:2.5rem; font-size: 1.1rem;">저장
       </el-button>
     </el-form-item>
@@ -48,15 +48,15 @@
 </template>
 <script lang="ts" setup>
 import {onMounted, ref} from 'vue';
-import axios from 'axios';
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import type { UploadProps } from 'element-plus'
 import { ElMessage } from "element-plus";
-import {getSettingsProfile} from "@/api/member";
+import { getProfile, edit } from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();
+const resStore = useResponseStore();
 const router = useRouter();
 
 const imageUrl = ref('')
@@ -87,16 +87,15 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   return true
 }
 
-onMounted(()=>{onGetSettingsProfile()})
-const onGetSettingsProfile = async function (){
-    const response = await getSettingsProfile()
+onMounted(()=>{onGetProfile()})
+const onGetProfile = async function (){
+    await getProfile()
         .then((response:any)=>{
             imageUrl.value = response.data.imagePath;
             profile.value.name = response.data.name;
             profile.value.nickname = response.data.nickname;
         })
         .catch((error) => {
-            const resStore = useResponseStore();
             console.log("res type = " + !resStore.isError)
             console.log("error = " + error)
             if(resStore.isError) {
@@ -107,49 +106,61 @@ const onGetSettingsProfile = async function (){
         });
 }
 
-const edit = function () {
-  formData.append("name", profile.value.name)
-  formData.append("nickname", profile.value.nickname)
-  if (imageChanged) {
-    axios.post('/my-backend-api/settings/profile', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    }).then(() => {
-      router.back();
-    }).catch(error => {
-      if (error.response.data.code == "C001") {
-        alert("양식에 맞지 않습니다.");
-      } else if (error.response.data.code == "M008") {
-        alert("이미 존재하는 닉네임입니다.");
-      } else if (error.response.data.code == "I001") {
-        alert("사진 용량 초과입니다.");
-      } else {
-        alert(error);
-      }
-      router.replace("/settings/profile");
-    })
-  } else {
-    axios.post('/my-backend-api/settings/profile', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    }).then(() => {
-      router.back();
-    }).catch(error => {
-      if (error.response.data.code == "C001") {
-        alert("양식에 맞지 않습니다.");
-      } else if (error.response.data.code == "M008") {
-        alert("이미 존재하는 닉네임입니다.");
-      } else {
-        alert(error);
-      }
-      router.replace("/settings/profile");
-    })
-  }
-};
-const cancel = function () {
-  router.replace("/settings/profile");
+const onEdit = async function () {
+    formData.append("name", profile.value.name)
+    formData.append("nickname", profile.value.nickname)
+    if (imageChanged) {
+        await edit(formData)
+            .then(() => {
+                alert("수정이 완료되었습니다.")
+                router.go(0);
+            }).catch((error: any) => {
+                if (resStore.isError) {
+                    switch (resStore.getErrorCode) {
+                        case "C001":
+                            alert("양식에 맞지 않습니다.");
+                            break;
+                        case "M008":
+                            alert("이미 존재하는 닉네임입니다.");
+                            break;
+                        case "I001":
+                            alert("사진 용량 초과입니다.");
+                            break;
+                        default:
+                            alert("Error : " + error);
+                            break;
+                    }
+                    router.replace("profile");
+                }else{
+                    alert("Error : " + error);
+                    router.replace("profile");
+                }
+            })
+    } else {
+        await edit(formData)
+            .then(() => {
+                alert("수정이 완료되었습니다.")
+                router.go(0);
+            }).catch((error: any) => {
+                if (resStore.isError) {
+                    switch (resStore.getErrorCode) {
+                        case "C001":
+                            alert("양식에 맞지 않습니다.");
+                            break;
+                        case "M008":
+                            alert("이미 존재하는 닉네임입니다.");
+                            break;
+                        default:
+                            alert("Error Code : " + resStore.getErrorCode);
+                            break;
+                    }
+                    router.replace("profile");
+                }else{
+                    alert("Error : " + error);
+                    router.replace("profile");
+                }
+            })
+    }
 }
 </script>
 

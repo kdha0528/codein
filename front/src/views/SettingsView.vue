@@ -19,9 +19,6 @@
 <script lang="ts" setup>
 import Header from '@/components/Header.vue';
 import { reactive, toRefs } from "vue";
-import { useRouter } from "vue-router";
-
-const route = useRouter();
 
 const state = reactive({
   circleUrl:

@@ -17,16 +17,29 @@
 
 <script setup lang="ts">
 import Header from '@/components/Header.vue';
-import { ref } from "vue";
-import axios from "axios";
+import {onMounted, ref} from "vue";
+import {getHome} from "@/api/member";
+import {useResponseStore} from "@/stores/Response";
+import {useRouter} from "vue-router";
 
 const members = ref([]);
 
-axios.get("/my-backend-api/home?page=1&size=5").then((response) => {
-  response.data.forEach((r: any) => {
-    members.value.push(r);
-  });
-});
+onMounted(()=>{onGetHome()})
+const onGetHome = async function (){
+    await getHome()
+        .then((response: any)=>{
+            response.data.forEach((r: any) => {
+                members.value.push(r);
+            });
+        })
+        .catch((error:any) => {
+            const resStore = useResponseStore();
+            console.log("res type = " + !resStore.isError)
+            console.log("error = " + error)
+            alert(error);
+            useRouter().push("home");
+        });
+}
 </script>
 
 <style scoped lang="scss">

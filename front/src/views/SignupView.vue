@@ -152,18 +152,16 @@ const rules = reactive<FormRules>({
 });
 
 const onSignup = async function () {
-    const response = await signup(signupForm.value)
+    await signup(signupForm.value)
         .then(()=>{
             alert("회원가입이 성공적으로 완료되었습니다.")
             router.push("home");
         }).catch((error)=>{
             const resStore = useResponseStore();
-            console.log("res type = " + !resStore.isError)
-            console.log("error = " + error)
             if(resStore.isError) {
                 switch (resStore.getErrorCode) {
                     case "C001":
-                        alert("회원가입 양식에 맞지 않습니다.");
+                        alert("양식에 맞지 않습니다.");
                         break;
                     case "MOO1":
                         alert("이미 존재하는 이메일입니다.");
@@ -175,9 +173,12 @@ const onSignup = async function () {
                         alert("이미 존재하는 닉네임입니다.");
                         break;
                     default:
-                        alert("Error Code : "+ response);
+                        alert("Error : "+ error);
                         break;
                 }
+                router.replace("signup");
+            }else{
+                alert("Error : "+ error);
                 router.replace("signup");
             }
         })
