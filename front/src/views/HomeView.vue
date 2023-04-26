@@ -23,21 +23,26 @@ import {useResponseStore} from "@/stores/Response";
 import {useRouter} from "vue-router";
 
 const members = ref([]);
+const router = useRouter();
+const resStore = useResponseStore();
 
 onMounted(()=>{onGetHome()})
 const onGetHome = async function (){
     await getHome()
-        .then((response: any)=>{
-            response.data.forEach((r: any) => {
+        .then((response:any)=>{
+            response.data.forEach((r:any) => {
                 members.value.push(r);
             });
         })
         .catch((error:any) => {
-            const resStore = useResponseStore();
-            console.log("res type = " + !resStore.isError)
-            console.log("error = " + error)
-            alert(error);
-            useRouter().push("home");
+            if(resStore.isError) {
+                console.log("error code : ",resStore.getErrorCode)
+                alert("Error : "+error)
+                router.replace("home");
+            }else{
+                alert("Error : "+error)
+                router.replace("home");
+            }
         });
 }
 </script>

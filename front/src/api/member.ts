@@ -60,7 +60,8 @@ export async function getProfile() {
         return error;
     }
 }
-export async function edit(data: any) {
+
+export async function editProfile(data: any) {
     try {
         return await apiController({
             url: '/settings/profile',
@@ -69,6 +70,69 @@ export async function edit(data: any) {
                 'Content-Type': 'multipart/form-data',
             },
             data: data,
+        })
+    } catch (error) {
+        console.log("api member error here")
+        return error;
+    }
+}
+
+export async function getAccount() {
+    try {
+        return await apiController({
+            url: '/settings/account',
+            method: 'get',
+        })
+    } catch (error) {
+        console.log("api member error here")
+        return error;
+    }
+}
+
+export async function changePassword(data: any) {
+    try {
+        return await apiController({
+            url: '/settings/account/password',
+            method: 'post',
+            data: data,
+        })
+    } catch (error) {
+        console.log("api member error here")
+        return error;
+    }
+}
+
+
+export async function changeEmail(data: any) {
+    try {
+        return await apiController({
+            url: '/settings/account/email',
+            method: 'post',
+            data: data,
+        })
+    } catch (error) {
+        console.log("api member error here")
+        return error;
+    }
+}
+
+export async function changePhone(data: any) {
+    try {
+        return await apiController({
+            url: '/settings/account/phone',
+            method: 'post',
+            data: data,
+        })
+    } catch (error) {
+        console.log("api member error here")
+        return error;
+    }
+}
+export async function deleteAccount() {
+    try {
+        return await apiController({
+            url: '/settings/account',
+            method: 'delete',
         })
     } catch (error) {
         console.log("api member error here")

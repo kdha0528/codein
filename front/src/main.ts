@@ -5,7 +5,7 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import 'normalize.css';
 import 'bootstrap/dist/css/bootstrap-utilities.css';
-import * as ElementPlusIconsVue from '@element-plus/icons-vue';
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import { createPinia } from 'pinia';
 import VueCookies from 'vue3-cookies';

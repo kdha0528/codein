@@ -61,7 +61,7 @@ const rules = reactive<FormRules>({
 
 const onLogin = async function () {
     await login(loginForm.value)
-        .then(async (res: any)=>{
+        .then(async (res:any)=>{
             const member: Profile = {
               id: res.data.id,
               email: res.data.email,
@@ -71,7 +71,7 @@ const onLogin = async function () {
             }
             auth.login(member);
             await router.push("home");
-        }).catch((error: any)=>{
+        }).catch((error:any)=>{
             const resStore = useResponseStore();
             if(resStore.isError) {
                 switch (resStore.getErrorCode) {
@@ -85,6 +85,7 @@ const onLogin = async function () {
                         alert("Error : "+ error);
                         break;
                 }
+                console.log("error code : ",resStore.getErrorCode)
                 router.replace("/login");
             }else{
                 alert("Error : "+ error);

@@ -21,9 +21,9 @@ apiController.interceptors.request.use(
 apiController.interceptors.response.use(
 
     async function (response) {
+        console.log("response is fine")
         await useResponseStore().setResponseType(true);
         await useResponseStore().setErrorCode('');
-        console.log("response is fine")
         return response;
     }, async function (error) {
         const errorAPI = error.config;

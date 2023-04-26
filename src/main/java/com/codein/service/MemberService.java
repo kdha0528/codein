@@ -101,7 +101,11 @@ public class MemberService {
 
         Member member = token.getMember();
 
-        member.setPassword(passwordEncoder.encrypt(passwordServiceDto.getPassword()));
+        if (!passwordEncoder.matches(passwordServiceDto.getOriginPassword(), member.getPassword())) {
+            throw new InvalidLoginInputException();
+        }
+
+        member.setPassword(passwordEncoder.encrypt(passwordServiceDto.getNewPassword()));
     }
 
     @Transactional

@@ -2,10 +2,7 @@ package com.codein.domain.member;
 
 import com.codein.domain.auth.Token;
 import com.codein.domain.image.ProfileImage;
-import com.codein.responsedto.LoginResponseDto;
-import com.codein.responsedto.MemberListResponseDto;
-import com.codein.responsedto.ProfileResponseDto;
-import com.codein.responsedto.ProfileSettingsResponseDto;
+import com.codein.responsedto.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -70,7 +67,7 @@ public class Member {
         this.point = 0;
     }
 
-    public MemberListResponseDto toMemberResponse() {
+    public MemberListResponseDto toMemberResponseDto() {
         return MemberListResponseDto.builder()
                 .id(this.getId())
                 .email(this.getEmail())
@@ -78,7 +75,7 @@ public class Member {
                 .build();
     }
 
-    public LoginResponseDto toLoginResponse() {
+    public LoginResponseDto toLoginResponseDto() {
         return LoginResponseDto.builder()
                 .id(this.getId())
                 .email(this.getEmail())
@@ -88,8 +85,8 @@ public class Member {
                 .build();
     }
 
-    public ProfileResponseDto toProfileResponse() {
-        return ProfileResponseDto.builder()
+    public MemberProfileResponseDto toProfileResponseDto() {
+        return MemberProfileResponseDto.builder()
                 .email(this.getEmail())
                 .name(this.getName())
                 .nickname(this.getNickname())
@@ -97,14 +94,20 @@ public class Member {
                 .build();
     }
 
-    public ProfileSettingsResponseDto toProfileSettingsResponse() throws IOException {
-        return ProfileSettingsResponseDto.builder()
+    public SettingsProfileResponseDto toSettingsProfileResponseDto() throws IOException {
+        return SettingsProfileResponseDto.builder()
                 .name(this.getName())
                 .nickname(this.getNickname())
                 .profileImage(this.getProfileImage())
                 .build();
     }
 
+    public SettingsAccountResponseDto toSettingsAccountResponseDto() throws IOException {
+        return SettingsAccountResponseDto.builder()
+                .email(this.getEmail())
+                .phone(this.getPhone())
+                .build();
+    }
 
     public ProfileEditor.ProfileEditorBuilder toProfileEditor() {
         if (profileImage == null) {

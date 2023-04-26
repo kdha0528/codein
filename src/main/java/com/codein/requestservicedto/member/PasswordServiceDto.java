@@ -7,10 +7,11 @@ import lombok.ToString;
 @Getter
 @ToString
 public class PasswordServiceDto {
-    private final String password;
-
+    private final String originPassword;
+    private final String newPassword;
     @Builder
-    public PasswordServiceDto(String password) {
-        this.password = password;
+    public PasswordServiceDto(String originPassword, String newPassword) {
+        this.originPassword = originPassword;
+        this.newPassword = newPassword;
     }
 }

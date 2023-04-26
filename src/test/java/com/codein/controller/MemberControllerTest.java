@@ -8,6 +8,7 @@ import com.codein.repository.TokenRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.member.*;
+import com.codein.responsedto.SettingsAccountResponseDto;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -22,16 +23,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -583,7 +587,7 @@ class MemberControllerTest {
         // expected
         Member member = memberRepository.findByEmail("kdha4585@gmail.com");
         String imagePath = "/my-backend-api/images/profile/" + member.getProfileImage().getImgFileName();
-        Assertions.assertEquals(member.toProfileSettingsResponse().getImagePath(), imagePath);
+        assertEquals(member.toSettingsProfileResponseDto().getImagePath(), imagePath);
 
     }
 
@@ -621,7 +625,8 @@ class MemberControllerTest {
         login();
 
         PasswordDto passwordDto = PasswordDto.builder()
-                .password("11112222")
+                .originPassword("12341234")
+                .newPassword("11112222")
                 .build();
 
         System.out.println(memberRepository.findByAccessToken(getCookie().getValue()).getPassword());
@@ -670,6 +675,27 @@ class MemberControllerTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(phoneDto))
                 )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Settings Account 정보 가져오기 성공")
+    void test11_1() throws Exception {
+        // given
+        signup();
+        login();
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        SettingsAccountResponseDto settingsAccountResponseDto = SettingsAccountResponseDto.builder()
+                .email(member.getEmail())
+                .phone(member.getPhone())
+                .build();
+
+        // expected
+        mockMvc.perform(get("/settings/account").cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(settingsAccountResponseDto)))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

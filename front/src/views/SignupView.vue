@@ -156,7 +156,7 @@ const onSignup = async function () {
         .then(()=>{
             alert("회원가입이 성공적으로 완료되었습니다.")
             router.push("home");
-        }).catch((error)=>{
+        }).catch((error:any)=>{
             const resStore = useResponseStore();
             if(resStore.isError) {
                 switch (resStore.getErrorCode) {
@@ -176,6 +176,7 @@ const onSignup = async function () {
                         alert("Error : "+ error);
                         break;
                 }
+                console.log("error code : ",resStore.getErrorCode)
                 router.replace("signup");
             }else{
                 alert("Error : "+ error);

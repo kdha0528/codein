@@ -52,7 +52,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import type { UploadProps } from 'element-plus'
 import { ElMessage } from "element-plus";
-import { getProfile, edit } from "@/api/member";
+import { getProfile, editProfile } from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();
@@ -95,13 +95,15 @@ const onGetProfile = async function (){
             profile.value.name = response.data.name;
             profile.value.nickname = response.data.nickname;
         })
-        .catch((error) => {
-            console.log("res type = " + !resStore.isError)
-            console.log("error = " + error)
+        .catch((error:any) => {
             if(resStore.isError) {
-                alert(error);
+                alert("Error : " + error);
                 auth.logout()
-                router.replace("home");
+                console.log("error code : ",resStore.getErrorCode)
+                router.push({name:"home"})
+            }else{
+                auth.logout()
+                router.push({name:"home"})
             }
         });
 }
@@ -110,11 +112,11 @@ const onEdit = async function () {
     formData.append("name", profile.value.name)
     formData.append("nickname", profile.value.nickname)
     if (imageChanged) {
-        await edit(formData)
+        await editProfile(formData)
             .then(() => {
                 alert("수정이 완료되었습니다.")
-                router.go(0);
-            }).catch((error: any) => {
+                router.replace("profile");
+            }).catch((error:any) => {
                 if (resStore.isError) {
                     switch (resStore.getErrorCode) {
                         case "C001":
@@ -130,6 +132,7 @@ const onEdit = async function () {
                             alert("Error : " + error);
                             break;
                     }
+                    console.log("error code : ",resStore.getErrorCode)
                     router.replace("profile");
                 }else{
                     alert("Error : " + error);
@@ -137,11 +140,11 @@ const onEdit = async function () {
                 }
             })
     } else {
-        await edit(formData)
+        await editProfile(formData)
             .then(() => {
                 alert("수정이 완료되었습니다.")
                 router.go(0);
-            }).catch((error: any) => {
+            }).catch((error:any) => {
                 if (resStore.isError) {
                     switch (resStore.getErrorCode) {
                         case "C001":

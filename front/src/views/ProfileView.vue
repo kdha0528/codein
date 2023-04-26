@@ -66,6 +66,12 @@ const state = reactive({
 const {circleUrl, squareUrl, sizeList} = toRefs(state)
 const auth = useAuthStore();
 
+axios.get("/my-backend-api/members/{id}").then((response) => {
+    profile.value.email = response.data.email;
+    profile.value.name = response.data.name;
+    profile.value.nickname = response.data.nickname;
+    profile.value.phone = response.data.phone;
+});
 
 const getProfile = auth.getProfile;
 const profile = ref({

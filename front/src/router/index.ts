@@ -7,6 +7,7 @@ import SettingsView from "@/views/SettingsView.vue";
 import SettingsProfile from "@/components/SettingsProfile.vue";
 import SettingsAccount from "@/components/SettingsAccount.vue";
 import { useAuthStore } from "@/stores/auth";
+import SettingsPassword from "@/components/SettingsPassword.vue";
 
 
 const router = createRouter({
@@ -64,15 +65,21 @@ const router = createRouter({
                 meta: {
                     authRequire: true
                 },
-            }]
+            }, {
+                path: 'password',
+                name: 'password',
+                component: SettingsPassword,
+                meta: {
+                    authRequire: true
+                },
+            },]
+        }, {
+        path: '/members/:id',
+        name: 'members',
+        component: ProfileView,
+        meta: {
+            authRequire: true
         },
-        {
-            path: '/members/:id',
-            name: 'members',
-            component: ProfileView,
-            meta: {
-                authRequire: true
-            },
         },
     ],
 });

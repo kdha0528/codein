@@ -8,10 +8,7 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.member.*;
-import com.codein.responsedto.LoginResponseDto;
-import com.codein.responsedto.MemberListResponseDto;
-import com.codein.responsedto.ProfileResponseDto;
-import com.codein.responsedto.ProfileSettingsResponseDto;
+import com.codein.responsedto.*;
 import com.codein.service.AuthService;
 import com.codein.service.MemberService;
 import jakarta.servlet.http.Cookie;
@@ -37,7 +34,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping(value = {"/home", "/", "/index"})
-    public List<MemberListResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto, RedirectAttributes redirect, HttpServletResponse response) {
+    public List<MemberListResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto) {
         return memberService.getMemberList(pageSizeDto);
     }
 
@@ -54,7 +51,7 @@ public class MemberController {
         ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(1));
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-        return memberRepository.findByAccessToken(tokens.get(1)).toLoginResponse();
+        return memberRepository.findByAccessToken(tokens.get(1)).toLoginResponseDto();
     }
 
     @MySecured(role = Role.MEMBER)
@@ -66,19 +63,18 @@ public class MemberController {
 
     @MySecured(role = Role.MEMBER)
     @GetMapping("/members/{id}")
-    public ProfileResponseDto getProfile(@PathVariable Long id) {
+    public MemberProfileResponseDto getMemberProfile(@PathVariable Long id) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(MemberNotExistsException::new);
-        return member.toProfileResponse();
+        return member.toProfileResponseDto();
     }
 
     @MySecured(role = Role.MEMBER)
     @GetMapping(value = "/settings/profile")
-    public ProfileSettingsResponseDto getProfileSettings(@CookieValue(value = "accesstoken") Cookie cookie) throws IOException {
-        System.out.println("cookie = " + cookie.getValue());
+    public SettingsProfileResponseDto getSettingsProfile(@CookieValue(value = "accesstoken") Cookie cookie) throws IOException {
         Member member = memberRepository.findByAccessToken(cookie.getValue());
         if (member != null) {
-            return member.toProfileSettingsResponse();
+            return member.toSettingsProfileResponseDto();
         } else {
             throw new MemberNotExistsException();
         }
@@ -88,6 +84,17 @@ public class MemberController {
     @PostMapping("/settings/profile")
     public void editProfile(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute EditProfileDto editProfileDto) {
         memberService.editProfile(cookie.getValue(), editProfileDto.toEditProfileServiceDto());
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @GetMapping(value = "/settings/account")
+    public SettingsAccountResponseDto getSettingsAccount(@CookieValue(value = "accesstoken") Cookie cookie) throws IOException {
+        Member member = memberRepository.findByAccessToken(cookie.getValue());
+        if (member != null) {
+            return member.toSettingsAccountResponseDto();
+        } else {
+            throw new MemberNotExistsException();
+        }
     }
 
     @MySecured(role = Role.MEMBER)

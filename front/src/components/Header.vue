@@ -25,6 +25,7 @@ import router from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { logout } from "@/api/member";
+import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();
 const route = useRouter();
@@ -39,11 +40,11 @@ const onLogout = async function () {
     await logout()
         .then(()=>{
             auth.logout();
-            route.push("home");
-        }).catch((error)=>{
-            console.log(error);
-            alert("오류가 발생했습니다.");
-            route.push("home");
+            route.push({name:"home"});
+        }).catch((error:any)=>{
+            alert("Error : " + error);
+            console.log("error code : ",useResponseStore().getErrorCode)
+            route.push({name:"home"});
         })
 }
 </script>
