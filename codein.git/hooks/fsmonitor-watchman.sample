@@ -8,9 +8,9 @@ use IPC::Open2;
 # (https://facebook.github.io/watchman/) with git to speed up detecting
 # new and modified files.
 #
-# The hook is passed a version (currently 2) and last update token
-# formatted as a string and outputs to stdout a new update token and
-# all files that have been modified since the update token. Paths must
+# The hook is passed a version (currently 2) and last update tokens
+# formatted as a string and outputs to stdout a new update tokens and
+# all files that have been modified since the update tokens. Paths must
 # be relative to the root of the working tree and separated by a single NUL.
 #
 # To enable this hook, rename this file to "query-watchman" and set

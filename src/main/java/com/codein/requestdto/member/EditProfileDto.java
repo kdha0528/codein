@@ -13,12 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 @ToString
 public class EditProfileDto {
 
-    @Size(min = 2, max = 10)
     @NotBlank(message = "이름을 입력해주세요.")
+    @Size(min = 2, max = 10)
     private final String name;
-    @Pattern(regexp = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,8}$", message = "2자 이상, 16자 이하, 영어 또는 숫자 또는 한글로 입력해주세요.")
+
     @NotBlank(message = "닉네임을 입력해주세요.")
+    @Pattern(regexp = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,8}$", message = "2자 이상, 16자 이하, 영어 또는 숫자 또는 한글로 입력해주세요.")
     private final String nickname;
+
     private final MultipartFile profileImage;
 
     @Builder

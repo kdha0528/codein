@@ -1,6 +1,6 @@
 package com.codein.domain.member;
 
-import com.codein.domain.auth.Token;
+import com.codein.domain.auth.Tokens;
 import com.codein.domain.image.ProfileImage;
 import com.codein.responsedto.*;
 import jakarta.persistence.*;
@@ -46,7 +46,7 @@ public class Member {
     private Integer point;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.LAZY)
-    private final List<Token> tokens = new ArrayList<>();
+    private final List<Tokens> tokens = new ArrayList<>();
 
     @Setter
     private Role role = Role.MEMBER;

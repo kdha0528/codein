@@ -1,18 +1,20 @@
 package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
-import com.codein.domain.auth.Token;
+import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.ProfileEditor;
+import com.codein.error.exception.auth.InvalidTokensCookieException;
 import com.codein.error.exception.member.*;
 import com.codein.error.exception.profileimage.ImageTooLargeException;
 import com.codein.error.exception.profileimage.InvalidImageException;
-import com.codein.repository.TokenRepository;
+import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.PageSizeDto;
 import com.codein.requestservicedto.member.*;
 import com.codein.responsedto.MemberListResponseDto;
+import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +38,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenRepository tokenRepository;
+    private final TokensRepository tokensRepository;
     private final ProfileImageRepository profileImageRepository;
 
     @Value("${spring.servlet.multipart.location}")
@@ -70,7 +72,7 @@ public class MemberService {
             throw new InvalidLoginInputException();
         }
 
-        Token token = Token.builder()
+        Tokens token = Tokens.builder()
                 .member(member)
                 .build();
 
@@ -86,20 +88,26 @@ public class MemberService {
     }
 
     @Transactional
-    public void logout(String accessToken) {
-
-        Token token = tokenRepository.findByAccessToken(accessToken)
-                .orElseThrow(MemberNotLoginException::new);
-
-        tokenRepository.delete(token);
+    public void logout(Cookie cookie) {
+        if(cookie.getName().equals("accesstoken")) {
+            Tokens tokens = tokensRepository.findByAccessToken(cookie.getValue())
+                    .orElseThrow(MemberNotLoginException::new);
+            tokensRepository.delete(tokens);
+        } else if (cookie.getName().equals("refreshtoken")) {
+            Tokens tokens = tokensRepository.findByRefreshToken(cookie.getValue())
+                    .orElseThrow(MemberNotLoginException::new);
+            tokensRepository.delete(tokens);
+        }else{
+            throw new InvalidTokensCookieException();
+        }
     }
 
     @Transactional
     public void changePassword(String accessToken, PasswordServiceDto passwordServiceDto) {
-        Token token = tokenRepository.findByAccessToken(accessToken)
+        Tokens tokens = tokensRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = token.getMember();
+        Member member = tokens.getMember();
 
         if (!passwordEncoder.matches(passwordServiceDto.getOriginPassword(), member.getPassword())) {
             throw new InvalidLoginInputException();
@@ -110,10 +118,10 @@ public class MemberService {
 
     @Transactional
     public void changeEmail(String accessToken, EmailServiceDto emailServiceDto) {
-        Token token = tokenRepository.findByAccessToken(accessToken)
+        Tokens tokens = tokensRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = token.getMember();
+        Member member = tokens.getMember();
 
         Member emailMember = memberRepository.findByEmail(emailServiceDto.getEmail());
         if (emailMember != null && !Objects.equals(emailMember.getEmail(), member.getEmail())) {
@@ -125,10 +133,10 @@ public class MemberService {
 
     @Transactional
     public void changePhone(String accessToken, PhoneServiceDto phoneServiceDto) {
-        Token token = tokenRepository.findByAccessToken(accessToken)
+        Tokens tokens = tokensRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = token.getMember();
+        Member member = tokens.getMember();
 
         Member phoneMember = memberRepository.findByPhone(phoneServiceDto.getPhone());
         if (phoneMember != null && !Objects.equals(phoneMember.getEmail(), member.getEmail())) {
@@ -141,10 +149,10 @@ public class MemberService {
 
     @Transactional
     public void editProfile(String accessToken, EditProfileServiceDto editProfileServiceDto) {
-        Token token = tokenRepository.findByAccessToken(accessToken)
+        Tokens tokens = tokensRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
-        Member member = token.getMember();
+        Member member = tokens.getMember();
 
         if (editProfileServiceDto.getNickname() != null) {  // 닉네임 중복 검사
             Member nicknameMember = memberRepository.findByNickname(editProfileServiceDto.getNickname());
@@ -204,9 +212,9 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(String accessToken) {
-        Token token = tokenRepository.findByAccessToken(accessToken)
+        Tokens tokens = tokensRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
-        Member member = token.getMember();
+        Member member = tokens.getMember();
         if (member.getProfileImage() != null) {
             removeProfileImage(member.getProfileImage().getImgFileName());
         }

@@ -1,13 +1,13 @@
 package com.codein.config;
 
 import com.codein.config.SecurityConfig.MySecured;
-import com.codein.domain.auth.Token;
+import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.auth.AccessTokenNullException;
 import com.codein.error.exception.auth.InvalidAccessTokenException;
 import com.codein.error.exception.auth.UnauthorizedException;
-import com.codein.repository.TokenRepository;
+import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ import java.util.function.Function;
 @Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
 
-    private final TokenRepository tokenRepository;
+    private final TokensRepository tokensRepository;
     private final MemberRepository memberRepository;
 
     @Override
@@ -60,7 +60,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         System.out.println("accesstoken = " + accessToken);
 
         // accessToken이 존재하면 유효한 세션인지 확인
-        Token token = tokenRepository.findByAccessToken(accessToken)
+        Tokens tokens = tokensRepository.findByAccessToken(accessToken)
                 .orElseThrow(InvalidAccessTokenException::new);
 
         // 유효한 세션이라면 해당 유저 가져오기

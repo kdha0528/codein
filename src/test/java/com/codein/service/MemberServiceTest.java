@@ -7,6 +7,7 @@ import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.member.EditProfileDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -127,9 +128,9 @@ class MemberServiceTest {
                 .password("12341234")
                 .build();
         ArrayList<String> tokens = memberService.login(login.toMemberServiceDto());
-
+        Cookie cookie = new Cookie("accesstoken",tokens.get(1));
         // when
-        memberService.logout(tokens.get(1));
+        memberService.logout(cookie);
 
         // then
         Member nullMember = memberRepository.findByAccessToken(tokens.get(1));

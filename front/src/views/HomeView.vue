@@ -28,22 +28,23 @@ const resStore = useResponseStore();
 
 onMounted(()=>{onGetHome()})
 const onGetHome = async function (){
+
     await getHome()
-        .then((response:any)=>{
-            response.data.forEach((r:any) => {
-                members.value.push(r);
-            });
-        })
-        .catch((error:any) => {
-            if(resStore.isError) {
-                console.log("error code : ",resStore.getErrorCode)
-                alert("Error : "+error)
-                router.replace("home");
-            }else{
-                alert("Error : "+error)
-                router.replace("home");
+        .then((response: any)=>{
+            if(resStore.isOK){
+                response.forEach((r:any) => {
+                    members.value.push(r);
+                });
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
+                router.push({name:"home"});
             }
-        });
+        }).catch(error => {
+            alert(error);
+            console.log(error);
+            router.push({name:"home"});
+        })
 }
 </script>
 

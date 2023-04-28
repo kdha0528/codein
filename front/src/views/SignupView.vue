@@ -61,8 +61,10 @@ import type { FormRules } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { signup } from '@/api/member';
 import {useResponseStore} from '@/stores/Response';
+import {Profile} from "@/components/props/profile";
 
 const router = useRouter();
+const resStore = useResponseStore();
 
 const signupForm = ref({
     email: '',
@@ -153,33 +155,23 @@ const rules = reactive<FormRules>({
 
 const onSignup = async function () {
     await signup(signupForm.value)
-        .then(()=>{
-            alert("회원가입이 성공적으로 완료되었습니다.")
-            router.push("home");
-        }).catch((error:any)=>{
-            const resStore = useResponseStore();
-            if(resStore.isError) {
-                switch (resStore.getErrorCode) {
-                    case "C001":
-                        alert("양식에 맞지 않습니다.");
-                        break;
-                    case "MOO1":
-                        alert("이미 존재하는 이메일입니다.");
-                        break;
-                    case "M007":
-                        alert("이미 존재하는 전화번호입니다.");
-                        break;
-                    case "M008":
-                        alert("이미 존재하는 닉네임입니다.");
-                        break;
-                    default:
-                        alert("Error : "+ error);
-                        break;
-                }
-                console.log("error code : ",resStore.getErrorCode)
+        .then((response: any)=>{
+            if(resStore.isOK){
+                alert("회원가입이 성공적으로 완료되었습니다.")
+                router.push({name: "home"});
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
                 router.replace("signup");
+            }
+        }).catch(error => {
+            if(resStore.isOK) {
+                alert(error);
+                console.log(error)
+                router.push({name: "home"});
             }else{
-                alert("Error : "+ error);
+                alert(error);
+                console.log(error)
                 router.replace("signup");
             }
         })

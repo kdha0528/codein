@@ -1,6 +1,6 @@
 package com.codein.config;
 
-import com.codein.repository.TokenRepository;
+import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -17,17 +17,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final TokenRepository tokenRepository;
+    private final TokensRepository tokensRepository;
     private final MemberRepository memberRepository;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new AuthResolver(tokenRepository));
+        resolvers.add(new AuthResolver(tokensRepository));
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthInterceptor(tokenRepository, memberRepository))
+        registry.addInterceptor(new AuthInterceptor(tokensRepository, memberRepository))
                 .addPathPatterns("/**")
                 .excludePathPatterns("/error", "/favicon.ico"); // 인증없이 접근 가능하게
     }

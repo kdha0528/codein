@@ -65,15 +65,16 @@ const router = createRouter({
                 meta: {
                     authRequire: true
                 },
-            }, {
-                path: 'password',
-                name: 'password',
-                component: SettingsPassword,
-                meta: {
-                    authRequire: true
-                },
             },]
         }, {
+            path: '/settings/account/password',
+            name: 'password',
+            component: SettingsPassword,
+            meta: {
+                authRequire: true
+            },
+        },
+        {
         path: '/members/:id',
         name: 'members',
         component: ProfileView,

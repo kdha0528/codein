@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,8 +55,10 @@ public class MemberController {
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/logout")
-    public String logout(@CookieValue(value = "accesstoken") Cookie cookie) {
-        memberService.logout(cookie.getValue());
+    public String logout(@CookieValue(value = "accesstoken") Cookie cookie, HttpServletResponse response) {
+        memberService.logout(cookie);
+        response.addCookie(authService.deleteCookie("accesstoken"));
+        response.addCookie(authService.deleteCookie("refreshtoken"));
         return "redirect:/home";
     }
 
@@ -81,8 +82,8 @@ public class MemberController {
     }
 
     @MySecured(role = Role.MEMBER)
-    @PostMapping("/settings/profile")
-    public void editProfile(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute EditProfileDto editProfileDto) {
+    @PostMapping(value ="/settings/profile")
+    public void editProfile(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute @Valid EditProfileDto editProfileDto) {
         memberService.editProfile(cookie.getValue(), editProfileDto.toEditProfileServiceDto());
     }
 
@@ -99,29 +100,30 @@ public class MemberController {
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/settings/account/password")
-    public void changePassword(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid PasswordDto passwordDto) {
+    public String changePassword(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid PasswordDto passwordDto) {
         memberService.changePassword(cookie.getValue(), passwordDto.toPasswordServiceDto());
-        memberService.logout(cookie.getValue());
+        return "redirect:/logout";
     }
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/settings/account/email")
-    public void changeEmail(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EmailDto emailDto) {
+    public String changeEmail(@CookieValue(value = "accesstoken") Cookie cookie,  @RequestBody @Valid EmailDto emailDto) {
+        System.out.println("email dto = " + emailDto.getEmail());
         memberService.changeEmail(cookie.getValue(), emailDto.toEmailServiceDto());
-        memberService.logout(cookie.getValue());
+        return "redirect:/logout";
     }
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/settings/account/phone")
-    public void changePhone(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid PhoneDto phoneDto) {
+    public String changePhone(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid PhoneDto phoneDto) {
         memberService.changePhone(cookie.getValue(), phoneDto.toPhoneServiceDto());
-        memberService.logout(cookie.getValue());
+        return "redirect:/logout";
     }
 
     @MySecured(role = Role.MEMBER)
     @DeleteMapping("/settings/account")
-    public String deleteMember(@CookieValue(value = "accesstoken") Cookie cookie, HttpServletResponse response) {
+    public String deleteMember(@CookieValue(value = "accesstoken") Cookie cookie) {
         memberService.deleteMember(cookie.getValue());
-        return "redirect:/home";
+        return "redirect:/logout";
     }
 }

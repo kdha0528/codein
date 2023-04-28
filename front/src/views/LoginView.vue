@@ -31,6 +31,7 @@ import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();
 const router = useRouter();
+const resStore = useResponseStore();
 
 const loginForm = ref({
     email: '',
@@ -61,34 +62,31 @@ const rules = reactive<FormRules>({
 
 const onLogin = async function () {
     await login(loginForm.value)
-        .then(async (res:any)=>{
-            const member: Profile = {
-              id: res.data.id,
-              email: res.data.email,
-              nickname: res.data.nickname,
-              point: res.data.point,
-              role: res.data.role,
-            }
-            auth.login(member);
-            await router.push("home");
-        }).catch((error:any)=>{
-            const resStore = useResponseStore();
-            if(resStore.isError) {
-                switch (resStore.getErrorCode) {
-                    case "C001":
-                        alert("양식에 맞지 않습니다.");
-                        break;
-                    case "MOO2":
-                        alert("이메일/비밀번호가 올바르지 않습니다.");
-                        break;
-                    default:
-                        alert("Error : "+ error);
-                        break;
+        .then((response: any)=>{
+            if(resStore.isOK){
+                const member: Profile = {
+                    id: response.id,
+                    email: response.email,
+                    nickname: response.nickname,
+                    point: response.point,
+                    role: response.role,
                 }
-                console.log("error code : ",resStore.getErrorCode)
+                auth.login(member);
+                router.push({name:"home"});
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
+                router.replace("/login");
+            }
+        }).catch(error => {
+            if(resStore.isOK) {
+                alert(error);
+                console.log(error)
+                auth.logout()
                 router.replace("/login");
             }else{
-                alert("Error : "+ error);
+                alert(error);
+                console.log(error)
                 router.replace("/login");
             }
         })

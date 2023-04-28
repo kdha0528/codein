@@ -29,6 +29,7 @@ import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();
 const route = useRouter();
+const resStore = useResponseStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
 
@@ -38,13 +39,19 @@ router.afterEach((to, from, next) => {
 
 const onLogout = async function () {
     await logout()
-        .then(()=>{
-            auth.logout();
-            route.push({name:"home"});
-        }).catch((error:any)=>{
-            alert("Error : " + error);
-            console.log("error code : ",useResponseStore().getErrorCode)
-            route.push({name:"home"});
+        .then((response: any)=>{
+            if(resStore.isOK){
+                auth.logout();
+                route.push({name:"home"});
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
+                router.push({name:"home"});
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error);
+            router.push({name:"home"});
         })
 }
 </script>

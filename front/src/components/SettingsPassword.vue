@@ -7,7 +7,7 @@
                 label-width="120px"
                 class="demo-ruleForm">
             <el-form-item label="현재 비밀번호" prop="originPassword">
-                <el-input v-model="passwordForm.originPassword"/>
+                <el-input v-model="passwordForm.originPassword " show-password/>
             </el-form-item>
             <el-form-item label="신규 비밀번호" prop="newPassword">
                 <el-input v-model="passwordForm.newPassword" show-password/>
@@ -31,6 +31,7 @@ import {changePassword} from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 const auth = useAuthStore();
 const router = useRouter();
+const resStore = useResponseStore();
 
 const passwordForm = ref({
     originPassword:'',
@@ -69,30 +70,22 @@ const rules = reactive<FormRules>({
 
 const onChangePassword = async function () {
     await changePassword(passwordForm.value)
-        .then(()=>{
-            alert("변경이 완료되었습니다.")
-            auth.logout()
-            router.push("home");
-        }).catch((error:any)=>{
-            const resStore = useResponseStore();
-            if(resStore.isError) {
-                switch (resStore.getErrorCode) {
-                    case "C001":
-                        alert("양식에 맞지 않습니다.");
-                        break;
-                    case "MOO2":
-                        alert("비밀번호가 올바르지 않습니다.");
-                        break;
-                    default:
-                        alert("Error : "+ error);
-                        break;
-                }
-                console.log("error code : ",resStore.getErrorCode)
-                router.replace("password");
-            }else{
-                alert("Error : "+ error);
-                router.replace("password");
+        .then((response: any)=>{
+            if(resStore.isOK){
+                alert("변경이 완료되었습니다.")
+                auth.logout()
+                router.push({name:"home"});
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response);
+                auth.logout()
+                router.push({name:"home"});
             }
+        }).catch(error => {
+            alert(error);
+            console.log(error);
+            auth.logout()
+            router.push({name:"home"});
         })
 };
 

@@ -1,11 +1,12 @@
 package com.codein.service;
 
-import com.codein.domain.auth.Token;
+import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.auth.InvalidRefreshTokenException;
-import com.codein.error.exception.member.MemberNotExistsException;
-import com.codein.repository.TokenRepository;
+import com.codein.error.exception.auth.RefreshTokenNullException;
+import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
+import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -17,29 +18,29 @@ import java.util.ArrayList;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final TokenRepository tokenRepository;
+    private final TokensRepository tokensRepository;
     private final MemberRepository memberRepository;
 
     @Transactional
     public ArrayList<String> validateRefreshToken(String refreshToken) {
-        Token token = tokenRepository.findByRefreshToken(refreshToken)
+        Tokens token = tokensRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(InvalidRefreshTokenException::new);
 
         Member member = memberRepository.findByRefreshToken(token.getRefreshToken());
 
-        tokenRepository.delete(token);
+        tokensRepository.delete(token);
 
         if(member == null){
-            throw new MemberNotExistsException();
+            return null;
         }
 
-        Token newToken = Token.builder()
+        Tokens newTokens = Tokens.builder()
                 .member(member)
                 .build();
 
         ArrayList<String> tokens = new ArrayList<>();
-        tokens.add(newToken.getRefreshToken());
-        tokens.add(newToken.getAccessToken());
+        tokens.add(newTokens.getRefreshToken());
+        tokens.add(newTokens.getAccessToken());
         return tokens;
 
     }
@@ -66,6 +67,21 @@ public class AuthService {
                 .sameSite("Strict")
                 .domain(".loca.lt")
                 .build();
+    }
+
+    @Transactional
+    public Cookie deleteCookie(String tokenName) {
+        Cookie cookie = new Cookie(tokenName,null);
+        cookie.setMaxAge(0);
+        return cookie;
+    }
+
+    @Transactional
+    public void deleteTokens(String refreshToken) {
+        Tokens tokens = tokensRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(RefreshTokenNullException::new);
+
+        tokensRepository.delete(tokens);
     }
 
 }

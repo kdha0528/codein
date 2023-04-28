@@ -1,23 +1,39 @@
 import { defineStore } from 'pinia';
 export const useResponseStore = defineStore("response", {
     state: () => ({
-        type: true as boolean,
+        state: true as boolean,
         errorCode: '',
+        errorMessage:'',
+        retry: false as boolean,
     }),
     getters: {
         isError: (state) => {
-            return !state.type;
+            return !state.state;
+        },
+        isOK: (state) => {
+            return state.state;
         },
         getErrorCode: (state) =>{
             return state.errorCode;
-        }
+        },
+        getErrorMessage: (state) =>{
+            return state.errorMessage;
+        }, getRetry: (state) =>{
+            return state.retry;
+        },
     },
     actions: {
-        async setResponseType(type: boolean){
-            this.type = type;
-        },
-        async setErrorCode(code:string){
+        async setError(state: boolean, code: string, message: string){
+            this.state = state;
             this.errorCode = code;
+            this.errorMessage = message;
+        },
+        async setSuccess(){
+            this.state = true;
+            this.errorCode = '';
+            this.errorMessage = '';
+        },async setRetry(retry: boolean){
+            this.retry = retry;
         },
     },
     persist: {

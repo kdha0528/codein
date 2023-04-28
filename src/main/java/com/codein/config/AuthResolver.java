@@ -1,9 +1,9 @@
 package com.codein.config;
 
 import com.codein.config.data.MemberSession;
-import com.codein.domain.auth.Token;
+import com.codein.domain.auth.Tokens;
 import com.codein.error.exception.auth.UnauthorizedException;
-import com.codein.repository.TokenRepository;
+import com.codein.repository.TokensRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class AuthResolver implements HandlerMethodArgumentResolver {
 
-    private final TokenRepository tokenRepository;
+    private final TokensRepository tokensRepository;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -59,10 +59,10 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
         }
 
         // accessToken이 유효한지 확인
-        Token token = tokenRepository.findByAccessToken(accessToken)
+        Tokens tokens = tokensRepository.findByAccessToken(accessToken)
                 .orElseThrow(UnauthorizedException::new);
 
         // 해당 토큰을 가지고 있는 유저의 아이디를 MemberSession 형태로 반환
-        return new MemberSession(token.getMember().getId());
+        return new MemberSession(tokens.getMember().getId());
     }
 }

@@ -25,6 +25,7 @@ public enum ErrorCode {
     INVALID_ACCESS_TOKEN(401, "A003", "Access token is invalid."),
     INVALID_REFRESH_TOKEN(401, "A004", "Refresh token is invalid."),
     UNAUTHORIZED_ACCESS(403, "A005", "Access is forbidden."),
+    INVALID_TOKENS_COOKIE(401, "A006", "Cookie is invalid"),
 
     // Member
     EMAIL_ALREADY_EXISTS(400, "M001", "Email is already exists"),

@@ -69,7 +69,6 @@ const formData = new FormData();
 
 let imageChanged = false;
 
-
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
     response,
     uploadFile
@@ -90,22 +89,24 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 onMounted(()=>{onGetProfile()})
 const onGetProfile = async function (){
     await getProfile()
-        .then((response:any)=>{
-            imageUrl.value = response.data.imagePath;
-            profile.value.name = response.data.name;
-            profile.value.nickname = response.data.nickname;
-        })
-        .catch((error:any) => {
-            if(resStore.isError) {
-                alert("Error : " + error);
-                auth.logout()
-                console.log("error code : ",resStore.getErrorCode)
-                router.push({name:"home"})
+        .then((response: any)=>{
+            if(resStore.isOK){
+                imageUrl.value = response.imagePath;
+                profile.value.name = response.name;
+                profile.value.nickname = response.nickname;
             }else{
                 auth.logout()
+                alert(resStore.getErrorMessage);
+                console.log(response)
                 router.push({name:"home"})
             }
-        });
+        })
+        .catch(error => {
+            auth.logout()
+            alert(error);
+            console.log(error)
+            router.push({name:"home"})
+        })
 }
 
 const onEdit = async function () {
@@ -113,55 +114,35 @@ const onEdit = async function () {
     formData.append("nickname", profile.value.nickname)
     if (imageChanged) {
         await editProfile(formData)
-            .then(() => {
-                alert("수정이 완료되었습니다.")
-                router.replace("profile");
-            }).catch((error:any) => {
-                if (resStore.isError) {
-                    switch (resStore.getErrorCode) {
-                        case "C001":
-                            alert("양식에 맞지 않습니다.");
-                            break;
-                        case "M008":
-                            alert("이미 존재하는 닉네임입니다.");
-                            break;
-                        case "I001":
-                            alert("사진 용량 초과입니다.");
-                            break;
-                        default:
-                            alert("Error : " + error);
-                            break;
-                    }
-                    console.log("error code : ",resStore.getErrorCode)
+            .then((response: any) => {
+                if(resStore.isOK){
+                    alert("수정이 완료되었습니다.")
                     router.replace("profile");
-                }else{
-                    alert("Error : " + error);
+                } else {
+                    alert(resStore.getErrorMessage);
+                    console.log(response)
                     router.replace("profile");
                 }
+            }).catch(error => {
+                alert(error);
+                console.log(error)
+                router.replace("profile");
             })
     } else {
         await editProfile(formData)
-            .then(() => {
-                alert("수정이 완료되었습니다.")
-                router.go(0);
-            }).catch((error:any) => {
-                if (resStore.isError) {
-                    switch (resStore.getErrorCode) {
-                        case "C001":
-                            alert("양식에 맞지 않습니다.");
-                            break;
-                        case "M008":
-                            alert("이미 존재하는 닉네임입니다.");
-                            break;
-                        default:
-                            alert("Error Code : " + resStore.getErrorCode);
-                            break;
-                    }
+            .then((response: any)=> {
+                if (resStore.isOK){
+                    alert("수정이 완료되었습니다.")
                     router.replace("profile");
-                }else{
-                    alert("Error : " + error);
+                } else {
+                    alert(resStore.getErrorMessage);
+                    console.log(response)
                     router.replace("profile");
                 }
+            }).catch(error => {
+                alert(error);
+                console.log(error)
+                router.replace("profile");
             })
     }
 }

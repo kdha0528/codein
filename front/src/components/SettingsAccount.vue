@@ -1,11 +1,13 @@
 <template>
     <h2>비밀번호</h2>
-    <el-button type="danger" href="/password">
-        <el-icon style="vertical-align: middle">
-            <Lock />
-        </el-icon>
-        <span style="vertical-align: middle"> 비밀번호 변경 </span>
-    </el-button>
+    <el-link href="/settings/account/password">
+      <el-button type="danger">
+          <el-icon style="vertical-align: middle">
+              <Lock />
+          </el-icon>
+          <span style="vertical-align: middle"> 비밀번호 변경 </span>
+      </el-button>
+    </el-link>
 
 
     <el-divider/>
@@ -16,7 +18,7 @@
         method="post"
         class="demo-ruleForm">
       <el-form-item prop="email">
-        <el-input v-model="emailForm"/>
+        <el-input v-model="emailForm.email"/>
       </el-form-item>
       <el-form-item>
           <el-button type="info" @click="onChangeEmail()">
@@ -36,7 +38,7 @@
         method="post"
         class="demo-ruleForm">
       <el-form-item prop="phone">
-        <el-input v-model="phoneForm"/>
+        <el-input v-model="phoneForm.phone"/>
       </el-form-item>
       <el-form-item>
           <el-button type="info" @click="onChangePhone()">
@@ -67,59 +69,61 @@ import { useRouter } from "vue-router";
 import {Delete, Iphone, Message, Lock, Search} from '@element-plus/icons-vue'
 import {changeEmail, changePassword, changePhone, deleteAccount, getAccount, getProfile} from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
+import Header from "@/components/Header.vue";
 const auth = useAuthStore();
 const router = useRouter();
 const resStore = useResponseStore();
 
 const deleteCheckBox = ref(false);
 
-const emailForm = ref('');
-const phoneForm = ref('');
+const emailForm = ref({
+    email: ''
+});
+const phoneForm = ref({
+    phone: '',
+});
 
 
 onMounted(()=>{onGetAccount()})
 const onGetAccount = async function (){
     await getAccount()
-        .then((response:any)=>{
-            emailForm.value = response.data.email;
-            phoneForm.value = response.data.phone;
-        })
-        .catch((error:any) => {
-            if(resStore.isError) {
-                alert("Error : " + error);
-                auth.logout()
-                console.log("error code : ",resStore.getErrorCode)
-                router.push({name:"home"});
-            }else{
-                alert("Error : " + error);
+        .then((response: any)=>{
+            if(resStore.isOK){
+                emailForm.value.email = response.email;
+                phoneForm.value.phone = response.phone;
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
                 router.push({name:"home"});
             }
-        });
+        }).catch(error => {
+            alert(error);
+            console.log(error);
+            router.push({name:"home"});
+        })
 }
 
 const onChangeEmail = async function () {
     await changeEmail(emailForm.value)
-        .then(()=>{
-            alert("변경이 완료되었습니다.")
-            auth.logout()
-            router.push("home");
-        }).catch((error:any)=>{
-            if(resStore.isError) {
-                switch (resStore.getErrorCode) {
-                    case "C001":
-                        alert("양식에 맞지 않습니다.");
-                        break;
-                    case "MOO1":
-                        alert("이미 존재하는 이메일입니다.");
-                        break;
-                    default:
-                        alert("Error : "+ error);
-                        break;
-                }
-                console.log("error code : ",resStore.getErrorCode)
+        .then((response: any)=>{
+            if(resStore.isOK){
+                alert("변경이 완료되었습니다.")
+                auth.logout()
+                router.push({name:"home"});
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
                 router.replace("account");
+            }
+        }).catch(error =>{
+            if(resStore.isOK) {
+                alert(error);
+                console.log(error)
+                auth.logout()
+                router.push({name:"home"});
             }else{
-                alert("Error : "+ error);
+                alert(error);
+                console.log(error)
                 router.replace("account");
             }
         })
@@ -127,27 +131,25 @@ const onChangeEmail = async function () {
 
 const onChangePhone = async function () {
     await changePhone(phoneForm.value)
-        .then(()=>{
-            alert("변경이 완료되었습니다.")
-            auth.logout()
-            router.push("home");
-        }).catch((error:any)=>{
-            if(resStore.isError) {
-                switch (resStore.getErrorCode) {
-                    case "C001":
-                        alert("양식에 맞지 않습니다.");
-                        break;
-                    case "MOO7":
-                        alert("이미 존재하는 전화번호입니다.");
-                        break;
-                    default:
-                        alert("Error : "+ error);
-                        break;
-                }
-                console.log("error code : ",resStore.getErrorCode)
+        .then((response: any)=>{
+            if(resStore.isOK){
+                alert("변경이 완료되었습니다.")
+                auth.logout()
+                router.push({name:"home"});
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
                 router.replace("account");
+            }
+        }).catch(error =>{
+            if(resStore.isOK) {
+                alert(error);
+                console.log(error)
+                auth.logout()
+                router.push({name:"home"});
             }else{
-                alert("Error : "+ error);
+                alert(error);
+                console.log(error)
                 router.replace("account");
             }
         })
@@ -155,19 +157,22 @@ const onChangePhone = async function () {
 
 const onDelete = async function () {
     await deleteAccount()
-        .then(()=>{
-            alert("삭제가 완료되었습니다.")
-            auth.logout()
-            router.push("home");
-        }).catch((error:any)=>{
-            if(resStore.isError) {
-                console.log("error code : ",resStore.getErrorCode)
-                alert("Error : "+ error);
-                router.replace("account");
-            }else{
-                alert("Error : "+ error);
-                router.replace("account");
+        .then((response: any)=>{
+            if(resStore.isOK){
+                alert("삭제가 완료되었습니다.")
+                auth.logout()
+                router.push({name:"home"});
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
+                auth.logout()
+                router.push({name:"home"});
             }
+        }).catch(error =>{
+            alert(error);
+            console.log(error)
+            auth.logout()
+            router.push({name:"home"});
         })
 };
 </script>

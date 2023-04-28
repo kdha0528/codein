@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Getter
-public class Token {
+public class Tokens {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class Token {
     private Member member;
 
     @Builder
-    public Token(Member member) {
+    public Tokens(Member member) {
         this.refreshToken = UUID.randomUUID().toString();
         this.accessToken = UUID.randomUUID().toString();
         this.member = member;
