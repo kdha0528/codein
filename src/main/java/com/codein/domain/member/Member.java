@@ -67,7 +67,7 @@ public class Member {
         this.point = 0;
     }
 
-    public MemberListResponseDto toMemberResponseDto() {
+    public MemberListResponseDto toMemberListResponseDto() {
         return MemberListResponseDto.builder()
                 .id(this.getId())
                 .email(this.getEmail())
@@ -85,12 +85,12 @@ public class Member {
                 .build();
     }
 
-    public MemberProfileResponseDto toProfileResponseDto() {
-        return MemberProfileResponseDto.builder()
-                .email(this.getEmail())
-                .name(this.getName())
+    public MemberResponseDto toMemberResponseDto() {
+        return MemberResponseDto.builder()
+                .id(this.getId())
                 .nickname(this.getNickname())
-                .phone(this.getPhone())
+                .role(this.getRole())
+                .profileImage(this.getProfileImage())
                 .build();
     }
 

@@ -136,6 +136,18 @@ export async function deleteAccount() {
     }
 }
 
+export async function getMember(id: any) {
+    try {
+        const response = await apiController({
+            url: '/members/'+id,
+            method: 'get',
+        })
+        return response.data
+    } catch (error) {
+        return error;
+    }
+}
+
 export async function refreshToken() {
     try {
         await apiController.post('/refreshtoken');

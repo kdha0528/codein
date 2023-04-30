@@ -1,18 +1,18 @@
 <template>
   <Header/>
-  <div class="content">
-    <ul>
-      <li v-for="member in members" :key="member.id">
-        <div class="email">
-          {{ member.email }}
-        </div>
-        <div class="sub d-flex">
-          <div class="id">{{ member.id }}</div>
-          <div class="name">{{ member.name }}</div>
-        </div>
-      </li>
-    </ul>
-  </div>
+      <el-table :data="members" height="70vh" border style="width: 90vw" class="mt-5 ms-5">
+          <el-table-column prop= id label="ID" width="180">
+          </el-table-column>
+          <el-table-column prop= email label="Email" width="180">
+          </el-table-column>
+          <el-table-column prop= name label="Name" >
+              <template v-slot:default="table">
+                  <el-link :href="'/members/'+table.row.id">
+                      {{ table.row.name }}
+                  </el-link>
+              </template>
+          </el-table-column>
+      </el-table>
 </template>
 
 <script setup lang="ts">
@@ -21,7 +21,6 @@ import {onMounted, ref} from "vue";
 import {getHome} from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 import {useRouter} from "vue-router";
-
 const members = ref([]);
 const router = useRouter();
 const resStore = useResponseStore();
@@ -35,6 +34,7 @@ const onGetHome = async function (){
                 response.forEach((r:any) => {
                     members.value.push(r);
                 });
+                console.log(members);
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)

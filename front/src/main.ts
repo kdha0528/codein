@@ -13,7 +13,6 @@ import VueCookies from 'vue3-cookies';
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
-
 const app = createApp(App);
 app.use(VueCookies);
 app.use(pinia);

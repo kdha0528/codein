@@ -31,7 +31,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                 .orderBy(member.id.desc())
                 .fetch();
 
-        return memberList.stream().map(Member::toMemberResponseDto)
+        return memberList.stream().map(Member::toMemberListResponseDto)
                 .collect(Collectors.toList());
     }
 

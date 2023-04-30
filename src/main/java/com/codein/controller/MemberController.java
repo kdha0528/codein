@@ -62,12 +62,11 @@ public class MemberController {
         return "redirect:/home";
     }
 
-    @MySecured(role = Role.MEMBER)
     @GetMapping("/members/{id}")
-    public MemberProfileResponseDto getMemberProfile(@PathVariable Long id) {
+    public MemberResponseDto getMemberProfile(@PathVariable Long id) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(MemberNotExistsException::new);
-        return member.toProfileResponseDto();
+        return member.toMemberResponseDto();
     }
 
     @MySecured(role = Role.MEMBER)
