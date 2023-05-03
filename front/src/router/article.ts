@@ -1,11 +1,13 @@
 import CategoryHeader from "@/components/CategoryHeader.vue";
 import CategoryView from "@/views/CategoryView.vue";
+import NewArticle from "@/views/NewArticle.vue";
+import EditArticle from "@/views/EditArticle.vue";
 
 export default [
     {
         path: '/',
-        alias: ['', '/home'],
-        name: 'category',
+        alias: ['','/'],
+        name: 'index',
         component: CategoryView,
         children: [{
             path: '',
@@ -16,7 +18,7 @@ export default [
             name: 'community',
             component: CategoryHeader,
         },{
-            path: '/questions',
+            path: '/question',
             name: 'question',
             component: CategoryHeader,
         },{
@@ -28,5 +30,21 @@ export default [
             name: 'notice',
             component: CategoryHeader,
         }]
+    },
+    {
+        path: '/:category/new',
+        name: 'new-article',
+        component: NewArticle,
+        meta: {
+            authRequire: true
+        },
+    },
+    {
+        path: '/article/:articleId/edit',
+        name: 'edit-article',
+        component: EditArticle,
+        meta: {
+            authRequire: true
+        },
     }
 ]

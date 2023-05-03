@@ -9,12 +9,14 @@ import lombok.ToString;
 @ToString
 public class EditArticleServiceDto {
 
+    private final Long id;
     private final String category;
     private final String title;
     private final String content;
 
     @Builder
-    public EditArticleServiceDto(String category, String title, String content) {
+    public EditArticleServiceDto(Long id,String category, String title, String content) {
+        this.id = id;
         this.category = category;
         this.title = title;
         this.content = content;

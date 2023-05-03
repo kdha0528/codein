@@ -1,17 +1,4 @@
 import apiController from '@/utils/ApiController';
-export async function getHome() {
-    try {
-        const response = await apiController({
-            url: '/home?page=1&size=5',
-            method: 'get',
-        })
-        return response.data;
-    } catch (error) {
-        await console.log(error)
-
-        return error;
-    }
-}
 
 export async function signup(data:any) {
     try {

@@ -104,12 +104,13 @@ class ArticleServiceTest {
         Article article = articles.get(0);
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
+                .id(article.getId())
                 .category("COMMUNITY")
                 .title("타이틀")
                 .content("내용")
                 .build();
         // when
-        articleService.editArticle(article.getId(), editArticleDto.toEditArticleServiceDto());
+        articleService.editArticle(editArticleDto.toEditArticleServiceDto());
 
         //then
         List<Article> editedArticles = articleRepository.findByMember(member);

@@ -1,56 +1,13 @@
 <template>
   <Header/>
-    <RouterView/>
-
-    <!--<el-table :data="members" height="70vh" border style="width: 90vw" class="mt-5 ms-5">
-          <el-table-column prop= id label="ID" width="180">
-          </el-table-column>
-          <el-table-column prop= email label="Email" width="180">
-          </el-table-column>
-          <el-table-column prop= name label="Name" >
-              <template v-slot:default="table">
-                  <el-link :href="'/members/'+table.row.id">
-                      {{ table.row.name }}
-                  </el-link>
-              </template>
-          </el-table-column>
-      </el-table>-->
+  <RouterView/>
 </template>
 
 <script setup lang="ts">
 import Header from '@/components/Header.vue';
-import {onBeforeMount, onMounted, ref} from "vue";
-import {getHome} from "@/api/member";
-import {useResponseStore} from "@/stores/Response";
 import {useRouter} from "vue-router";
-const members = ref([]);
 const router = useRouter();
-const resStore = useResponseStore();
 
-onBeforeMount(()=>{
-
-})
-onMounted(()=>{onGetHome()})
-const onGetHome = async function (){
-
-    await getHome()
-        .then((response: any)=>{
-            if(resStore.isOK){
-                response.forEach((r:any) => {
-                    members.value.push(r);
-                });
-                console.log(members);
-            } else {
-                alert(resStore.getErrorMessage);
-                console.log(response)
-                router.push({name:"home"});
-            }
-        }).catch(error => {
-            alert(error);
-            console.log(error);
-            router.push({name:"home"});
-        })
-}
 </script>
 
 <style scoped lang="scss">

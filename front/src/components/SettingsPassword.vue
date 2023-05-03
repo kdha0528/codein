@@ -74,18 +74,18 @@ const onChangePassword = async function () {
             if(resStore.isOK){
                 alert("변경이 완료되었습니다.")
                 auth.logout()
-                router.push({name:"home"});
+                router.push({name:"login"});
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response);
                 auth.logout()
-                router.push({name:"home"});
+                router.push({name:"login"});
             }
         }).catch(error => {
             alert(error);
             console.log(error);
             auth.logout()
-            router.push({name:"home"});
+            router.push({name:"login"});
         })
 };
 

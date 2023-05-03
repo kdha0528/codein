@@ -2,7 +2,7 @@
   <div v-if="isUserLogin">
     <el-header>
       <el-menu mode="horizontal" router>
-        <el-menu-item index="/home">Home</el-menu-item>
+        <el-menu-item index="/">Home</el-menu-item>
         <el-menu-item index="/settings/profile">개인정보</el-menu-item>
         <el-menu-item index="/logout" @click="onLogout">로그아웃</el-menu-item>
       </el-menu>
@@ -11,7 +11,7 @@
   <div v-else>
     <el-header>
       <el-menu mode="horizontal" router>
-        <el-menu-item index="/home">Home</el-menu-item>
+        <el-menu-item index="/">Home</el-menu-item>
         <el-menu-item index="/signup">회원가입</el-menu-item>
         <el-menu-item index="/login">로그인</el-menu-item>
       </el-menu>
@@ -20,19 +20,19 @@
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import memberRouter from "@/router";
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { logout } from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();
-const route = useRouter();
+const router = useRouter();
+const route = useRoute();
 const resStore = useResponseStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
 
-memberRouter.afterEach((to, from, next) => {
+router.afterEach((to, from, next) => {
   isUserLogin.value = auth.isLoggedIn;
 });
 
@@ -41,16 +41,18 @@ const onLogout = async function () {
         .then((response: any)=>{
             if(resStore.isOK){
                 auth.logout();
-                route.push({name:"home"});
+                router.go(-1);
             } else {
+                auth.logout();
                 alert(resStore.getErrorMessage);
                 console.log(response)
-                memberRouter.push({name:"home"});
+                router.push({name:"community"});
             }
         }).catch(error => {
+            auth.logout();
             alert(error);
             console.log(error);
-            memberRouter.push({name:"home"});
+            router.push({name:"community"});
         })
 }
 </script>

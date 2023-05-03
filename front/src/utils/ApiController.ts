@@ -19,9 +19,11 @@ apiController.interceptors.request.use(
 apiController.interceptors.response.use(
 
     async function (response) {
-        if(useResponseStore().getRetry) {
+        if(await useResponseStore().getRetry) {
+            await console.log("set retry false")
             await useResponseStore().setRetry(false);
-        }else{
+        } else {
+            await console.log("set retry true")
             await useResponseStore().setSuccess();
         }
         return response;
@@ -37,8 +39,10 @@ apiController.interceptors.response.use(
             errorAPI.retry = true;
             await useResponseStore().setRetry(true);
             await refreshToken();
-            return await axios(errorAPI);
+            await console.log("refresh token")
+            return axios(errorAPI);
         }
+        await console.log("last error")
         await useResponseStore().setError(false, error.response.data.code, error.response.data.message);
         return await Promise.reject(error);
     }

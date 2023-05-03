@@ -5,9 +5,12 @@
           <span>{{ intro.message }}</span>
       </div>
       <div  class="d-flex mt-3 justify-content-between">
-          <div class="d-flex">
+          <div v-if="isNotice">
+              <div style="width:180px;"></div>
+          </div>
+          <div v-else class="d-flex">
               <div>
-                  <el-link :href="'/'+intro.category+'/write'">
+                  <el-link :href="'/'+route.name+'/new'">
                       <el-button type="primary">
                           <el-icon style="vertical-align: middle">
                               <EditPen />
@@ -63,6 +66,8 @@ import {useRoute, useRouter} from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
+
+const isNotice = ref(false);
 
 const select = ref({
     search:'0',
@@ -130,6 +135,9 @@ const selectList = reactive({
 
 onMounted(()=>{
     setIntro(route.name);
+    if(route.name === "notice"){
+        isNotice.value = true;
+    }
 })
 
 const setIntro = function(category: any) {
@@ -138,7 +146,7 @@ const setIntro = function(category: any) {
             intro.value.category = "커뮤니티";
             intro.value.message = "즐겁게 일상을 나누는 공간입니다.";
             break;
-        case "questions":
+        case "question":
             intro.value.category = "Q&A";
             intro.value.message = "좋은 질문과 답변으로 함께 성장하는 공간입니다.";
             break;

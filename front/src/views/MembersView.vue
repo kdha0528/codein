@@ -71,12 +71,12 @@ const onGetMembers = async function (id: any){
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
-                router.push({name:"home"});
+                router.go(-1);
             }
         }).catch(error => {
             alert(error);
             console.log(error);
-            router.push({name:"home"});
+            router.go(-1);
         })
 }
 

@@ -23,16 +23,17 @@ export const useResponseStore = defineStore("response", {
         },
     },
     actions: {
-        async setError(state: boolean, code: string, message: string){
+        setError(state: boolean, code: string, message: string){
             this.state = state;
             this.errorCode = code;
             this.errorMessage = message;
         },
-        async setSuccess(){
+        setSuccess(){
             this.state = true;
             this.errorCode = '';
             this.errorMessage = '';
-        },async setRetry(retry: boolean){
+        },
+        setRetry(retry: boolean){
             this.retry = retry;
         },
     },

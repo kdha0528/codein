@@ -98,14 +98,14 @@ const onGetProfile = async function (){
                 auth.logout()
                 alert(resStore.getErrorMessage);
                 console.log(response)
-                router.push({name:"home"})
+                router.push({name:"login"})
             }
         })
         .catch(error => {
             auth.logout()
             alert(error);
             console.log(error)
-            router.push({name:"home"})
+            router.push({name:"login"})
         })
 }
 

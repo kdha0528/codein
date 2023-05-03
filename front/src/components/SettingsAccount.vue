@@ -92,14 +92,16 @@ const onGetAccount = async function (){
                 emailForm.value.email = response.email;
                 phoneForm.value.phone = response.phone;
             } else {
+                auth.logout()
                 alert(resStore.getErrorMessage);
                 console.log(response)
-                router.push({name:"home"});
+                router.push({name:"login"});
             }
         }).catch(error => {
+            auth.logout()
             alert(error);
             console.log(error);
-            router.push({name:"home"});
+            router.push({name:"login"});
         })
 }
 
@@ -109,7 +111,7 @@ const onChangeEmail = async function () {
             if(resStore.isOK){
                 alert("변경이 완료되었습니다.")
                 auth.logout()
-                router.push({name:"home"});
+                router.push({name:"login"});
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
@@ -120,7 +122,7 @@ const onChangeEmail = async function () {
                 alert(error);
                 console.log(error)
                 auth.logout()
-                router.push({name:"home"});
+                router.push({name:"login"});
             }else{
                 alert(error);
                 console.log(error)
@@ -135,7 +137,7 @@ const onChangePhone = async function () {
             if(resStore.isOK){
                 alert("변경이 완료되었습니다.")
                 auth.logout()
-                router.push({name:"home"});
+                router.push({name:"login"});
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
@@ -146,7 +148,7 @@ const onChangePhone = async function () {
                 alert(error);
                 console.log(error)
                 auth.logout()
-                router.push({name:"home"});
+                router.push({name:"login"});
             }else{
                 alert(error);
                 console.log(error)

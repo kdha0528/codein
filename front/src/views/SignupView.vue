@@ -49,7 +49,13 @@
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="onSignup()">Sign up</el-button>
+          <div v-if="checkRules">
+              <el-button type="primary" @click="onSignup()">Sign up</el-button>
+          </div>
+          <div v-else>
+              <el-button type="primary" disabled>Sign up</el-button>
+          </div>
+
       </el-form-item>
     </el-form>
   </div>
@@ -61,10 +67,11 @@ import type { FormRules } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { signup } from '@/api/member';
 import {useResponseStore} from '@/stores/Response';
-import {Profile} from "@/components/custom-types/profile";
 
 const router = useRouter();
 const resStore = useResponseStore();
+
+const checkRules = ref(false);
 
 const signupForm = ref({
     email: '',
@@ -79,42 +86,52 @@ const signupForm = ref({
 
 const validateEmail = (rule: any, value: any, callback: any) => {
   if (signupForm.value.email === '') {
+      checkRules.value = false;
     callback(new Error('Please input the email'));
   } else {
+      checkRules.value = true;
     callback();
   }
 };
 
 const validatePassword = (rule: any, value: any, callback: any) => {
   if (signupForm.value.password === '') {
+      checkRules.value = false;
     callback(new Error('Please input the password'));
   } else {
+      checkRules.value = true;
     callback();
   }
 };
 
 const validatePassword2 = (rule: any, value: any, callback: any) => {
   if (signupForm.value.checkPassword === '') {
+      checkRules.value = false;
     callback(new Error('Please input the password again'));
   } else if (signupForm.value.checkPassword !== signupForm.value.password) {
     callback(new Error("Two inputs don't match!"));
   } else {
-    callback();
+      checkRules.value = true;
+      callback();
   }
 };
 
 const checkNickname = (rule: any, value: any, callback: any) => {
   if (signupForm.value.nickname === '') {
+      checkRules.value = false;
     callback(new Error('Please input your nick name'));
   } else {
+      checkRules.value = true;
     callback();
   }
 };
 
 const checkName = (rule: any, value: any, callback: any) => {
   if (signupForm.value.name === '') {
+      checkRules.value = false;
     callback(new Error('Please input your name'));
   } else {
+      checkRules.value = true;
     callback();
   }
 };
@@ -122,23 +139,28 @@ const checkName = (rule: any, value: any, callback: any) => {
 const checkAge = (rule: any, value: any, callback: any) => {
   let today = new Date();
   if (today.getFullYear() - Number(signupForm.value.birth.slice(0, 4)) < 13) {
+      checkRules.value = false;
     return callback(new Error('Age must be greater than 13'));
   } else if (today.getFullYear() - Number(signupForm.value.birth.slice(0, 4)) == 13) {
     if (
         today.getMonth() - Number(signupForm.value.birth.slice(5, 7)) < 0 &&
         today.getDate() - Number(signupForm.value.birth.slice(8, 10)) < 0
     ) {
+        checkRules.value = false;
       return callback(new Error('Age must be greater than 13'));
     }
   } else {
+      checkRules.value = true;
     callback();
   }
 };
 
 const checkPhone = (rule: any, value: any, callback: any) => {
   if (signupForm.value.phone === '') {
+      checkRules.value = false;
     callback(new Error('Please input your phone number'));
   } else {
+      checkRules.value = true;
     callback();
   }
 };
@@ -158,7 +180,7 @@ const onSignup = async function () {
         .then((response: any)=>{
             if(resStore.isOK){
                 alert("회원가입이 성공적으로 완료되었습니다.")
-                router.push({name: "home"});
+                router.push({name: "login"});
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
@@ -168,7 +190,7 @@ const onSignup = async function () {
             if(resStore.isOK) {
                 alert(error);
                 console.log(error)
-                router.push({name: "home"});
+                router.push({name: "signup"});
             }else{
                 alert(error);
                 console.log(error)

@@ -1,5 +1,8 @@
 package com.codein.controller;
 
+import com.codein.config.SecurityConfig;
+import com.codein.config.SecurityConfig.MySecured;
+import com.codein.domain.member.Role;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.service.ArticleService;
@@ -15,14 +18,16 @@ import org.springframework.web.bind.annotation.*;
 public class ArticleController {
     private final ArticleService articleService;
 
-    @PostMapping(value = {"/{category}/new", "/articles/new"})
-    public void newArticle(@RequestBody @Valid NewArticleDto newArticleDto, @CookieValue(value = "accesstoken") Cookie cookie) {
+    @MySecured(role = Role.MEMBER)
+    @PostMapping(value = "/article/new")
+    public void newArticle(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid NewArticleDto newArticleDto) {
         articleService.newArticle(newArticleDto.toNewArticleServiceDto(), cookie.getValue());
     }
 
-    @PostMapping("/articles/{articleId}/edit")
-    public void editArticle(@PathVariable Long articleId, @RequestBody @Valid EditArticleDto editArticleDto) {
-        articleService.editArticle(articleId, editArticleDto.toEditArticleServiceDto());
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/article/edit")
+    public void editArticle(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid EditArticleDto editArticleDto) {
+        articleService.editArticle(editArticleDto.toEditArticleServiceDto());
     }
 
 }

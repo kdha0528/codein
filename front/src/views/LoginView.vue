@@ -72,7 +72,7 @@ const onLogin = async function () {
                     role: response.role,
                 }
                 auth.login(member);
-                router.push({name:"home"});
+                router.go(-1);
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)

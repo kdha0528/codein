@@ -30,15 +30,15 @@ public class ArticleService {
     }
 
     @Transactional
-    public void editArticle(Long articleId, EditArticleServiceDto editArticleServiceDto) {
+    public void editArticle(EditArticleServiceDto editArticleServiceDto) {
+        Article article = articleRepository.findById(editArticleServiceDto.getId())
+                .orElseThrow(ArticlePostNotExistsException::new);
+
         ArticleEditor articleEditor = ArticleEditor.builder()
                 .category(editArticleServiceDto.getCategory())
                 .title(editArticleServiceDto.getTitle())
                 .content(editArticleServiceDto.getContent())
                 .build();
-
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(ArticlePostNotExistsException::new);
 
         article.edit(articleEditor);
     }

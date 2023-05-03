@@ -4,8 +4,8 @@ public enum Category {
 
     NOTICE("공지사항"),
     COMMUNITY("커뮤니티"),
+    QUESTION("Q&A"),
     INFORMATION("정보공유"),
-    QUESTIONS("Q&A"),
     CODEIN("코드인");
 
     private final String category;
@@ -21,4 +21,5 @@ public enum Category {
     public String getName() {
         return this.name();
     }
+
 }
