@@ -1,6 +1,8 @@
 <template>
   <Header/>
-      <el-table :data="members" height="70vh" border style="width: 90vw" class="mt-5 ms-5">
+    <RouterView/>
+
+    <!--<el-table :data="members" height="70vh" border style="width: 90vw" class="mt-5 ms-5">
           <el-table-column prop= id label="ID" width="180">
           </el-table-column>
           <el-table-column prop= email label="Email" width="180">
@@ -12,12 +14,12 @@
                   </el-link>
               </template>
           </el-table-column>
-      </el-table>
+      </el-table>-->
 </template>
 
 <script setup lang="ts">
 import Header from '@/components/Header.vue';
-import {onMounted, ref} from "vue";
+import {onBeforeMount, onMounted, ref} from "vue";
 import {getHome} from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 import {useRouter} from "vue-router";
@@ -25,6 +27,9 @@ const members = ref([]);
 const router = useRouter();
 const resStore = useResponseStore();
 
+onBeforeMount(()=>{
+
+})
 onMounted(()=>{onGetHome()})
 const onGetHome = async function (){
 

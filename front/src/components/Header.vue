@@ -19,9 +19,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import axios from "axios";
 import { ref } from "vue";
-import router from "@/router";
+import memberRouter from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { logout } from "@/api/member";
@@ -33,7 +32,7 @@ const resStore = useResponseStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
 
-router.afterEach((to, from, next) => {
+memberRouter.afterEach((to, from, next) => {
   isUserLogin.value = auth.isLoggedIn;
 });
 
@@ -46,12 +45,12 @@ const onLogout = async function () {
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
-                router.push({name:"home"});
+                memberRouter.push({name:"home"});
             }
         }).catch(error => {
             alert(error);
             console.log(error);
-            router.push({name:"home"});
+            memberRouter.push({name:"home"});
         })
 }
 </script>

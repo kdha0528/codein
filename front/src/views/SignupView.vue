@@ -61,7 +61,7 @@ import type { FormRules } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { signup } from '@/api/member';
 import {useResponseStore} from '@/stores/Response';
-import {Profile} from "@/components/props/profile";
+import {Profile} from "@/components/custom-types/profile";
 
 const router = useRouter();
 const resStore = useResponseStore();

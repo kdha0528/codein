@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { Profile } from "@/components/props/profile";
+import type { Profile } from "@/components/custom-types/profile";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({

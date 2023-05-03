@@ -25,7 +25,7 @@ import { reactive, ref } from 'vue';
 import type { FormRules } from 'element-plus';
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
-import type { Profile } from "@/components/props/profile";
+import type { Profile } from "@/components/custom-types/profile";
 import {login} from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 
