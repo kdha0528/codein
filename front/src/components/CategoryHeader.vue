@@ -71,9 +71,9 @@ const router = useRouter();
 const isNotice = ref(false);
 
 const select = ref({
-    search:'0',
-    period:'0',
-    sort:'0',
+    search:'article',
+    period:'title',
+    sort:'latest',
 })
 
 const intro = ref({
@@ -85,51 +85,51 @@ const selectList = reactive({
     search: [
         {
             text: "제목+글",
-            value: "0",
+            value: "article",
         },
         {
             text: "제목",
-            value: "1",
+            value: "title",
         },
         {
             text: "작성자",
-            value: "2",
+            value: "author",
         }
     ],
     period: [
         {
             text: "ALL",
-            value: "0",
+            value: "all",
         },
         {
             text: "1D",
-            value: "1",
+            value: "1d",
         },
         {
             text: "1W",
-            value: "2",
+            value: "1w",
         },
         {
             text: "1M",
-            value: "3",
+            value: "1m",
         },
         {
             text: "1Y",
-            value: "4",
+            value: "1y",
         },
     ],
     sort: [
         {
             text: "최신순",
-            value: "0",
+            value: "latest",
         },
         {
             text: "조회순",
-            value: "1",
+            value: "view",
         },
         {
             text: "인기순",
-            value: "2",
+            value: "like",
         }
     ],
 })

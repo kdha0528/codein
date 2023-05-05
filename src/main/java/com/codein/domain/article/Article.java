@@ -3,6 +3,7 @@ package com.codein.domain.article;
 import com.codein.domain.member.Member;
 import com.codein.responsedto.ArticleListResponseDto;
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -39,14 +40,14 @@ public class Article {
 
 
     @Builder
-    public Article(Member member, Category category, String title, String content) {
+    public Article(Member member, Category category, String title, String content, Integer viewNum, Integer commentNum, Integer likeNum) {
         this.member = member;
         this.category = category;
         this.title = title;
         this.content = content;
-        this.viewNum = 0;
-        this.commentNum = 0;
-        this.likeNum = 0;
+        this.viewNum = (viewNum == null) ? 0 : viewNum;
+        this.commentNum = (commentNum == null) ? 0 : commentNum;
+        this.likeNum = (likeNum == null) ? 0 : likeNum;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -67,6 +68,5 @@ public class Article {
                 .likeNum(this.getLikeNum())
                 .viewNum(this.getViewNum())
                 .build();
-
     }
 }

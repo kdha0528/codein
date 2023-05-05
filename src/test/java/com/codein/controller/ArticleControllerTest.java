@@ -1,32 +1,35 @@
 package com.codein.controller;
 
 import com.codein.domain.article.Article;
+import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
+import com.codein.responsedto.ArticleListResponseDto;
 import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
+import java.util.Random;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -93,6 +96,37 @@ class ArticleControllerTest {
         articleService.newArticle(newArticleDto.toNewArticleServiceDto(), getCookie().getValue());
     }
 
+    void createDummies(){
+        Cookie cookie = getCookie();
+        Random random = new Random();
+        Member member = memberRepository.findByAccessToken(cookie.getValue());
+        for(int i = 0; i < 100; i ++) {
+            int categoryFlag = random.nextInt(4);
+            Category category =  Category.COMMUNITY;
+            switch(categoryFlag){
+                case 1:
+                    category = Category.QUESTION;
+                    break;
+                case 2:
+                    category = Category.INFORMATION;
+                default:
+                    break;
+            }
+
+            Article article = Article.builder()
+                    .member(member)
+                    .category(category)
+                    .title("Title No."+i)
+                    .content("카테고리는 " + category.getName() + "입니다.")
+                    .viewNum(random.nextInt(100))
+                    .commentNum(random.nextInt(100))
+                    .likeNum(random.nextInt(100))
+                    .build();
+            articleRepository.save(article);
+        }
+
+    }
+
     @Test
     @DisplayName("글 등록 성공")
     void test1_1() throws Exception {
@@ -104,7 +138,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/new").cookie(getCookie())
+        mockMvc.perform(post("/article/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newArticleDto))
                 )
@@ -123,7 +157,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/new").cookie(getCookie())
+        mockMvc.perform(post("/article/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newArticleDto))
                 )
@@ -142,7 +176,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/new").cookie(getCookie())
+        mockMvc.perform(post("/article/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(writePostDto))
                 )
@@ -159,16 +193,16 @@ class ArticleControllerTest {
         Member member = memberRepository.findByAccessToken(getCookie().getValue());
         List<Article> articles = articleRepository.findByMember(member);
         Article article = articles.get(0);
-        Long articleId = article.getId();
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
+                .id(article.getId())
                 .category("COMMUNITY")
                 .title("타이틀입니다.")
                 .content("내용입니다.")
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{articleId}/edit", articleId).cookie(getCookie())
+        mockMvc.perform(post("/article/edit").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
@@ -188,13 +222,14 @@ class ArticleControllerTest {
         Long articleId = article.getId();
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
+                .id(articleId)
                 .category("COMMUNITY")
                 .title("타이틀")
                 .content("내용입니다.")
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{articleId}/edit", articleId).cookie(getCookie())
+        mockMvc.perform(post("/article/edit").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
@@ -214,17 +249,107 @@ class ArticleControllerTest {
         Long articleId = article.getId();
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
+                .id(articleId)
                 .category("COMMUNITY")
                 .title("타이틀입니다.")
                 .content("내용")
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{articleId}/edit", articleId).cookie(getCookie())
+        mockMvc.perform(post("/article/edit").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("글 목록 가져오기 성공")
+    void test3_1() throws Exception {
+        // given
+        createDummies();
+        String category = "community";
+        // expected
+        mockMvc.perform(get("/{category}", category).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 목록 가져오기 성공: 5페이지 가져오기")
+    void test3_2() throws Exception {
+        // given
+        createDummies();
+        String category = "community";
+
+        // expected
+        mockMvc.perform(get("/{category}?page=5&sort=latest&period=all",category).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 목록 가져오기 성공: 추천수로 정렬하기")
+    void test3_3() throws Exception {
+        // given
+        createDummies();
+        String category = "community";
+
+        // expected
+        mockMvc.perform(get("/{category}?page=1&sort=like&period=all",category).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 목록 가져오기 성공: 다른 카테고리")
+    void test3_4() throws Exception {
+        // given
+        createDummies();
+        String category = "information";
+
+        // expected
+        mockMvc.perform(get("/{category}?page=1&sort=latest&period=all",category).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 목록 가져오기 성공: 잘못된 path variable") // category와 page를 제외한 path variable이 잘못된 경우 default 값으로 이동
+    void test3_5() throws Exception {
+        // given
+        createDummies();
+        String category = "community";
+
+        // expected
+        mockMvc.perform(get("/{category}?page=1&sort=abc&period=abc",category).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+    @Test
+    @DisplayName("글 목록 가져오기 성공: 존재하지 않는 페이지") // 아무것도 들어있지 않음
+    void test3_6() throws Exception {
+        // given
+        createDummies();
+        String category = "community";
+
+        // expected
+        mockMvc.perform(get("/{category}?page=12345&sort=latest&period=all",category).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+    @Test
+    @DisplayName("글 목록 가져오기 실패: 잘못된 카테고리") // category와 page를 제외한 path variable이 잘못된 경우 default 값으로 이동
+    void test3_7() throws Exception {
+        // given
+        createDummies();
+        String category = "abc";
+
+        // expected
+        mockMvc.perform(get("/{category}?page=1&sort=latest&period=all",category).cookie(getCookie()))
+                .andExpect(status().is5xxServerError())
+                .andDo(print());
+    }
+
 }

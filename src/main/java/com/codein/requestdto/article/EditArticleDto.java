@@ -1,8 +1,8 @@
 package com.codein.requestdto.article;
 
-
 import com.codein.requestservicedto.article.EditArticleServiceDto;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString
 public class EditArticleDto {
 
-    @NotBlank(message = "존재하지 않는 게시글입니다.")
+    @NotNull(message = "존재하지 않는 게시글입니다.")
     private final Long id;
 
     @NotBlank(message = "카테고리를 입력해주세요.")
@@ -35,13 +35,11 @@ public class EditArticleDto {
     }
 
     public EditArticleServiceDto toEditArticleServiceDto() {
-
         return EditArticleServiceDto.builder()
-                .id(id)
-                .category(category)
-                .title(title)
-                .content(content)
+                .id(this.id)
+                .category(this.category)
+                .title(this.title)
+                .content(this.content)
                 .build();
-
     }
 }

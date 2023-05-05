@@ -2,6 +2,7 @@ package com.codein.service;
 
 import com.codein.domain.article.Article;
 import com.codein.domain.article.ArticleEditor;
+import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.article.ArticlePostNotExistsException;
@@ -48,7 +49,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public List<ArticleListResponseDto> getArticleList(PageSizeDto pageSizeDto) {
-        return articleRepository.getArticleList(pageSizeDto);
+    public List<ArticleListResponseDto> getArticleList(PageSizeDto pageSizeDto, Category category) {
+        return articleRepository.getArticleList(pageSizeDto, category);
     }
 }

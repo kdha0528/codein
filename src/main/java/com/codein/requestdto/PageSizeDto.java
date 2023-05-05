@@ -16,10 +16,10 @@ public class PageSizeDto {
     private final Integer page = 1;
 
     @Builder.Default
-    private final Integer period = 0;
+    private final String period = "all";
 
     @Builder.Default
-    private final Integer sort = 0;
+    private final String sort = "latest";
 
     public long getOffset() {
         return (long) (max(1, page) - 1) * SIZE;
@@ -31,16 +31,16 @@ public class PageSizeDto {
 
     public LocalDateTime getStartDate() {
         switch (this.period) {
-            case 1 -> {
+            case "1d" -> {
                 return LocalDateTime.now().minusDays(1);
             }
-            case 2 -> {
+            case "1w" -> {
                 return LocalDateTime.now().minusWeeks(1);
             }
-            case 3 -> {
+            case "1m" -> {
                 return LocalDateTime.now().minusMonths(1);
             }
-            case 4 -> {
+            case "1y" -> {
                 return LocalDateTime.now().minusYears(1);
             }
             default -> {

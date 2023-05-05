@@ -1,6 +1,7 @@
 package com.codein.service;
 
 import com.codein.domain.article.Article;
+import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
@@ -159,7 +160,7 @@ class ArticleServiceTest {
                 .build();
 
         // when
-        List<ArticleListResponseDto> articleList = articleService.getArticleList(pageSizeDto);
+        List<ArticleListResponseDto> articleList = articleService.getArticleList(pageSizeDto, Category.COMMUNITY);
 
         //then
         Assertions.assertEquals(20L, articleList.size());
