@@ -1,6 +1,7 @@
 package com.codein.domain.article;
 
 import com.codein.domain.member.Member;
+import com.codein.responsedto.ArticleListResponseDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -54,4 +56,16 @@ public class Article {
         this.content = articleEditor.getContent();
     }
 
+    public ArticleListResponseDto toArticleListResponseDto(){
+        return ArticleListResponseDto.builder()
+                .id(this.getId())
+                .profileImage(this.member.getProfileImage())
+                .nickname(this.member.getNickname())
+                .createdAt(this.getCreatedAt())
+                .commentNum(this.getCommentNum())
+                .likeNum(this.getLikeNum())
+                .viewNum(this.getViewNum())
+                .build();
+
+    }
 }

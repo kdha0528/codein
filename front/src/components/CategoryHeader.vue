@@ -1,10 +1,10 @@
 <template>
-  <div class="content d-flex flex-column mt-5">
+  <div class="content d-flex flex-column mt-4">
       <div class="d-flex flex-column ps-3 pb-3 pe-3" style="border-radius: 10px; background-color: #dcdfe6">
           <h3>{{ intro.category }}</h3>
           <span>{{ intro.message }}</span>
       </div>
-      <div  class="d-flex mt-3 justify-content-between">
+      <div  class="d-flex mt-4 justify-content-between">
           <div v-if="isNotice">
               <div style="width:180px;"></div>
           </div>
@@ -27,7 +27,7 @@
                   </el-button>
               </div>
           </div>
-          <div>
+          <div style="width: 50%;">
               <el-input
                       v-model="input.search"
                       placeholder="Please input"
@@ -56,6 +56,7 @@
               </el-select>
           </div>
       </div>
+      <el-divider/>
   </div>
 </template>
 

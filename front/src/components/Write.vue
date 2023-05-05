@@ -86,7 +86,7 @@ onMounted(()=>{
     }
 })
 
-const onGetArticle = async function(){
+const onGetArticle = async function() {
 }
 
 const onSubmit = async function(){
