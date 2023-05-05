@@ -46,6 +46,7 @@ public class ArticleService {
 
         article.edit(articleEditor);
     }
+
     @Transactional
     public List<ArticleListResponseDto> getArticleList(PageSizeDto pageSizeDto) {
         return articleRepository.getArticleList(pageSizeDto);

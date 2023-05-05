@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 public class ArticleListResponseDto {
     private final Long id;
+    private final String title;
     private final String createdAt;
     private final Integer viewNum;
     private final Integer commentNum;
@@ -19,8 +20,9 @@ public class ArticleListResponseDto {
     private final String imagePath;
 
     @Builder
-    public ArticleListResponseDto(Long id, LocalDateTime createdAt, Integer viewNum, Integer commentNum, Integer likeNum, String nickname, ProfileImage profileImage) {
+    public ArticleListResponseDto(Long id, String title, LocalDateTime createdAt, Integer viewNum, Integer commentNum, Integer likeNum, String nickname, ProfileImage profileImage) {
         this.id = id;
+        this.title = title;
         this.createdAt = compareDate(createdAt);
         this.viewNum = viewNum;
         this.commentNum = commentNum;

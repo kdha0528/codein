@@ -31,24 +31,18 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
 
     @Override
     public List<ArticleListResponseDto> getArticleList(PageSizeDto pageSizeDto) {
-       JPAQuery<Article> query = jpaQueryFactory.select(article)
-                .where(article.createdAt.between(pageSizeDto.getStartDate(),LocalDateTime.now()))
+        LocalDateTime now = LocalDateTime.now();
+
+        JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
+                .where(article.createdAt.between(pageSizeDto.getStartDate(),now))
                 .limit(pageSizeDto.getSize())
                 .offset(pageSizeDto.getOffset());
 
-       if (pageSizeDto.getSort() == 1) {
-           query.orderBy(
-                   article.viewNum.desc(),
-                   article.id.desc());
-       } else if (pageSizeDto.getSort() == 2) {
-           query.orderBy(
-                   article.likeNum.desc(),
-                   article.id.desc());
-       } else {
-           query.orderBy(
-                   article.id.desc()
-           );
-       }
+        switch (pageSizeDto.getSort()) {
+            case 1 -> query.orderBy(article.viewNum.desc(), article.id.desc());
+            case 2 -> query.orderBy(article.likeNum.desc(), article.id.desc());
+            default -> query.orderBy(article.id.desc());
+        }
 
        List<Article> articleList = query.fetch();
 

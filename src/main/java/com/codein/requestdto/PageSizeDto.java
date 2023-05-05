@@ -44,7 +44,7 @@ public class PageSizeDto {
                 return LocalDateTime.now().minusYears(1);
             }
             default -> {
-                return LocalDateTime.now().minusYears(2000);
+                return LocalDateTime.now().minusYears(1000);
             }
         }
 

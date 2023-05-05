@@ -7,15 +7,18 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.PageSizeDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
+import com.codein.responsedto.ArticleListResponseDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
 class ArticleServiceTest {
@@ -63,6 +66,32 @@ class ArticleServiceTest {
         return tokens.getAccessToken();
     }
 
+    void newArticle() {
+        String accessToken = getToken();
+
+        NewArticleDto newArticleDto = NewArticleDto.builder()
+                .category("NOTICE")
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+
+        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
+    }
+
+    void createDummies(){
+        String accessToken = getToken();
+        for(int i = 0; i < 100; i ++){
+            NewArticleDto newArticleDto = NewArticleDto.builder()
+                    .category("COMMUNITY")
+                    .title("Title No."+i)
+                    .content("내용입니다.")
+                    .build();
+
+            articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
+        }
+
+    }
+
     @Test
     @DisplayName("글 등록 성공")
     void test1() {
@@ -70,8 +99,8 @@ class ArticleServiceTest {
         String accessToken = getToken();
         NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
-                .title("제목")
-                .content("내용")
+                .title("제목입니다.")
+                .content("내용입니다.")
                 .build();
         // when
         articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
@@ -94,8 +123,8 @@ class ArticleServiceTest {
 
         NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
-                .title("제목")
-                .content("내용")
+                .title("제목입니다.")
+                .content("내용입니다.")
                 .build();
         articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
 
@@ -121,4 +150,22 @@ class ArticleServiceTest {
         Assertions.assertEquals(editArticleDto.getContent(), editedArticle.getContent());
     }
 
+    @Test
+    @DisplayName("글 목록 가져오기 성공")
+    void test3() {
+        // given
+        createDummies();
+        PageSizeDto pageSizeDto = PageSizeDto.builder()
+                .build();
+
+        // when
+        List<ArticleListResponseDto> articleList = articleService.getArticleList(pageSizeDto);
+
+        //then
+        Assertions.assertEquals(20L, articleList.size());
+        Assertions.assertEquals("Title No.99", articleList.get(0).getTitle());
+        Assertions.assertEquals("Title No.80", articleList.get(19).getTitle());
+
+
+    }
 }

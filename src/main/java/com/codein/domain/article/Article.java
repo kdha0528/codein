@@ -59,6 +59,7 @@ public class Article {
     public ArticleListResponseDto toArticleListResponseDto(){
         return ArticleListResponseDto.builder()
                 .id(this.getId())
+                .title(this.getTitle())
                 .profileImage(this.member.getProfileImage())
                 .nickname(this.member.getNickname())
                 .createdAt(this.getCreatedAt())
