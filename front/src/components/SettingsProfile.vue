@@ -25,11 +25,11 @@
       >
         <img v-if="imageUrl" :src="imageUrl"
              class="ms-2"
-             style="max-width:5rem; max-height:5rem; width: 5rem; height: 5rem; border-radius: 100%; border: solid 1px black;"
+             style="width: 5rem; height: 5rem; border-radius: 100%;"
              alt=""/>
         <el-icon v-else size="40" class="ms-2"
-                 style="width: 5rem;  height:5rem; border-radius: 100%; border:solid 1px black;">
-          <UserFilled/>
+                 style="width: 5rem;  height:5rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+          <Avatar/>
         </el-icon>
         <el-button type="primary" class="ms-4">Select</el-button>
         <template #tip>
@@ -54,6 +54,7 @@ import type { UploadProps } from 'element-plus'
 import { ElMessage } from "element-plus";
 import { getProfile, editProfile } from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
+import {Avatar} from "@element-plus/icons-vue";
 
 const auth = useAuthStore();
 const resStore = useResponseStore();

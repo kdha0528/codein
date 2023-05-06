@@ -6,7 +6,7 @@ import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.PageSizeDto;
+import com.codein.requestdto.GetArticlesDto;
 import com.codein.requestdto.member.*;
 import com.codein.responsedto.*;
 import com.codein.service.AuthService;
@@ -31,11 +31,6 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final AuthService authService;
     private final MemberService memberService;
-
-    @GetMapping(value = {"/home", "/", "/index"})
-    public List<MemberListResponseDto> getMemberList(@ModelAttribute PageSizeDto pageSizeDto) {
-        return memberService.getMemberList(pageSizeDto);
-    }
 
     @PostMapping("/signup")
     public String signup(@RequestBody @Valid SignupDto signupDto) {

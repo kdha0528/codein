@@ -8,7 +8,7 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.PageSizeDto;
+import com.codein.requestdto.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.UUID;
 
 @SpringBootTest
 class ArticleServiceTest {
@@ -156,11 +155,11 @@ class ArticleServiceTest {
     void test3() {
         // given
         createDummies();
-        PageSizeDto pageSizeDto = PageSizeDto.builder()
+        GetArticlesDto getArticlesDto = GetArticlesDto.builder()
                 .build();
 
         // when
-        List<ArticleListResponseDto> articleList = articleService.getArticleList(pageSizeDto, Category.COMMUNITY);
+        List<ArticleListResponseDto> articleList = articleService.getArticleList(getArticlesDto, Category.COMMUNITY);
 
         //then
         Assertions.assertEquals(20L, articleList.size());

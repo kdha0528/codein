@@ -23,3 +23,16 @@ export async function edit(data:any, id:any) {
         return error;
     }
 }
+
+
+export async function getArticles(path: string) {
+    try {
+        const response = await apiController({
+            url: path,
+            method: 'get',
+        })
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}

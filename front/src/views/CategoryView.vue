@@ -1,13 +1,13 @@
 <template>
   <Header/>
-  <RouterView/>
+  <RouterView />
 </template>
 
 <script setup lang="ts">
 import Header from '@/components/Header.vue';
 import {useRouter} from "vue-router";
+import Articles from "@/components/Articles.vue";
 const router = useRouter();
-
 </script>
 
 <style scoped lang="scss">

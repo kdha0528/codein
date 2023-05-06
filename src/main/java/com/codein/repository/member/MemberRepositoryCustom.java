@@ -1,14 +1,14 @@
 package com.codein.repository.member;
 
 import com.codein.domain.member.Member;
-import com.codein.requestdto.PageSizeDto;
+import com.codein.requestdto.GetArticlesDto;
 import com.codein.responsedto.MemberListResponseDto;
 
 import java.util.List;
 
 public interface MemberRepositoryCustom {
 
-    List<MemberListResponseDto> getMemberResponseList(PageSizeDto pageSizeDto);
+    List<MemberListResponseDto> getMemberResponseList(GetArticlesDto getArticlesDto);
 
     Member findByEmail(String email);
 

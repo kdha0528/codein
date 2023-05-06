@@ -26,11 +26,12 @@ import Header from '@/components/Header.vue';
 import { reactive, ref } from 'vue';
 import type { FormRules } from 'element-plus';
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {changePassword} from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 const auth = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 const resStore = useResponseStore();
 
 const passwordForm = ref({

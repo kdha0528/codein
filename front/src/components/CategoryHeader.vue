@@ -20,7 +20,7 @@
                   </el-link>
               </div>
               <div class="reload-button">
-                  <el-button plain @click="onReload()" style="border: none;">
+                  <el-button plain @click="reloadArticles()" style="border: none;">
                       <el-icon style="vertical-align: middle">
                           <Refresh />
                       </el-icon>
@@ -29,17 +29,16 @@
           </div>
           <div style="width: 50%;">
               <el-input
-                      v-model="input.search"
+                      v-model="search.keyword"
                       placeholder="Please input"
                       class="input-with-select"
-                      form="post"
                 ><template #prepend>
-                      <el-select class="select-search" v-model="select.search" suffix-icon="" >
+                      <el-select class="select-search" v-model="search.condition" suffix-icon="">
                           <el-option v-for="item in selectList.search" :label="item.text" :value="item.value" />
                       </el-select>
                   </template>
                   <template #append>
-                      <el-button plain @click="onSearch()" style="border: none;">
+                      <el-button plain @click="onSearch()&reloadArticles()" style="border: none;">
                           <el-icon style="vertical-align: middle">
                               <Search />
                           </el-icon>
@@ -48,15 +47,16 @@
               </el-input>
           </div>
           <div class="sort-options">
-              <el-select class="el-select-custom" v-model="select.period" suffix-icon="">
+              <el-select class="el-select-custom" v-model="sort.period" suffix-icon="" @change="onPeriod()&reloadArticles()">
                   <el-option class="options" v-for="item in selectList.period" :label="item.text" :value="item.value" />
               </el-select>
-              <el-select class="el-select-custom" v-model="select.sort" suffix-icon="">
+              <el-select class="el-select-custom" v-model="sort.sort" suffix-icon="" @change="onSort()&reloadArticles()">
                   <el-option class="options" v-for="item in selectList.sort" :label="item.text" :value="item.value" />
               </el-select>
           </div>
       </div>
       <el-divider/>
+      <Articles :key="articlesKey"/>
   </div>
 </template>
 
@@ -64,16 +64,30 @@
 
 import {onMounted, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
+import Articles from "@/components/Articles.vue";
 
 const route = useRoute();
 const router = useRouter();
 
 const isNotice = ref(false);
+const articlesKey = ref(0);
 
-const select = ref({
-    search:'article',
-    period:'title',
+const sort = ref({
+    period:'all',
     sort:'latest',
+    isSetPeriod: false,
+    isSetSort: false,
+})
+
+const search = ref({
+    condition:'article',
+    keyword:'',
+    isSearch: false,
+})
+
+const page = ref({
+    page:1,
+    isSetPage: false,
 })
 
 const intro = ref({
@@ -163,18 +177,58 @@ const setIntro = function(category: any) {
             break;
     }
 }
-const onReload = async function() {
 
+
+const reloadArticles = function () {
+    router.replace(getPath())
+    articlesKey.value++;
 }
 
-const onSearch = async function() {
+const getPath = function(){
+    let isFirst = true;
+    let path = '/';
 
+    if(typeof route.name === 'string'){
+        path = path+route.name;
+    }
+
+    const checkChanges = ref({
+        search: null as null | any,
+        period: null as null | any,
+        sort: null as null | any,
+        page: null as null | any,
+    })
+
+    if(page.value.isSetPage) checkChanges.value.page = 'page='+page.value.page
+    if(search.value.isSearch) checkChanges.value.search = 'condition='+search.value.condition+'&keyword='+search.value.keyword
+    if(sort.value.isSetPeriod) checkChanges.value.period = 'period='+sort.value.period
+    if(sort.value.isSetSort) checkChanges.value.sort = 'sort='+sort.value.sort
+
+    for (let item in checkChanges) {
+        if(item){
+            if(isFirst){
+                path = path+'?'+item
+                isFirst = false
+            }else{
+                path = path+'&'+item
+            }
+        }
+    }
+
+    return path;
+}
+const onSearch = function () {
+    search.value.isSearch = search.value.keyword !== '';
 }
 
+const onSort = function (){
+    sort.value.isSetSort = true;
+}
 
-const input = ref({
-    search: '',
-});
+const onPeriod = function(){
+    sort.value.isSetPeriod = true;
+}
+
 </script>
 
 <style scoped>
@@ -184,12 +238,12 @@ const input = ref({
     width: 65px;
     font-size: 0.8rem;
 }
+
 .sort-options {
     display: flex;
     width: 120px;
     flex-wrap: nowrap;
     justify-content: space-between;
-
 }
 
 

@@ -3,7 +3,7 @@ package com.codein.repository.article;
 import com.codein.domain.article.Article;
 import com.codein.domain.article.Category;
 import com.codein.domain.member.Member;
-import com.codein.requestdto.PageSizeDto;
+import com.codein.requestdto.GetArticlesDto;
 import com.codein.responsedto.ArticleListResponseDto;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -31,18 +31,18 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleListResponseDto> getArticleList(PageSizeDto pageSizeDto, Category category) {
+    public List<ArticleListResponseDto> getArticleList(GetArticlesDto getArticlesDto, Category category) {
         LocalDateTime now = LocalDateTime.now();
 
         JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
                 .where(
                         article.category.eq(category),
-                        article.createdAt.between(pageSizeDto.getStartDate(),now)
+                        article.createdAt.between(getArticlesDto.getStartDate(),now)
                 )
-                .limit(pageSizeDto.getSize())
-                .offset(pageSizeDto.getOffset());
+                .limit(getArticlesDto.getSize())
+                .offset(getArticlesDto.getOffset());
 
-        switch (pageSizeDto.getSort()) {
+        switch (getArticlesDto.getSort()) {
             case "view" -> query.orderBy(article.viewNum.desc(), article.id.desc());
             case "like" -> query.orderBy(article.likeNum.desc(), article.id.desc());
             default -> query.orderBy(article.id.desc());

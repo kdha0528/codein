@@ -11,7 +11,7 @@ import com.codein.error.exception.profileimage.InvalidImageException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
-import com.codein.requestdto.PageSizeDto;
+import com.codein.requestdto.GetArticlesDto;
 import com.codein.requestservicedto.member.*;
 import com.codein.responsedto.MemberListResponseDto;
 import jakarta.servlet.http.Cookie;
@@ -83,8 +83,8 @@ public class MemberService {
     }
 
 
-    public List<MemberListResponseDto> getMemberList(PageSizeDto pageSizeDto) {
-        return memberRepository.getMemberResponseList(pageSizeDto);
+    public List<MemberListResponseDto> getMemberList(GetArticlesDto getArticlesDto) {
+        return memberRepository.getMemberResponseList(getArticlesDto);
     }
 
     @Transactional

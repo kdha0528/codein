@@ -9,7 +9,7 @@ import com.codein.error.exception.article.ArticlePostNotExistsException;
 import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
-import com.codein.requestdto.PageSizeDto;
+import com.codein.requestdto.GetArticlesDto;
 import com.codein.requestservicedto.article.EditArticleServiceDto;
 import com.codein.requestservicedto.article.NewArticleServiceDto;
 import com.codein.responsedto.ArticleListResponseDto;
@@ -49,7 +49,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public List<ArticleListResponseDto> getArticleList(PageSizeDto pageSizeDto, Category category) {
-        return articleRepository.getArticleList(pageSizeDto, category);
+    public List<ArticleListResponseDto> getArticleList(GetArticlesDto getArticlesDto, Category category) {
+        return articleRepository.getArticleList(getArticlesDto, category);
     }
 }
