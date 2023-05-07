@@ -6,7 +6,6 @@ import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.GetArticlesDto;
 import com.codein.requestdto.member.*;
 import com.codein.responsedto.*;
 import com.codein.service.AuthService;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 @Slf4j
 @RestController

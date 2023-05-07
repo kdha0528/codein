@@ -1,7 +1,7 @@
 package com.codein.repository.member;
 
 import com.codein.domain.member.Member;
-import com.codein.requestdto.GetArticlesDto;
+import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.responsedto.MemberListResponseDto;
 
 import java.util.List;

@@ -9,7 +9,7 @@ import com.codein.error.exception.article.ArticlePostNotExistsException;
 import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
-import com.codein.requestdto.GetArticlesDto;
+import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestservicedto.article.EditArticleServiceDto;
 import com.codein.requestservicedto.article.NewArticleServiceDto;
 import com.codein.responsedto.ArticleListResponseDto;

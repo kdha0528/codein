@@ -11,7 +11,7 @@ import com.codein.error.exception.profileimage.InvalidImageException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
-import com.codein.requestdto.GetArticlesDto;
+import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestservicedto.member.*;
 import com.codein.responsedto.MemberListResponseDto;
 import jakarta.servlet.http.Cookie;

@@ -281,7 +281,7 @@ class ArticleControllerTest {
         String category = "community";
 
         // expected
-        mockMvc.perform(get("/{category}?page=5&sort=latest&period=all",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=5&sort=LATEST&period=ALL",category).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -294,7 +294,7 @@ class ArticleControllerTest {
         String category = "community";
 
         // expected
-        mockMvc.perform(get("/{category}?page=1&sort=like&period=all",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=1&sort=LIKE&period=ALL",category).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -307,13 +307,13 @@ class ArticleControllerTest {
         String category = "information";
 
         // expected
-        mockMvc.perform(get("/{category}?page=1&sort=latest&period=all",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=1&sort=LATEST&period=ALL",category).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
 
     @Test
-    @DisplayName("글 목록 가져오기 성공: 잘못된 path variable") // category와 page를 제외한 path variable이 잘못된 경우 default 값으로 이동
+    @DisplayName("글 목록 가져오기 실패: 잘못된 path variable") //
     void test3_5() throws Exception {
         // given
         createDummies();
@@ -321,7 +321,7 @@ class ArticleControllerTest {
 
         // expected
         mockMvc.perform(get("/{category}?page=1&sort=abc&period=abc",category).cookie(getCookie()))
-                .andExpect(status().isOk())
+                .andExpect(status().is5xxServerError())
                 .andDo(print());
     }
     @Test
@@ -332,7 +332,7 @@ class ArticleControllerTest {
         String category = "community";
 
         // expected
-        mockMvc.perform(get("/{category}?page=12345&sort=latest&period=all",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=12345&sort=LATEST&period=ALL",category).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

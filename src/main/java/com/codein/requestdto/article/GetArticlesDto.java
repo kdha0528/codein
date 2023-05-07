@@ -1,4 +1,4 @@
-package com.codein.requestdto;
+package com.codein.requestdto.article;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -12,18 +12,30 @@ public class GetArticlesDto {
 
     private static final int SIZE = 20;
     private final Integer page;
-    private final String period;
-    private final String sort;
+    private final Period period;
+    private final Sort sort;
     // condition과 keyword는 검색 조건과, 검색문입니다.
-    private final String condition;
+    private final Condition condition;
     private final String keyword;
 
     @Builder
     public GetArticlesDto(Integer page, String period, String sort, String condition, String keyword) {
         this.page = Objects.requireNonNullElse(page, 1);
-        this.period = Objects.requireNonNullElse(period, "all");
-        this.sort = Objects.requireNonNullElse(sort, "latest");
-        this.condition = condition;
+        if(period == null){
+            this.period = Period.ALL;
+        }else{
+            this.period = Period.valueOf(period);
+        }
+        if(sort == null){
+            this.sort = Sort.LATEST;
+        }else{
+            this.sort = Sort.valueOf(sort);
+        }
+        if(condition == null){
+            this.condition = Condition.ALL;
+        }else{
+            this.condition = Condition.valueOf(condition);
+        }
         this.keyword = keyword;
     }
 
@@ -37,19 +49,19 @@ public class GetArticlesDto {
 
     public LocalDateTime getStartDate() {
         switch (this.period) {
-            case "all" ->{
-                return LocalDateTime.now().minusYears(1000);
+            case ALL ->{
+                return LocalDateTime.now().minusYears(100);
             }
-            case "1d" -> {
+            case DAY -> {
                 return LocalDateTime.now().minusDays(1);
             }
-            case "1w" -> {
+            case WEEK -> {
                 return LocalDateTime.now().minusWeeks(1);
             }
-            case "1m" -> {
+            case MONTH -> {
                 return LocalDateTime.now().minusMonths(1);
             }
-            case "1y" -> {
+            case YEAR -> {
                 return LocalDateTime.now().minusYears(1);
             }
             default -> {

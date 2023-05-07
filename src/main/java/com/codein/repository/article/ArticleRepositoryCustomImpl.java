@@ -3,7 +3,7 @@ package com.codein.repository.article;
 import com.codein.domain.article.Article;
 import com.codein.domain.article.Category;
 import com.codein.domain.member.Member;
-import com.codein.requestdto.GetArticlesDto;
+import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.responsedto.ArticleListResponseDto;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -43,8 +43,8 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .offset(getArticlesDto.getOffset());
 
         switch (getArticlesDto.getSort()) {
-            case "view" -> query.orderBy(article.viewNum.desc(), article.id.desc());
-            case "like" -> query.orderBy(article.likeNum.desc(), article.id.desc());
+            case VIEW -> query.orderBy(article.viewNum.desc(), article.id.desc());
+            case LIKE -> query.orderBy(article.likeNum.desc(), article.id.desc());
             default -> query.orderBy(article.id.desc());
         }
 

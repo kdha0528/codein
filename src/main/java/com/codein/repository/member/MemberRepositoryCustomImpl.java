@@ -2,7 +2,7 @@ package com.codein.repository.member;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.member.Member;
-import com.codein.requestdto.GetArticlesDto;
+import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.responsedto.MemberListResponseDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

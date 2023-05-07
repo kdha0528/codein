@@ -3,7 +3,7 @@ package com.codein.controller;
 import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.article.Category;
 import com.codein.domain.member.Role;
-import com.codein.requestdto.GetArticlesDto;
+import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.responsedto.ArticleListResponseDto;
@@ -25,21 +25,16 @@ public class ArticleController {
     @GetMapping(value = {"/","/{category}"})
     public List<ArticleListResponseDto> getMemberList(
             @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "all") String period,
-            @RequestParam(required = false, defaultValue = "latest") String sort,
+            @RequestParam(required = false, defaultValue = "ALL") String period,
+            @RequestParam(required = false, defaultValue = "LATEST") String sort,
             @RequestParam(required = false) String condition,
             @RequestParam(required = false) String keyword,
             @PathVariable(value = "category", required = false) String category,
             @ModelAttribute GetArticlesDto getArticlesDto
           ) {
 
-        System.out.println("page = "+ getArticlesDto.getPage());
-        System.out.println("period = "+ getArticlesDto.getPeriod());
-        System.out.println("latest = "+ getArticlesDto.getSort());
-
         if(category == null) {
             return articleService.getArticleList(getArticlesDto, Category.COMMUNITY);
-
         } else {
             return articleService.getArticleList(getArticlesDto, Category.valueOf(category.toUpperCase()));
         }

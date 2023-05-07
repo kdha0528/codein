@@ -73,14 +73,14 @@ const isNotice = ref(false);
 const articlesKey = ref(0);
 
 const sort = ref({
-    period:'all',
-    sort:'latest',
+    period:'ALL',
+    sort:'LATEST',
     isSetPeriod: false,
     isSetSort: false,
 })
 
 const search = ref({
-    condition:'article',
+    condition:'ALL',
     keyword:'',
     isSearch: false,
 })
@@ -99,51 +99,51 @@ const selectList = reactive({
     search: [
         {
             text: "제목+글",
-            value: "article",
+            value: "ALL",
         },
         {
             text: "제목",
-            value: "title",
+            value: "TITLE",
         },
         {
             text: "작성자",
-            value: "author",
+            value: "AUTHOR",
         }
     ],
     period: [
         {
             text: "ALL",
-            value: "all",
+            value: "ALL",
         },
         {
             text: "1D",
-            value: "1d",
+            value: "DAY",
         },
         {
             text: "1W",
-            value: "1w",
+            value: "WEEK",
         },
         {
             text: "1M",
-            value: "1m",
+            value: "MONTH",
         },
         {
             text: "1Y",
-            value: "1y",
+            value: "YEAR",
         },
     ],
     sort: [
         {
             text: "최신순",
-            value: "latest",
+            value: "LATEST",
         },
         {
             text: "조회순",
-            value: "view",
+            value: "VIEW",
         },
         {
             text: "인기순",
-            value: "like",
+            value: "LIKE",
         }
     ],
 })
