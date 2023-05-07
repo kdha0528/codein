@@ -13,6 +13,10 @@ export default router;
 router.beforeEach(function (to, from, next) {
     const auth = useAuthStore();
 
+    if(from.name){
+        to.meta.previousRouteName = from.name;
+    }
+
     if (to.meta.authRequire) {
         if (auth.isLoggedIn) {
             next();

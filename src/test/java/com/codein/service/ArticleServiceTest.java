@@ -13,7 +13,7 @@ import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
-import com.codein.responsedto.ArticleListResponseDto;
+import com.codein.responsedto.ArticleResponseDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -159,7 +159,7 @@ class ArticleServiceTest {
                 .build();
 
         // when
-        List<ArticleListResponseDto> articleList = articleService.getArticleList(getArticlesDto, Category.COMMUNITY);
+        List<ArticleResponseDto> articleList = articleService.getArticleList(getArticlesDto, Category.COMMUNITY);
 
         //then
         Assertions.assertEquals(20L, articleList.size());

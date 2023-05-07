@@ -5,11 +5,16 @@
           <span>{{ intro.message }}</span>
       </div>
       <div  class="d-flex mt-4 justify-content-between">
-          <div v-if="isNotice">
-              <div style="width:180px;"></div>
-          </div>
-          <div v-else class="d-flex">
-              <div>
+          <div class="d-flex">
+              <div v-if="isNotice" class="d-flex">
+                  <el-button type="primary" disabled>
+                      <el-icon style="vertical-align: middle">
+                          <EditPen />
+                      </el-icon>
+                      <span style="vertical-align: middle"> 글쓰기 </span>
+                  </el-button>
+              </div>
+              <div v-else class="d-flex">
                   <el-link :href="'/'+route.name+'/new'">
                       <el-button type="primary">
                           <el-icon style="vertical-align: middle">
@@ -23,6 +28,13 @@
                   <el-button plain @click="reloadArticles()" style="border: none;">
                       <el-icon style="vertical-align: middle">
                           <Refresh />
+                      </el-icon>
+                  </el-button>
+              </div>
+              <div v-if="isAdmin()" class="create-dummies-button">
+                  <el-button plain @click="onCreateDummies()" style="border: none;">
+                      <el-icon style="vertical-align: middle">
+                          <Plus />
                       </el-icon>
                   </el-button>
               </div>
@@ -62,12 +74,16 @@
 
 <script setup lang="ts">
 
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, provide, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import Articles from "@/components/Articles.vue";
+import {createDummies} from "@/api/article";
+import {useResponseStore} from "@/stores/Response";
+import {useAuthStore} from "@/stores/auth";
 
 const route = useRoute();
 const router = useRouter();
+const resStore = useResponseStore();
 
 const isNotice = ref(false);
 const articlesKey = ref(0);
@@ -85,8 +101,9 @@ const search = ref({
     isSearch: false,
 })
 
-const page = ref({
-    page:1,
+const page = reactive({
+    page: 1,
+    max: 1,
     isSetPage: false,
 })
 
@@ -148,12 +165,73 @@ const selectList = reactive({
     ],
 })
 
-onMounted(()=>{
-    setIntro(route.name);
+const onSearch = function () {
+    search.value.isSearch = search.value.keyword !== '';
+}
+
+const onSort = function (){
+    sort.value.isSetSort = true;
+}
+
+const onPeriod = function(){
+    sort.value.isSetPeriod = true;
+}
+const onPaging = function(p: number){
+    page.page = p;
+    page.isSetPage = true;
+    reloadArticles();
+}
+
+const setMaxPage = function(max: number){
+    page.max = max;
+}
+
+const isAdmin = function(){
+    return useAuthStore().isAdmin;
+}
+
+onMounted(async ()=>{
+    await setIntro(route.name);
     if(route.name === "notice"){
         isNotice.value = true;
     }
+    await setDefaultFromPath(route.fullPath);
+    await reloadArticles();
 })
+
+function setDefaultFromPath(path: string):void {
+    const regex = /[?&]([^=]+)=([^&]*)/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(path)) !== null) {
+        const paramName = match[1];
+        const paramValue = decodeURIComponent(match[2]);
+
+        switch (paramName) {
+            case "page":
+                page.page = parseInt(paramValue, 10);
+                page.isSetPage = true;
+                break;
+            case "period":
+                sort.value.period = paramValue;
+                sort.value.isSetPeriod = true;
+                break;
+            case "sort":
+                sort.value.sort = paramValue;
+                sort.value.isSetSort = true;
+                break;
+            case "condition":
+                search.value.condition = paramValue;
+                break;
+            case "keyword":
+                search.value.keyword = paramValue;
+                search.value.isSearch = true;
+                break;
+            default:
+                break;
+        }
+    }
+}
 
 const setIntro = function(category: any) {
     switch(category){
@@ -179,54 +257,61 @@ const setIntro = function(category: any) {
 }
 
 
-const reloadArticles = function () {
-    router.replace(getPath())
+const reloadArticles = async function () {
+    await router.replace(getPath())
     articlesKey.value++;
 }
 
 const getPath = function(){
     let isFirst = true;
     let path = '/';
+    const checkChanges: any = ref([])
 
     if(typeof route.name === 'string'){
         path = path+route.name;
     }
 
-    const checkChanges = ref({
-        search: null as null | any,
-        period: null as null | any,
-        sort: null as null | any,
-        page: null as null | any,
-    })
-
-    if(page.value.isSetPage) checkChanges.value.page = 'page='+page.value.page
-    if(search.value.isSearch) checkChanges.value.search = 'condition='+search.value.condition+'&keyword='+search.value.keyword
-    if(sort.value.isSetPeriod) checkChanges.value.period = 'period='+sort.value.period
-    if(sort.value.isSetSort) checkChanges.value.sort = 'sort='+sort.value.sort
-
-    for (let item in checkChanges) {
-        if(item){
-            if(isFirst){
-                path = path+'?'+item
+    if(page.isSetPage) {
+        checkChanges.value.push('page='+page.page)
+    }
+    if(sort.value.isSetPeriod) {
+        checkChanges.value.push('period='+sort.value.period)
+    }
+    if(sort.value.isSetSort) {
+        checkChanges.value.push('sort='+sort.value.sort)
+    }
+    if(search.value.isSearch) {
+        checkChanges.value.push('condition='+search.value.condition+'&keyword='+search.value.keyword)
+    }
+    checkChanges.value.forEach((item: any) => {
+        if(item) {
+            if (isFirst) {
+                path = path + '?' + item
                 isFirst = false
-            }else{
-                path = path+'&'+item
+            } else {
+                path = path + '&' + item
             }
         }
-    }
+    });
 
     return path;
 }
-const onSearch = function () {
-    search.value.isSearch = search.value.keyword !== '';
-}
 
-const onSort = function (){
-    sort.value.isSetSort = true;
-}
+provide('onPaging', onPaging);
+provide('setMaxPage', setMaxPage);
+provide('page', page);
 
-const onPeriod = function(){
-    sort.value.isSetPeriod = true;
+const onCreateDummies = async function(){
+    await createDummies()
+        .then((response: any)=>{
+            if(resStore.isError){
+                alert(resStore.getErrorMessage);
+                console.log(response)
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error)
+        })
 }
 
 </script>

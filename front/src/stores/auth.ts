@@ -12,6 +12,14 @@ export const useAuthStore = defineStore("auth", {
         getProfile: (state) => {
             return state.member;
         },
+        isAdmin: (state)=>{
+            if(state.member != null){
+                return state.member.role === 'ADMIN';
+            } else {
+                return false;
+            }
+
+        }
     },
     actions: {
         login(m: Profile) {

@@ -40,31 +40,39 @@
             <el-divider class="mt-3 mb-3"/>
         </li>
     </ul>
+    <Pagination :key="paginationKey"/>
 </template>
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {inject, onMounted, provide, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {getArticles} from "@/api/article";
 import {useResponseStore} from "@/stores/Response";
 import {ChatDotSquare, Star} from "@element-plus/icons-vue";
+import Pagination from "@/components/Pagination.vue";
 
 const router = useRouter();
 const route = useRoute();
 const resStore = useResponseStore();
 
 const articles: any = ref([])
+const paginationKey = ref(0);
+
+const setMaxPage: any = inject('setMaxPage');
 
 onMounted(()=>{
     onGetArticles();
+    paginationKey.value++;
 })
 
 const onGetArticles = async function(){
-    await getArticles(route.path)
+    await getArticles(route.fullPath)
         .then((response: any)=>{
             if(resStore.isOK){
-                response.forEach((r: any) => {
+                response.articleList.forEach((r: any) => {
                    articles.value.push(r);
                 });
+                setMaxPage(response.maxPage);
+                paginationKey.value++;
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)

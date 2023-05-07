@@ -20,10 +20,8 @@ apiController.interceptors.response.use(
 
     async function (response) {
         if(await useResponseStore().getRetry) {
-            await console.log("set retry false")
             await useResponseStore().setRetry(false);
         } else {
-            await console.log("set retry true")
             await useResponseStore().setSuccess();
         }
         return response;

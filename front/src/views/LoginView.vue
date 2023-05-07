@@ -24,13 +24,14 @@ import Header from '@/components/Header.vue';
 import { reactive, ref } from 'vue';
 import type { FormRules } from 'element-plus';
 import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import type { Profile } from "@/components/custom-types/profile";
 import {login} from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 const resStore = useResponseStore();
 
 const loginForm = ref({
@@ -72,7 +73,12 @@ const onLogin = async function () {
                     role: response.role,
                 }
                 auth.login(member);
-                router.go(-1);
+                if(route.meta.previousRouteName === 'signup' || route.meta.previousRouteName === 'login'){
+                    router.push({name: "community"})
+                } else {
+                    router.go(-1);
+                }
+
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)

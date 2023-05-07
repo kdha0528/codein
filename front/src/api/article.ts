@@ -1,5 +1,29 @@
 import apiController from "@/utils/ApiController";
 
+export async function getArticles(path: string) {
+    try {
+        const response = await apiController({
+            url: path,
+            method: 'get',
+        })
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
+
+export async function createDummies() {
+    try {
+        const response = await apiController({
+            url:  '/create-dummies',
+            method: 'post',
+        })
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
+
 export async function write(data:any) {
     try {
         await apiController({
@@ -25,14 +49,3 @@ export async function edit(data:any, id:any) {
 }
 
 
-export async function getArticles(path: string) {
-    try {
-        const response = await apiController({
-            url: path,
-            method: 'get',
-        })
-        return response.data;
-    } catch (error) {
-        return error;
-    }
-}

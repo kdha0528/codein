@@ -1,14 +1,20 @@
 package com.codein.controller;
 
 import com.codein.config.SecurityConfig.MySecured;
+import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.article.Category;
+import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
+import com.codein.repository.article.ArticleRepositoryCustom;
+import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.responsedto.ArticleListResponseDto;
+import com.codein.responsedto.ArticleResponseDto;
 import com.codein.service.ArticleService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,24 +26,51 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class ArticleController {
+    private final ArticleRepositoryCustom articleRepository;
+    private final MemberRepository memberRepository;
     private final ArticleService articleService;
 
     @GetMapping(value = {"/","/{category}"})
-    public List<ArticleListResponseDto> getMemberList(
-            @RequestParam(required = false, defaultValue = "1") Integer page,
-            @RequestParam(required = false, defaultValue = "ALL") String period,
-            @RequestParam(required = false, defaultValue = "LATEST") String sort,
-            @RequestParam(required = false) String condition,
-            @RequestParam(required = false) String keyword,
+    public ArticleListResponseDto getMemberList(
             @PathVariable(value = "category", required = false) String category,
-            @ModelAttribute GetArticlesDto getArticlesDto
+            @ModelAttribute GetArticlesDto getArticlesDto,
+            HttpServletResponse response
           ) {
 
+        if(memberRepository.findByEmail("kdha4585@gmail.com") == null){
+            PasswordEncoder passwordEncoder = new PasswordEncoder();
+            Member member = Member.builder()
+                    .name("김동하")
+                    .email("kdha4585@gmail.com")
+                    .nickname("데일이")
+                    .password(passwordEncoder.encrypt("12341234"))
+                    .phone("01075444357")
+                    .birth("1996-05-28")
+                    .sex("male")
+                    .build();
+            member.setRole(Role.ADMIN);
+            memberRepository.save(member);
+        }   // 관리자 계정 없으면 생성
+
         if(category == null) {
-            return articleService.getArticleList(getArticlesDto, Category.COMMUNITY);
+            return ArticleListResponseDto.builder()
+                    .articleList(articleService.getArticleList(getArticlesDto, Category.COMMUNITY))
+                    .maxPage(articleService.getMaxPage(getArticlesDto, Category.COMMUNITY))
+                    .build();
+
         } else {
-            return articleService.getArticleList(getArticlesDto, Category.valueOf(category.toUpperCase()));
+            return ArticleListResponseDto.builder()
+                    .articleList(articleService.getArticleList(getArticlesDto, Category.valueOf(category.toUpperCase())))
+                    .maxPage(articleService.getMaxPage(getArticlesDto, Category.valueOf(category.toUpperCase())))
+                    .build();
         }
+    }
+
+
+    @MySecured(role = Role.ADMIN)
+    @PostMapping( "/create-dummies")
+    public void createDummies(@CookieValue(value = "accesstoken") Cookie cookie) {
+        articleService.createDummies(memberRepository.findByAccessToken(cookie.getValue()));
     }
 
     @MySecured(role = Role.MEMBER)

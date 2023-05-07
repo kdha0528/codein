@@ -4,9 +4,11 @@ import com.codein.domain.article.Article;
 import com.codein.domain.article.Category;
 import com.codein.domain.member.Member;
 import com.codein.requestdto.article.GetArticlesDto;
-import com.codein.responsedto.ArticleListResponseDto;
+import com.codein.responsedto.ArticleResponseDto;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -22,7 +24,7 @@ import static com.codein.domain.article.QArticle.article;
 public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
-
+    private final EntityManager em;
     @Override
     public List<Article> findByMember(Member member) {
         return jpaQueryFactory.selectFrom(article)
@@ -31,7 +33,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleListResponseDto> getArticleList(GetArticlesDto getArticlesDto, Category category) {
+    public List<ArticleResponseDto> getArticleList(GetArticlesDto getArticlesDto, Category category) {
         LocalDateTime now = LocalDateTime.now();
 
         JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
@@ -53,5 +55,19 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         return articleList.stream()
                 .map(Article::toArticleListResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Integer getMaxPage(GetArticlesDto getArticlesDto, Category category) {
+
+        String jpql = "SELECT COUNT(article) FROM Article article WHERE " +
+                "article.category = :category " +
+                "AND article.createdAt BETWEEN :startDate AND :endDate";
+        Query query = em.createQuery(jpql);
+        query.setParameter("category", category);
+        query.setParameter("startDate", getArticlesDto.getStartDate());
+        query.setParameter("endDate", LocalDateTime.now());
+        Long count =  (Long) query.getSingleResult();
+        return count.intValue();
     }
 }
