@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isUserLogin">
+  <div v-if="isUserLogin" class="navbar">
     <el-header>
       <el-menu mode="horizontal" router>
         <el-menu-item index="/">Home</el-menu-item>
@@ -8,7 +8,7 @@
       </el-menu>
     </el-header>
   </div>
-  <div v-else>
+  <div v-else class="navbar">
     <el-header>
       <el-menu mode="horizontal" router>
         <el-menu-item index="/">Home</el-menu-item>
@@ -57,9 +57,13 @@ const onLogout = async function () {
 }
 </script>
 <style scoped lang="scss">
-.header {
-  padding: 0;
+.navbar{
   width: 100vw;
+  position: fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index: 99;
 }
 
 </style>

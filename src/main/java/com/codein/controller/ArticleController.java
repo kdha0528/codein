@@ -5,36 +5,29 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.article.Category;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
-import com.codein.repository.article.ArticleRepositoryCustom;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.responsedto.ArticleListResponseDto;
-import com.codein.responsedto.ArticleResponseDto;
 import com.codein.service.ArticleService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ArticleController {
-    private final ArticleRepositoryCustom articleRepository;
     private final MemberRepository memberRepository;
     private final ArticleService articleService;
 
     @GetMapping(value = {"/","/{category}"})
     public ArticleListResponseDto getMemberList(
             @PathVariable(value = "category", required = false) String category,
-            @ModelAttribute GetArticlesDto getArticlesDto,
-            HttpServletResponse response
+            @ModelAttribute GetArticlesDto getArticlesDto
           ) {
 
         if(memberRepository.findByEmail("kdha4585@gmail.com") == null){
@@ -53,16 +46,9 @@ public class ArticleController {
         }   // 관리자 계정 없으면 생성
 
         if(category == null) {
-            return ArticleListResponseDto.builder()
-                    .articleList(articleService.getArticleList(getArticlesDto, Category.COMMUNITY))
-                    .maxPage(articleService.getMaxPage(getArticlesDto, Category.COMMUNITY))
-                    .build();
-
+            return articleService.getArticleList(getArticlesDto, Category.COMMUNITY);
         } else {
-            return ArticleListResponseDto.builder()
-                    .articleList(articleService.getArticleList(getArticlesDto, Category.valueOf(category.toUpperCase())))
-                    .maxPage(articleService.getMaxPage(getArticlesDto, Category.valueOf(category.toUpperCase())))
-                    .build();
+            return articleService.getArticleList(getArticlesDto, Category.valueOf(category.toUpperCase()));
         }
     }
 

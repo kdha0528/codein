@@ -1,10 +1,10 @@
 <template>
-  <div class="content d-flex flex-column mt-4">
+  <div class="content d-flex flex-column">
       <div class="d-flex flex-column ps-3 pb-3 pe-3" style="border-radius: 10px; background-color: #dcdfe6">
           <h3>{{ intro.category }}</h3>
           <span>{{ intro.message }}</span>
       </div>
-      <div  class="d-flex mt-4 justify-content-between">
+      <div  class="d-flex justify-content-between mt-4">
           <div class="d-flex">
               <div v-if="isNotice" class="d-flex">
                   <el-button type="primary" disabled>
@@ -25,7 +25,7 @@
                   </el-link>
               </div>
               <div class="reload-button">
-                  <el-button plain @click="reloadArticles()" style="border: none;">
+                  <el-button plain @click="onGetArticles()" style="border: none;">
                       <el-icon style="vertical-align: middle">
                           <Refresh />
                       </el-icon>
@@ -50,7 +50,7 @@
                       </el-select>
                   </template>
                   <template #append>
-                      <el-button plain @click="onSearch()&reloadArticles()" style="border: none;">
+                      <el-button plain @click="onSearch()&onGetArticles()" style="border: none;">
                           <el-icon style="vertical-align: middle">
                               <Search />
                           </el-icon>
@@ -59,16 +59,20 @@
               </el-input>
           </div>
           <div class="sort-options">
-              <el-select class="el-select-custom" v-model="sort.period" suffix-icon="" @change="onPeriod()&reloadArticles()">
+              <el-select class="el-select-custom" v-model="sort.period" suffix-icon="" @change="onPeriod()&onGetArticles()">
                   <el-option class="options" v-for="item in selectList.period" :label="item.text" :value="item.value" />
               </el-select>
-              <el-select class="el-select-custom" v-model="sort.sort" suffix-icon="" @change="onSort()&reloadArticles()">
+              <el-select class="el-select-custom" v-model="sort.sort" suffix-icon="" @change="onSort()&onGetArticles()">
                   <el-option class="options" v-for="item in selectList.sort" :label="item.text" :value="item.value" />
               </el-select>
           </div>
       </div>
       <el-divider/>
-      <Articles :key="articlesKey"/>
+      <keep-alive>
+        <Articles :key="route.fullPath"/>
+      </keep-alive>
+      <Pagination :key="route.fullPath"/>
+
   </div>
 </template>
 
@@ -77,16 +81,19 @@
 import {onMounted, provide, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import Articles from "@/components/Articles.vue";
-import {createDummies} from "@/api/article";
+import {createDummies, getArticles} from "@/api/article";
 import {useResponseStore} from "@/stores/Response";
 import {useAuthStore} from "@/stores/auth";
+import {useArticlesStore} from "@/stores/articles";
+import type {Article} from "@/components/custom-types/article";
+import Pagination from "@/components/Pagination.vue";
 
 const route = useRoute();
 const router = useRouter();
 const resStore = useResponseStore();
+const articlesStore = useArticlesStore();
 
 const isNotice = ref(false);
-const articlesKey = ref(0);
 
 const sort = ref({
     period:'ALL',
@@ -103,7 +110,6 @@ const search = ref({
 
 const page = reactive({
     page: 1,
-    max: 1,
     isSetPage: false,
 })
 
@@ -179,11 +185,7 @@ const onPeriod = function(){
 const onPaging = function(p: number){
     page.page = p;
     page.isSetPage = true;
-    reloadArticles();
-}
-
-const setMaxPage = function(max: number){
-    page.max = max;
+    onGetArticles();
 }
 
 const isAdmin = function(){
@@ -196,7 +198,7 @@ onMounted(async ()=>{
         isNotice.value = true;
     }
     await setDefaultFromPath(route.fullPath);
-    await reloadArticles();
+    await onGetArticles();
 })
 
 function setDefaultFromPath(path: string):void {
@@ -256,12 +258,6 @@ const setIntro = function(category: any) {
     }
 }
 
-
-const reloadArticles = async function () {
-    await router.replace(getPath())
-    articlesKey.value++;
-}
-
 const getPath = function(){
     let isFirst = true;
     let path = '/';
@@ -297,8 +293,38 @@ const getPath = function(){
     return path;
 }
 
+const onGetArticles = async function() {
+    const path = getPath();
+    await getArticles(path)
+        .then((response: any)=>{
+            if(resStore.isOK){
+                articlesStore.clean();
+                response.articleList.forEach((r: any) => {
+                    const article: Article = {
+                        id: r.id,
+                        title: r.title,
+                        createdAt: r.createdAt,
+                        viewNum: r.viewNum,
+                        commentNum: r.commentNum,
+                        likeNum: r.likeNum,
+                        nickname: r.nickname,
+                        imagePath: r.imagePath,
+                    }
+                    articlesStore.addArticle(article);
+                });
+                articlesStore.setMaxPage(response.maxPage);
+                router.replace(path);
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error)
+        })
+}
+
 provide('onPaging', onPaging);
-provide('setMaxPage', setMaxPage);
 provide('page', page);
 
 const onCreateDummies = async function(){

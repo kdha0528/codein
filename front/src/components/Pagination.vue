@@ -11,11 +11,11 @@
     </div>
 </template>
 <script setup lang="ts">
-import {inject, onMounted, ref, watch} from "vue";
+import {inject, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {useResponseStore} from "@/stores/Response";
+import {useArticlesStore} from "@/stores/articles";
 const router = useRouter();
-const resStore = useResponseStore();
 
 const currentPage = ref(1);
 const maxPage = ref(1);
@@ -25,19 +25,9 @@ onMounted(()=>{
     const page:any = inject('page');
     if(typeof page.page === 'number'){
         currentPage.value = page.page;
-        console.log("page = ", currentPage.value)
-    }
-    if(typeof page.max === 'number'){
-        maxPage.value = page.max;
-        console.log("max = ", maxPage.value)
+        maxPage.value = useArticlesStore().getMaxPage;
     }
 })
-/*
-watch(page, (newPage) => {
-   currentPage.value = newPage.page;
-   maxPage.value = newPage.max;
-    console.log("max page = ", maxPage)
-});*/
 
 const onPaging: any = inject('onPaging');
 

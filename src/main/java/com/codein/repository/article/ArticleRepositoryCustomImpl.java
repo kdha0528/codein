@@ -34,12 +34,11 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
 
     @Override
     public List<ArticleResponseDto> getArticleList(GetArticlesDto getArticlesDto, Category category) {
-        LocalDateTime now = LocalDateTime.now();
 
         JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
                 .where(
                         article.category.eq(category),
-                        article.createdAt.between(getArticlesDto.getStartDate(),now)
+                        article.createdAt.between(getArticlesDto.getStartDate(),LocalDateTime.now())
                 )
                 .limit(getArticlesDto.getSize())
                 .offset(getArticlesDto.getOffset());
@@ -58,8 +57,15 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public Integer getMaxPage(GetArticlesDto getArticlesDto, Category category) {
+    public int getMaxPage(GetArticlesDto getArticlesDto, Category category) {
 
+        long count = jpaQueryFactory.selectFrom(article)
+                .where(
+                        article.category.eq(category),
+                        article.createdAt.between(getArticlesDto.getStartDate(), LocalDateTime.now()))
+                .fetch()
+                .size();
+/*
         String jpql = "SELECT COUNT(article) FROM Article article WHERE " +
                 "article.category = :category " +
                 "AND article.createdAt BETWEEN :startDate AND :endDate";
@@ -67,7 +73,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         query.setParameter("category", category);
         query.setParameter("startDate", getArticlesDto.getStartDate());
         query.setParameter("endDate", LocalDateTime.now());
-        Long count =  (Long) query.getSingleResult();
-        return count.intValue();
+        Long count =  (Long) query.getSingleResult();*/
+        return (int)count/20; // 한 페이지에 20개
     }
 }

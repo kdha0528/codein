@@ -12,6 +12,6 @@ public interface ArticleRepositoryCustom {
 
     List<Article> findByMember(Member member);
     List<ArticleResponseDto> getArticleList(GetArticlesDto getArticlesDto, Category category);
-    Integer getMaxPage(GetArticlesDto getArticlesDto, Category category);
+    int getMaxPage(GetArticlesDto getArticlesDto, Category category);
 
 }

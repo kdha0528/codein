@@ -13,6 +13,7 @@ import com.codein.repository.member.MemberRepositoryCustom;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestservicedto.article.EditArticleServiceDto;
 import com.codein.requestservicedto.article.NewArticleServiceDto;
+import com.codein.responsedto.ArticleListResponseDto;
 import com.codein.responsedto.ArticleResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -52,10 +53,12 @@ public class ArticleService {
     }
 
     @Transactional
-    public List<ArticleResponseDto> getArticleList(GetArticlesDto getArticlesDto, Category category) {
-        return articleRepository.getArticleList(getArticlesDto, category);
+    public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto, Category category) {
+        return ArticleListResponseDto.builder()
+                .articleList(articleRepository.getArticleList(getArticlesDto, category))
+                .maxPage(articleRepository.getMaxPage(getArticlesDto, category))
+                .build();
     }
-
     @Transactional
     public void createDummies(Member member) {
         if(member == null) throw new MemberNotLoginException();
@@ -87,8 +90,5 @@ public class ArticleService {
             }
         }
     }
-    @Transactional
-    public Integer getMaxPage(GetArticlesDto getArticlesDto, Category category){
-        return articleRepository.getMaxPage(getArticlesDto, category) / 20; // 한 페이지에 글 20개
-    }
+
 }

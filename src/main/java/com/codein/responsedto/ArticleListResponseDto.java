@@ -10,10 +10,10 @@ import java.util.List;
 @Getter
 public class ArticleListResponseDto {
     private final List<ArticleResponseDto> articleList;
-    private final Integer maxPage;
+    private final int maxPage;
 
     @Builder
-    public ArticleListResponseDto(List<ArticleResponseDto> articleList, Integer maxPage) {
+    public ArticleListResponseDto(List<ArticleResponseDto> articleList, int maxPage) {
         this.articleList = articleList;
         this.maxPage = maxPage;
     }
