@@ -1,22 +1,85 @@
 <template>
-  <div v-if="isUserLogin" class="navbar">
-    <el-header>
-      <el-menu mode="horizontal" router>
-        <el-menu-item index="/">Home</el-menu-item>
-        <el-menu-item index="/settings/profile">개인정보</el-menu-item>
-        <el-menu-item index="/logout" @click="onLogout">로그아웃</el-menu-item>
-      </el-menu>
+    <el-header >
+        <el-menu mode="horizontal" router class="navbar d-flex justify-content-between">
+            <div class="d-flex" >
+                <div class="d-flex align-items-center justify-content-center ms-3 ">
+                  <el-icon size="25">
+                      <Loading />
+                  </el-icon>
+                  <div class="d-flex ms-1 me-2" style="cursor: default">Code In</div>
+                </div>
+                <el-menu-item index="/community" style="font-size: 1rem; font-weight: 500;">
+                    커뮤니티
+                </el-menu-item>
+                <el-menu-item index="/question" style="font-size: 1rem; font-weight: 500;">
+                    Q&A
+                </el-menu-item>
+                <el-menu-item index="/information" style="font-size: 1rem; font-weight: 500;">
+                    정보공유
+                </el-menu-item>
+                <el-menu-item index="/notice" style="font-size: 1rem; font-weight: 500;">
+                    공지사항
+                </el-menu-item>
+            </div>
+            <div v-if="isUserLogin" class="d-flex justify-content-center align-items-center me-4" style="cursor: pointer;">
+                <el-dropdown  trigger="click">
+                    <span class="el-dropdown-link">
+                    <img v-if="auth.getProfileImage" :src="auth.getProfileImage"
+                         style="width: 2rem; height: 2rem; border-radius: 100%;"
+                         alt=""/>
+                    <el-icon v-else size="40"
+                             style="width: 2rem;  height:2rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+                        <Avatar/>
+                    </el-icon>
+                    </span>
+                    <template #dropdown>
+                      <el-dropdown-menu class="d-flex flex-column"
+                                        style="--el-dropdown-menuItem-hover-fill: white;
+                                        --el-menu-hover-bg-color: white;
+                                        --el-menu-hover-text-color: #409eff;
+                                        --el-menu-active-color: #409eff">
+                          <el-dropdown-item class="d-flex pe-5" >
+                              <el-menu-item index="/settings/profile">
+                                  <el-icon>
+                                      <User />
+                                  </el-icon>
+                                  내 프로필
+                              </el-menu-item>
+                          </el-dropdown-item>
+                          <el-dropdown-item class="d-flex">
+                              <el-menu-item index="/settings/account">
+                                  <el-icon>
+                                      <Setting />
+                                  </el-icon>
+                                  내 계정
+                              </el-menu-item>
+                          </el-dropdown-item>
+                          <el-dropdown-item class="d-flex">
+                              <el-menu-item :index="toActivity()" >
+                                  <el-icon>
+                                      <Clock />
+                                  </el-icon>
+                                  활동내역
+                              </el-menu-item>
+                          </el-dropdown-item>
+                          <el-dropdown-item divided class="d-flex">
+                              <el-menu-item index="logout" @click="onLogout">
+                                  <el-icon>
+                                      <CloseBold/>
+                                  </el-icon>
+                                  로그아웃
+                              </el-menu-item>
+                          </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
+            </div>
+            <div v-else class="d-flex">
+                <el-menu-item index="/signup">회원가입</el-menu-item>
+                <el-menu-item index="/login">로그인</el-menu-item>
+            </div>
+        </el-menu>
     </el-header>
-  </div>
-  <div v-else class="navbar">
-    <el-header>
-      <el-menu mode="horizontal" router>
-        <el-menu-item index="/">Home</el-menu-item>
-        <el-menu-item index="/signup">회원가입</el-menu-item>
-        <el-menu-item index="/login">로그인</el-menu-item>
-      </el-menu>
-    </el-header>
-  </div>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
@@ -24,6 +87,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import { logout } from "@/api/member";
 import {useResponseStore} from "@/stores/Response";
+import {Loading, Avatar, CloseBold, Setting} from "@element-plus/icons-vue";
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -31,6 +95,10 @@ const route = useRoute();
 const resStore = useResponseStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
+
+const toActivity = function(): string {
+    return '/members/' + auth.getProfile.id;
+}
 
 router.afterEach((to, from, next) => {
   isUserLogin.value = auth.isLoggedIn;
@@ -64,6 +132,12 @@ const onLogout = async function () {
   left:0;
   right:0;
   z-index: 99;
-}
 
+    .el-menu-item {
+        --el-menu-hover-bg-color: #ffffff;
+        --el-menu-hover-text-color: #409eff;
+        --el-menu-active-color:  #303133;
+    }
+
+}
 </style>

@@ -1,79 +1,75 @@
 <template>
-  <div class="content d-flex flex-column">
-      <div class="d-flex flex-column ps-3 pb-3 pe-3" style="border-radius: 10px; background-color: #dcdfe6">
-          <h3>{{ intro.category }}</h3>
-          <span>{{ intro.message }}</span>
-      </div>
-      <div  class="d-flex justify-content-between mt-4">
-          <div class="d-flex">
-              <div v-if="isNotice" class="d-flex">
-                  <el-button type="primary" disabled>
-                      <el-icon style="vertical-align: middle">
-                          <EditPen />
-                      </el-icon>
-                      <span style="vertical-align: middle"> 글쓰기 </span>
-                  </el-button>
-              </div>
-              <div v-else class="d-flex">
-                  <el-link :href="'/'+route.name+'/new'">
-                      <el-button type="primary">
+    <keep-alive>
+      <div class="content d-flex flex-column">
+          <CategoryIntro />
+          <div  class="d-flex justify-content-between mt-4">
+              <div class="d-flex">
+                  <div v-if="isNotice" class="d-flex">
+                      <el-button type="primary" disabled>
                           <el-icon style="vertical-align: middle">
                               <EditPen />
                           </el-icon>
                           <span style="vertical-align: middle"> 글쓰기 </span>
                       </el-button>
-                  </el-link>
-              </div>
-              <div class="reload-button">
-                  <el-button plain @click="onGetArticles()" style="border: none;">
-                      <el-icon style="vertical-align: middle">
-                          <Refresh />
-                      </el-icon>
-                  </el-button>
-              </div>
-              <div v-if="isAdmin()" class="create-dummies-button">
-                  <el-button plain @click="onCreateDummies()" style="border: none;">
-                      <el-icon style="vertical-align: middle">
-                          <Plus />
-                      </el-icon>
-                  </el-button>
-              </div>
-          </div>
-          <div style="width: 50%;">
-              <el-input
-                      v-model="search.keyword"
-                      placeholder="Please input"
-                      class="input-with-select"
-                ><template #prepend>
-                      <el-select class="select-search" v-model="search.condition" suffix-icon="">
-                          <el-option v-for="item in selectList.search" :label="item.text" :value="item.value" />
-                      </el-select>
-                  </template>
-                  <template #append>
-                      <el-button plain @click="onSearch()&onGetArticles()" style="border: none;">
+                  </div>
+                  <div v-else class="d-flex">
+                      <el-link :href="'/'+route.name+'/new'">
+                          <el-button type="primary">
+                              <el-icon style="vertical-align: middle">
+                                  <EditPen />
+                              </el-icon>
+                              <span style="vertical-align: middle"> 글쓰기 </span>
+                          </el-button>
+                      </el-link>
+                  </div>
+                  <div class="reload-button">
+                      <el-button plain @click="onGetArticles()" style="border: none;">
                           <el-icon style="vertical-align: middle">
-                              <Search />
+                              <Refresh />
                           </el-icon>
                       </el-button>
-                  </template>
-              </el-input>
+                  </div>
+                  <div v-if="isAdmin()" class="create-dummies-button">
+                      <el-button plain @click="onCreateDummies()" style="border: none;">
+                          <el-icon style="vertical-align: middle">
+                              <Plus />
+                          </el-icon>
+                      </el-button>
+                  </div>
+              </div>
+              <div style="width: 50%;">
+                  <el-input
+                          v-model="search.keyword"
+                          placeholder="Please input"
+                          class="input-with-select"
+                    ><template #prepend>
+                          <el-select class="select-search" v-model="search.condition" suffix-icon="">
+                              <el-option v-for="item in selectList.search" :label="item.text" :value="item.value" />
+                          </el-select>
+                      </template>
+                      <template #append>
+                          <el-button plain @click="onSearch()&onGetArticles()" style="border: none;">
+                              <el-icon style="vertical-align: middle">
+                                  <Search />
+                              </el-icon>
+                          </el-button>
+                      </template>
+                  </el-input>
+              </div>
+              <div class="sort-options">
+                  <el-select class="el-select-custom" v-model="sort.period" suffix-icon="" @change="onPeriod()&onGetArticles()">
+                      <el-option class="options" v-for="item in selectList.period" :label="item.text" :value="item.value" />
+                  </el-select>
+                  <el-select class="el-select-custom" v-model="sort.sort" suffix-icon="" @change="onSort()&onGetArticles()">
+                      <el-option class="options" v-for="item in selectList.sort" :label="item.text" :value="item.value" />
+                  </el-select>
+              </div>
           </div>
-          <div class="sort-options">
-              <el-select class="el-select-custom" v-model="sort.period" suffix-icon="" @change="onPeriod()&onGetArticles()">
-                  <el-option class="options" v-for="item in selectList.period" :label="item.text" :value="item.value" />
-              </el-select>
-              <el-select class="el-select-custom" v-model="sort.sort" suffix-icon="" @change="onSort()&onGetArticles()">
-                  <el-option class="options" v-for="item in selectList.sort" :label="item.text" :value="item.value" />
-              </el-select>
-          </div>
+          <el-divider/>
+          <Articles />
+          <Pagination />
       </div>
-      <el-divider/>
-      <keep-alive>
-        <Articles :key="route.fullPath"/>
-      </keep-alive>
-      <Pagination :key="route.fullPath"/>
-
-  </div>
+    </keep-alive>
 </template>
 
 <script setup lang="ts">
@@ -87,6 +83,8 @@ import {useAuthStore} from "@/stores/auth";
 import {useArticlesStore} from "@/stores/articles";
 import type {Article} from "@/components/custom-types/article";
 import Pagination from "@/components/Pagination.vue";
+import CategoryIntro from "@/components/CategoryIntro.vue";
+import type {Intro} from "@/components/custom-types/intro";
 
 const route = useRoute();
 const router = useRouter();
@@ -111,11 +109,6 @@ const search = ref({
 const page = reactive({
     page: 1,
     isSetPage: false,
-})
-
-const intro = ref({
-    category: '',
-    message:'',
 })
 
 const selectList = reactive({
@@ -193,12 +186,11 @@ const isAdmin = function(){
 }
 
 onMounted(async ()=>{
-    await setIntro(route.name);
+    await setDefaultFromPath(route.fullPath);
+    await onGetArticles();
     if(route.name === "notice"){
         isNotice.value = true;
     }
-    await setDefaultFromPath(route.fullPath);
-    await onGetArticles();
 })
 
 function setDefaultFromPath(path: string):void {
@@ -236,22 +228,35 @@ function setDefaultFromPath(path: string):void {
 }
 
 const setIntro = function(category: any) {
+    let intro: Intro;
     switch(category){
         case "community":
-            intro.value.category = "커뮤니티";
-            intro.value.message = "즐겁게 일상을 나누는 공간입니다.";
+            intro={
+                category: "커뮤니티",
+                message: "즐겁게 일상을 나누는 공간입니다.",
+            }
+            articlesStore.setIntro(intro);
             break;
         case "question":
-            intro.value.category = "Q&A";
-            intro.value.message = "좋은 질문과 답변으로 함께 성장하는 공간입니다.";
+            intro={
+                category: "Q&A",
+                message: "좋은 질문과 답변으로 함께 성장하는 공간입니다.",
+            }
+            articlesStore.setIntro(intro);
             break;
         case "information":
-            intro.value.category = "정보공유";
-            intro.value.message = "정보를 공유하고 새로운 아이디어를 얻어보세요.";
+            intro={
+                category: "정보공유",
+                message: "정보를 공유하고 새로운 아이디어를 얻어보세요.",
+            }
+            articlesStore.setIntro(intro);
             break;
         case "notice":
-            intro.value.category = "공지사항";
-            intro.value.message = "새로운 소식과 공지사항을 전해드리는 공간입니다.";
+            intro={
+                category: "공지사항",
+                message: "새로운 소식과 공지사항을 전해드리는 공간입니다.",
+            }
+            articlesStore.setIntro(intro);
             break;
         default:
             break;
@@ -294,8 +299,7 @@ const getPath = function(){
 }
 
 const onGetArticles = async function() {
-    const path = getPath();
-    await getArticles(path)
+    await getArticles(getPath())
         .then((response: any)=>{
             if(resStore.isOK){
                 articlesStore.clean();
@@ -313,7 +317,8 @@ const onGetArticles = async function() {
                     articlesStore.addArticle(article);
                 });
                 articlesStore.setMaxPage(response.maxPage);
-                router.replace(path);
+                setIntro(route.name);
+                router.replace(getPath());
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
@@ -344,7 +349,6 @@ const onCreateDummies = async function(){
 
 <style scoped>
 @import "../components/css/contentBase.css";
-
 .select-search{
     width: 65px;
     font-size: 0.8rem;

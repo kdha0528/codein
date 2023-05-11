@@ -4,4 +4,5 @@ export interface Profile {
     nickname: String,
     point: Number,
     role: String,
+    imagePath: String,
 }

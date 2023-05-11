@@ -1,5 +1,5 @@
 <template>
-    <ul class="d-flex flex-column" style="width:100%; margin-block:0; padding-inline-start: 0">
+    <ul class=" d-flex flex-column" style="width:100%; margin-block:0; padding-inline-start: 0">
         <li v-for="article in articlesStore.getArticles" :key="article.id">
             <div class="d-flex justify-content-between mb-3">
                 <div class="d-flex align-items-center">
@@ -51,6 +51,7 @@ const articlesStore = useArticlesStore();
 
 </script>
 <style scoped>
+
 li {
     list-style: none;
 }

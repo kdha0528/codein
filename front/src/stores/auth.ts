@@ -12,13 +12,15 @@ export const useAuthStore = defineStore("auth", {
         getProfile: (state) => {
             return state.member;
         },
+        getProfileImage: (state) => {
+            return state.member.imagePath;
+        },
         isAdmin: (state)=>{
             if(state.member != null){
                 return state.member.role === 'ADMIN';
             } else {
                 return false;
             }
-
         }
     },
     actions: {

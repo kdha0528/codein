@@ -1,5 +1,5 @@
 <template>
-    <div class="pagination mt-4 pb-5" >
+    <div class=" pagination mt-4 pb-5" >
         <el-pagination
             layout="prev, pager, next"
             prev-text="Previous"
@@ -33,6 +33,7 @@ const onPaging: any = inject('onPaging');
 
 </script>
 <style scoped>
+
 .el-pagination{
     justify-content: space-between;
     --el-pagination-font-size: 1rem;

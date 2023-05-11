@@ -82,6 +82,7 @@ public class Member {
                 .nickname(this.getNickname())
                 .role(this.getRole().getRole())
                 .point(this.getPoint())
+                .profileImage(this.getProfileImage())
                 .build();
     }
 

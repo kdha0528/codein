@@ -71,6 +71,7 @@ const onLogin = async function () {
                     nickname: response.nickname,
                     point: response.point,
                     role: response.role,
+                    imagePath: response.imagepath,
                 }
                 auth.login(member);
                 if(route.meta.previousRouteName === 'signup' || route.meta.previousRouteName === 'login'){
