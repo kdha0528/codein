@@ -1,7 +1,8 @@
 <template>
-    <keep-alive>
       <div class="content d-flex flex-column">
-          <CategoryIntro />
+          <keep-alive>
+            <CategoryIntro />
+          </keep-alive>
           <div  class="d-flex justify-content-between mt-4">
               <div class="d-flex">
                   <div v-if="isNotice" class="d-flex">
@@ -42,6 +43,7 @@
                           v-model="search.keyword"
                           placeholder="Please input"
                           class="input-with-select"
+                          @keyup.enter="onSearch()&onGetArticles()"
                     ><template #prepend>
                           <el-select class="select-search" v-model="search.condition" suffix-icon="">
                               <el-option v-for="item in selectList.search" :label="item.text" :value="item.value" />
@@ -66,10 +68,13 @@
               </div>
           </div>
           <el-divider/>
-          <Articles />
-          <Pagination />
+          <keep-alive>
+            <Articles />
+          </keep-alive>
+          <keep-alive>
+            <Pagination />
+          </keep-alive>
       </div>
-    </keep-alive>
 </template>
 
 <script setup lang="ts">

@@ -5,7 +5,10 @@ import type {Intro} from "@/components/custom-types/intro";
 export const useArticlesStore = defineStore("article", {
     state: () => ({
         articles: [] as Article[],
-        intro: null as Intro | any,
+        intro: {
+          category: ' ',
+          message: ' ',
+        } as Intro,
         maxPage: 1,
     }),
     getters: {

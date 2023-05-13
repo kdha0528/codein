@@ -33,7 +33,7 @@ public class GetArticlesDto {
         }
         if(condition == null){
             this.condition = Condition.ALL;
-        }else{
+        } else{
             this.condition = Condition.valueOf(condition);
         }
         this.keyword = keyword;

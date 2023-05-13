@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.codein.domain.article.QArticle.article;
+import static com.codein.requestdto.article.Condition.AUTHOR;
+import static com.codein.requestdto.article.Condition.TITLE;
 
 
 @Repository
@@ -43,6 +45,14 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .limit(getArticlesDto.getSize())
                 .offset(getArticlesDto.getOffset());
 
+        if (getArticlesDto.getKeyword() != null) {
+            switch(getArticlesDto.getCondition()) {
+                case TITLE -> query.where(article.title.contains(getArticlesDto.getKeyword()));
+                case AUTHOR -> query.where(article.member.nickname.contains(getArticlesDto.getKeyword()));
+                default -> query.where(article.title.contains(getArticlesDto.getKeyword()).or(article.content.contains(getArticlesDto.getKeyword())));
+            }
+        }
+
         switch (getArticlesDto.getSort()) {
             case VIEW -> query.orderBy(article.viewNum.desc(), article.id.desc());
             case LIKE -> query.orderBy(article.likeNum.desc(), article.id.desc());
@@ -65,7 +75,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                         article.createdAt.between(getArticlesDto.getStartDate(), LocalDateTime.now()))
                 .fetch()
                 .size();
-/*
+        /*
         String jpql = "SELECT COUNT(article) FROM Article article WHERE " +
                 "article.category = :category " +
                 "AND article.createdAt BETWEEN :startDate AND :endDate";

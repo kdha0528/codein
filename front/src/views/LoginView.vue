@@ -5,6 +5,7 @@
         status-icon
         :rules="rules"
         label-width="120px"
+        @keyup.enter="onLogin()"
         class="demo-ruleForm">
       <el-form-item label="Email" prop="email">
         <el-input v-model="loginForm.email"/>
