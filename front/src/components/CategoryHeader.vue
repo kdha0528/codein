@@ -14,14 +14,12 @@
                       </el-button>
                   </div>
                   <div v-else class="d-flex">
-                      <el-link :href="'/'+route.name+'/new'">
-                          <el-button type="primary">
-                              <el-icon style="vertical-align: middle">
-                                  <EditPen />
-                              </el-icon>
-                              <span style="vertical-align: middle"> 글쓰기 </span>
-                          </el-button>
-                      </el-link>
+                      <el-button @click="replacePath('/'+route.name+'/new')" type="primary">
+                          <el-icon style="vertical-align: middle">
+                              <EditPen />
+                          </el-icon>
+                          <span style="vertical-align: middle"> 글쓰기 </span>
+                      </el-button>
                   </div>
                   <div class="reload-button">
                       <el-button plain @click="onGetArticles()" style="border: none;">
@@ -198,6 +196,10 @@ onMounted(async ()=>{
     }
 })
 
+const replacePath = function (path: string) {
+    router.replace(path);
+}
+
 function setDefaultFromPath(path: string):void {
     const regex = /[?&]([^=]+)=([^&]*)/g;
     let match: RegExpExecArray | null;
@@ -316,6 +318,7 @@ const onGetArticles = async function() {
                         viewNum: r.viewNum,
                         commentNum: r.commentNum,
                         likeNum: r.likeNum,
+                        authorId: r.authorId,
                         nickname: r.nickname,
                         imagePath: r.imagePath,
                     }

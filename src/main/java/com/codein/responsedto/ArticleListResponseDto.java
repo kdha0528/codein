@@ -9,11 +9,11 @@ import java.util.List;
 @ToString
 @Getter
 public class ArticleListResponseDto {
-    private final List<ArticleResponseDto> articleList;
+    private final List<ArticleListItem> articleList;
     private final int maxPage;
 
     @Builder
-    public ArticleListResponseDto(List<ArticleResponseDto> articleList, int maxPage) {
+    public ArticleListResponseDto(List<ArticleListItem> articleList, int maxPage) {
         this.articleList = articleList;
         this.maxPage = maxPage;
     }

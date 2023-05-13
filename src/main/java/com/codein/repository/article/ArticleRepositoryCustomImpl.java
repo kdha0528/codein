@@ -4,11 +4,10 @@ import com.codein.domain.article.Article;
 import com.codein.domain.article.Category;
 import com.codein.domain.member.Member;
 import com.codein.requestdto.article.GetArticlesDto;
-import com.codein.responsedto.ArticleResponseDto;
+import com.codein.responsedto.ArticleListItem;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -17,8 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.codein.domain.article.QArticle.article;
-import static com.codein.requestdto.article.Condition.AUTHOR;
-import static com.codein.requestdto.article.Condition.TITLE;
 
 
 @Repository
@@ -35,7 +32,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleResponseDto> getArticleList(GetArticlesDto getArticlesDto, Category category) {
+    public List<ArticleListItem> getArticleList(GetArticlesDto getArticlesDto, Category category) {
 
         JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
                 .where(

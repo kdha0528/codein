@@ -9,24 +9,26 @@ import java.time.LocalDateTime;
 
 @ToString
 @Getter
-public class ArticleResponseDto {
+public class ArticleListItem {
     private final Long id;
     private final String title;
     private final String createdAt;
     private final Integer viewNum;
     private final Integer commentNum;
     private final Integer likeNum;
+    private final Long authorId;
     private final String nickname;
     private final String imagePath;
 
     @Builder
-    public ArticleResponseDto(Long id, String title, LocalDateTime createdAt, Integer viewNum, Integer commentNum, Integer likeNum, String nickname, ProfileImage profileImage) {
+    public ArticleListItem(Long id, String title, LocalDateTime createdAt, Integer viewNum, Integer commentNum, Integer likeNum, Long authorId, String nickname, ProfileImage profileImage) {
         this.id = id;
         this.title = title;
         this.createdAt = compareDate(createdAt);
         this.viewNum = viewNum;
         this.commentNum = commentNum;
         this.likeNum = likeNum;
+        this.authorId = authorId;
         this.nickname = nickname;
         if (profileImage != null) {
             this.imagePath = "/my-backend-api/images/profile/" + profileImage.getImgFileName();

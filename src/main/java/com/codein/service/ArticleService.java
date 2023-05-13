@@ -14,12 +14,10 @@ import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestservicedto.article.EditArticleServiceDto;
 import com.codein.requestservicedto.article.NewArticleServiceDto;
 import com.codein.responsedto.ArticleListResponseDto;
-import com.codein.responsedto.ArticleResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Random;
 
 @Service

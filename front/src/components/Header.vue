@@ -1,12 +1,12 @@
 <template>
-    <el-header >
+    <el-header height="80px">
         <el-menu mode="horizontal" router class="navbar d-flex justify-content-between">
-            <div class="d-flex" >
+            <div class="d-flex align-items-center justify-content-center" >
                 <div class="d-flex align-items-center justify-content-center ms-3 ">
-                  <el-icon size="25">
+                  <el-icon size="40">
                       <Loading />
                   </el-icon>
-                  <div class="d-flex ms-1 me-2" style="cursor: default">Code In</div>
+                  <div class="d-flex ms-1 me-2" style="cursor: default; font-size: larger; font-weight: bold;">Code In</div>
                 </div>
                 <el-menu-item index="/community" style="font-size: 1rem; font-weight: 500;">
                     커뮤니티
@@ -25,21 +25,22 @@
                 <el-dropdown  trigger="click">
                     <span class="el-dropdown-link">
                     <img v-if="auth.getProfileImage" :src="auth.getProfileImage"
-                         style="width: 2rem; height: 2rem; border-radius: 100%;"
+                         style="width: 2.8rem; height: 2.8rem; border-radius: 100%;"
                          alt=""/>
                     <el-icon v-else size="40"
-                             style="width: 2rem;  height:2rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+                             style="width: 2.8rem;  height:2.8rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
                         <Avatar/>
                     </el-icon>
                     </span>
                     <template #dropdown>
-                      <el-dropdown-menu class="d-flex flex-column"
-                                        style="--el-dropdown-menuItem-hover-fill: white;
+                      <el-dropdown-menu class="dropdown_menu d-flex flex-column"
+                                        style="
+                                        --el-dropdown-menuItem-hover-fill: white;
                                         --el-menu-hover-bg-color: white;
                                         --el-menu-hover-text-color: #409eff;
                                         --el-menu-active-color: #409eff">
-                          <el-dropdown-item class="d-flex pe-5" >
-                              <el-menu-item index="/settings/profile">
+                          <el-dropdown-item class="d-flex" style="padding-right: 5rem;" >
+                              <el-menu-item class="dropdown" index="/settings/profile">
                                   <el-icon>
                                       <User />
                                   </el-icon>
@@ -127,6 +128,7 @@ const onLogout = async function () {
 <style scoped lang="scss">
 .navbar{
   width: 100vw;
+  height: 80px;
   position: fixed;
   top:0;
   left:0;
@@ -139,5 +141,15 @@ const onLogout = async function () {
         --el-menu-active-color:  #303133;
     }
 
+}
+.dropdown_menu{
+    .el-menu-item {
+        font-size: 1rem;
+        .el-icon{
+            font-size:22px;
+            width: 2.2rem;
+            height: 2.2rem;
+        }
+    }
 }
 </style>

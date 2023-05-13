@@ -5,6 +5,7 @@ export interface Article {
     viewNum: Number,
     commentNum: Number,
     likeNum: Number,
+    authorId: Number,
     nickname: String,
     imagePath: String,
 }

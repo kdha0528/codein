@@ -4,14 +4,16 @@
             <div class="d-flex justify-content-between mb-3">
                 <div class="d-flex align-items-center">
                     <img v-if="article.imagePath" :src="article.imagePath"
-                         style="width: 1.8rem; height: 1.8rem; border-radius: 100%;"
-                         alt=""/>
+                         style="width: 2rem; height: 2rem; border-radius: 100%; cursor: pointer;"
+                         alt=""
+                         @click="replacePath('/members/'+article.authorId)"/>
                     <el-icon v-else size="40"
-                             style="width: 1.8rem;  height:1.8rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+                             style="width: 2rem;  height:2rem; border-radius: 100%; color:white; background-color: #E2E2E2; cursor: pointer;"
+                             @click="replacePath('/members/'+article.authorId)">
                         <Avatar/>
                     </el-icon>
-                    <div class="ms-2">{{ article.nickname }}</div>
-                    <div class="ms-2">{{ article.createdAt }}</div>
+                    <div class="ms-2"  @click="replacePath('/members/'+article.authorId)" style="cursor: pointer; font-size:1rem;">{{ article.nickname }}</div>
+                    <div class="ms-2"  style="font-size:1rem;">{{ article.createdAt }}</div>
                 </div>
                 <div class="d-flex">
                     <div class="d-flex align-items-center">
@@ -34,7 +36,7 @@
                     </div>
                 </div>
             </div>
-            <div style="font-size:1.25rem;">
+            <div style="font-size:1.25rem; cursor: pointer;" @click="replacePath('/articles/'+article.id)">
                 {{ article.title }}
             </div>
             <el-divider class="mt-3 mb-3"/>
@@ -44,10 +46,14 @@
 </template>
 <script setup lang="ts">
 import {ChatDotSquare, Star} from "@element-plus/icons-vue";
-import Pagination from "@/components/Pagination.vue";
 import {useArticlesStore} from "@/stores/articles";
+import {useRouter} from "vue-router";
 
 const articlesStore = useArticlesStore();
+const router = useRouter();
+const replacePath = function (path: string) {
+    router.replace(path);
+}
 
 </script>
 <style scoped>

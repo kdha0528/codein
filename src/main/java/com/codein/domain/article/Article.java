@@ -1,7 +1,7 @@
 package com.codein.domain.article;
 
 import com.codein.domain.member.Member;
-import com.codein.responsedto.ArticleResponseDto;
+import com.codein.responsedto.ArticleListItem;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -55,10 +55,11 @@ public class Article {
         this.content = articleEditor.getContent();
     }
 
-    public ArticleResponseDto toArticleListResponseDto(){
-        return ArticleResponseDto.builder()
+    public ArticleListItem toArticleListResponseDto(){
+        return ArticleListItem.builder()
                 .id(this.getId())
                 .title(this.getTitle())
+                .authorId(this.member.getId())
                 .profileImage(this.member.getProfileImage())
                 .nickname(this.member.getNickname())
                 .createdAt(this.getCreatedAt())

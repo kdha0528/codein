@@ -54,6 +54,7 @@ const id = ref({
 const select = ref({
     category: 'COMMUNITY',
 })
+
 const selectList = reactive({
     category: [
         {
@@ -79,7 +80,7 @@ const form = ref({
 
 onMounted(()=>{
     if(route.params.category){
-        form.value.category = (route.params.category as string).toUpperCase();
+        select.value.category = (route.params.category as string).toUpperCase();
     } else if(route.params.articleId){
         id.value.article = route.params.articleId;
         onGetArticle()
