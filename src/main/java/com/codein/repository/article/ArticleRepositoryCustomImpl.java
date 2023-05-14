@@ -3,11 +3,14 @@ package com.codein.repository.article;
 import com.codein.domain.article.Article;
 import com.codein.domain.article.Category;
 import com.codein.domain.member.Member;
+import com.codein.requestdto.article.GetActivityDto;
 import com.codein.requestdto.article.GetArticlesDto;
+import com.codein.responsedto.ActivityListItem;
+import com.codein.responsedto.ActivityListResponseDto;
 import com.codein.responsedto.ArticleListItem;
+import com.codein.responsedto.ArticleListResponseDto;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.codein.domain.article.QArticle.article;
+import static com.codein.domain.article.QLike.like;
+import static com.codein.domain.comment.QComment.comment;
 
 
 @Repository
@@ -23,7 +28,7 @@ import static com.codein.domain.article.QArticle.article;
 public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
-    private final EntityManager em;
+
     @Override
     public List<Article> findByMember(Member member) {
         return jpaQueryFactory.selectFrom(article)
@@ -32,15 +37,16 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public List<ArticleListItem> getArticleList(GetArticlesDto getArticlesDto, Category category) {
+    public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto, Category category) {
 
         JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
                 .where(
                         article.category.eq(category),
                         article.createdAt.between(getArticlesDto.getStartDate(),LocalDateTime.now())
-                )
-                .limit(getArticlesDto.getSize())
-                .offset(getArticlesDto.getOffset());
+                );
+
+        long count = query.fetch().size();
+        int maxPage = (int) Math.floorDiv(count, getArticlesDto.getSize());
 
         if (getArticlesDto.getKeyword() != null) {
             switch(getArticlesDto.getCondition()) {
@@ -56,31 +62,53 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
             default -> query.orderBy(article.id.desc());
         }
 
-       List<Article> articleList = query.fetch();
+        List<Article> fetchResult = query
+                .limit(getArticlesDto.getSize())
+                .offset(getArticlesDto.getOffset())
+                .fetch();
 
-        return articleList.stream()
-                .map(Article::toArticleListResponseDto)
+        List<ArticleListItem> articleList = fetchResult.stream()
+                .map(Article::toArticleListItem)
                 .collect(Collectors.toList());
+
+        return ArticleListResponseDto.builder()
+                .articleList(articleList)
+                .maxPage(maxPage)
+                .build();
     }
 
     @Override
-    public int getMaxPage(GetArticlesDto getArticlesDto, Category category) {
+    public ActivityListResponseDto getActivityListResponseDto(GetActivityDto getActivityDto, Member member) {
 
-        long count = jpaQueryFactory.selectFrom(article)
-                .where(
-                        article.category.eq(category),
-                        article.createdAt.between(getArticlesDto.getStartDate(), LocalDateTime.now()))
-                .fetch()
-                .size();
-        /*
-        String jpql = "SELECT COUNT(article) FROM Article article WHERE " +
-                "article.category = :category " +
-                "AND article.createdAt BETWEEN :startDate AND :endDate";
-        Query query = em.createQuery(jpql);
-        query.setParameter("category", category);
-        query.setParameter("startDate", getArticlesDto.getStartDate());
-        query.setParameter("endDate", LocalDateTime.now());
-        Long count =  (Long) query.getSingleResult();*/
-        return (int)count/20; // 한 페이지에 20개
+        JPAQuery<Article> query = switch (getActivityDto.getActivity()) {
+            case COMMENTS -> jpaQueryFactory.select(comment.article)
+                    .innerJoin(comment)
+                    .where(comment.commenter.id.eq(getActivityDto.getId()));
+            case LIKES -> jpaQueryFactory.select(like.article)
+                    .innerJoin(like)
+                    .where(like.member.id.eq(getActivityDto.getId()));
+            default -> jpaQueryFactory.selectFrom(article)
+                    .where(article.id.eq(getActivityDto.getId()));
+        };
+
+        List<Article> articleList = query.limit(getActivityDto.getSize())
+                .offset(getActivityDto.getOffset())
+                .fetch();
+
+        List<ActivityListItem> activityList = articleList.stream()
+                .map(Article::toActivityListItem)
+                .collect(Collectors.toList());
+
+        long count = query.fetch().size();
+        int maxPage = (int) Math.floorDiv(count, getActivityDto.getSize());
+
+        return ActivityListResponseDto.builder()
+                .id(member.getId())
+                .nickname(member.getNickname())
+                .profileImage(member.getProfileImage())
+                .activityList(activityList)
+                .maxPage(maxPage)
+                .build();
     }
+
 }

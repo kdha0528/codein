@@ -1,6 +1,8 @@
 package com.codein.domain.article;
 
 import com.codein.domain.member.Member;
+import com.codein.requestdto.article.Activity;
+import com.codein.responsedto.ActivityListItem;
 import com.codein.responsedto.ArticleListItem;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +37,7 @@ public class Article {
     private Integer likeNum;
     @NotNull
     private LocalDateTime createdAt;
+    private boolean deleted;
 
 
     @Builder
@@ -47,6 +50,7 @@ public class Article {
         this.commentNum = (commentNum == null) ? 0 : commentNum;
         this.likeNum = (likeNum == null) ? 0 : likeNum;
         this.createdAt = LocalDateTime.now();
+        this.deleted = false;
     }
 
     public void edit(ArticleEditor articleEditor) {
@@ -55,7 +59,7 @@ public class Article {
         this.content = articleEditor.getContent();
     }
 
-    public ArticleListItem toArticleListResponseDto(){
+    public ArticleListItem toArticleListItem(){
         return ArticleListItem.builder()
                 .id(this.getId())
                 .title(this.getTitle())
@@ -66,6 +70,17 @@ public class Article {
                 .commentNum(this.getCommentNum())
                 .likeNum(this.getLikeNum())
                 .viewNum(this.getViewNum())
+                .build();
+    }
+
+    public ActivityListItem toActivityListItem(){
+        return ActivityListItem.builder()
+                .id(this.getId())
+                .authorId(this.member.getId())
+                .category(this.category.getName())
+                .title(this.getTitle())
+                .nickname(this.member.getNickname())
+                .createdAt(this.getCreatedAt())
                 .build();
     }
 }

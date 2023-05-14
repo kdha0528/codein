@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 import type {Article} from "@/components/custom-types/article";
 import type {Intro} from "@/components/custom-types/intro";
+import type {Activity} from "@/components/custom-types/activity";
 
 export const useArticlesStore = defineStore("article", {
     state: () => ({
-        articles: [] as Article[],
+        articles: [] as Article[] | Activity[],
         intro: {
           category: ' ',
           message: ' ',
@@ -26,7 +27,7 @@ export const useArticlesStore = defineStore("article", {
         }
     },
     actions: {
-        addArticle(a: Article){
+        addArticle(a: Article & Activity){
             this.articles.push(a);
         },
         setMaxPage(m: number){

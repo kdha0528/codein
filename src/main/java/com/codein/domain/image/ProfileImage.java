@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ProfileImage {
+public class ProfileImage { // 이미지의 크기, 형식, 사용자가 이미지를 공개했는지 여부 등 추가 염두하여 entity로 만들었음.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

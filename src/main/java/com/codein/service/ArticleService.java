@@ -6,13 +6,16 @@ import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.article.ArticlePostNotExistsException;
+import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
-import com.codein.repository.member.MemberRepositoryCustom;
+import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.article.GetActivityDto;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestservicedto.article.EditArticleServiceDto;
 import com.codein.requestservicedto.article.NewArticleServiceDto;
+import com.codein.responsedto.ActivityListResponseDto;
 import com.codein.responsedto.ArticleListResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +29,7 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final TokensRepository tokensRepository;
-    private final MemberRepositoryCustom memberRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
@@ -52,11 +55,16 @@ public class ArticleService {
 
     @Transactional
     public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto, Category category) {
-        return ArticleListResponseDto.builder()
-                .articleList(articleRepository.getArticleList(getArticlesDto, category))
-                .maxPage(articleRepository.getMaxPage(getArticlesDto, category))
-                .build();
+        return articleRepository.getArticleList(getArticlesDto, category);
     }
+
+    @Transactional
+    public ActivityListResponseDto getActivityList(GetActivityDto getActivityDto) {
+        Member member = memberRepository.findById(getActivityDto.getId())
+                .orElseThrow(MemberNotExistsException::new);
+        return articleRepository.getActivityListResponseDto(getActivityDto, member);
+    }
+
     @Transactional
     public void createDummies(Member member) {
         if(member == null) throw new MemberNotLoginException();

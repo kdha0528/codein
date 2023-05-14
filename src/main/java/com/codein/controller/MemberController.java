@@ -6,8 +6,10 @@ import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.article.GetActivityDto;
 import com.codein.requestdto.member.*;
 import com.codein.responsedto.*;
+import com.codein.service.ArticleService;
 import com.codein.service.AuthService;
 import com.codein.service.MemberService;
 import jakarta.servlet.http.Cookie;
@@ -29,6 +31,7 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final AuthService authService;
     private final MemberService memberService;
+    private final ArticleService articleService;
 
     @PostMapping("/signup")
     public String signup(@RequestBody @Valid SignupDto signupDto) {
@@ -55,11 +58,14 @@ public class MemberController {
         return "redirect:/home";
     }
 
-    @GetMapping("/members/{id}")
-    public MemberResponseDto getMemberProfile(@PathVariable Long id) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(MemberNotExistsException::new);
-        return member.toMemberResponseDto();
+    @GetMapping(value = {"/members/{id}","/members/{id}/{activity}"})
+    public ActivityListResponseDto getActivityList(
+            @PathVariable(value = "id") Long id,
+            @PathVariable(value = "activity", required = false) String activity,
+            @RequestParam(value = "page", required = false) Integer page,
+            @ModelAttribute GetActivityDto getActivityDto
+    ) {
+        return articleService.getActivityList(getActivityDto);
     }
 
     @MySecured(role = Role.MEMBER)

@@ -60,7 +60,7 @@
                                   <el-icon>
                                       <Clock />
                                   </el-icon>
-                                  활동내역
+                                  내 활동
                               </el-menu-item>
                           </el-dropdown-item>
                           <el-dropdown-item divided class="d-flex">

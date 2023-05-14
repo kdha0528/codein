@@ -5,10 +5,13 @@ import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.article.Category;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
+import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.article.GetActivityDto;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
+import com.codein.responsedto.ActivityListResponseDto;
 import com.codein.responsedto.ArticleListResponseDto;
 import com.codein.service.ArticleService;
 import jakarta.servlet.http.Cookie;
@@ -51,7 +54,6 @@ public class ArticleController {
             return articleService.getArticleList(getArticlesDto, Category.valueOf(category.toUpperCase()));
         }
     }
-
 
     @MySecured(role = Role.ADMIN)
     @PostMapping( "/create-dummies")
