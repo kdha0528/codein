@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "article_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Like {

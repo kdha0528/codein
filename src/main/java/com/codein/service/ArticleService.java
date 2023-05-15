@@ -54,8 +54,8 @@ public class ArticleService {
     }
 
     @Transactional
-    public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto, Category category) {
-        return articleRepository.getArticleList(getArticlesDto, category);
+    public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto) {
+        return articleRepository.getArticleList(getArticlesDto);
     }
 
     @Transactional

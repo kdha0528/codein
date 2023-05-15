@@ -8,11 +8,10 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.article.GetArticlesDto;
-import com.codein.requestdto.article.EditArticleDto;
-import com.codein.requestdto.article.NewArticleDto;
+import com.codein.requestdto.article.*;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
+import com.codein.responsedto.ActivityListResponseDto;
 import com.codein.responsedto.ArticleListItem;
 import com.codein.responsedto.ArticleListResponseDto;
 import org.junit.jupiter.api.*;
@@ -160,11 +159,26 @@ class ArticleServiceTest {
                 .build();
 
         // when
-        ArticleListResponseDto articleList = articleService.getArticleList(getArticlesDto, Category.COMMUNITY);
+        ArticleListResponseDto articleList = articleService.getArticleList(getArticlesDto);
 
         //then
         Assertions.assertEquals(20L, articleList.getArticleList().size());
+    }
 
+    @Test
+    @DisplayName("멤버 활동 내역 가져오기")
+    void test4() {
+        // given
+        createDummies();
+        Member member = memberRepository.findByAccessToken(getToken());
+        GetActivityDto getActivityDto = GetActivityDto.builder()
+                .id(member.getId())
+                .build();
 
+        // when
+        ActivityListResponseDto activityList = articleService.getActivityList(getActivityDto);
+
+        //then
+        Assertions.assertEquals(20L,activityList.getActivityList().size()) ;
     }
 }

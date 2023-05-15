@@ -1,5 +1,6 @@
 package com.codein.requestdto.article;
 
+import com.codein.domain.article.Category;
 import lombok.Builder;
 import lombok.Getter;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import static java.lang.Math.max;
 public class GetArticlesDto {
 
     private static final int SIZE = 20;
+    private final Category category;
     private final Integer page;
     private final Period period;
     private final Sort sort;
@@ -19,7 +21,13 @@ public class GetArticlesDto {
     private final String keyword;
 
     @Builder
-    public GetArticlesDto(Integer page, String period, String sort, String condition, String keyword) {
+    public GetArticlesDto(String category, Integer page, String period, String sort, String condition, String keyword) {
+        if(category == null){
+            this.category = Category.COMMUNITY;
+        } else {
+            this.category = Category.valueOf(category.toUpperCase());
+        }
+
         this.page = Objects.requireNonNullElse(page, 1);
         if(period == null){
             this.period = Period.ALL;

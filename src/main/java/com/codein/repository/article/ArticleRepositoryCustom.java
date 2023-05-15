@@ -13,7 +13,7 @@ import java.util.List;
 public interface ArticleRepositoryCustom {
 
     List<Article> findByMember(Member member);
-    ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto, Category category);
+    ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto);
     ActivityListResponseDto getActivityListResponseDto(GetActivityDto getActivityDto, Member member);
 
 }

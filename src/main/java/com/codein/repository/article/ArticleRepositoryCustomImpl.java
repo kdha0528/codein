@@ -1,7 +1,6 @@
 package com.codein.repository.article;
 
 import com.codein.domain.article.Article;
-import com.codein.domain.article.Category;
 import com.codein.domain.member.Member;
 import com.codein.requestdto.article.GetActivityDto;
 import com.codein.requestdto.article.GetArticlesDto;
@@ -37,11 +36,11 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto, Category category) {
+    public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto) {
 
         JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
                 .where(
-                        article.category.eq(category),
+                        article.category.eq(getArticlesDto.getCategory()),
                         article.createdAt.between(getArticlesDto.getStartDate(),LocalDateTime.now())
                 );
 
@@ -67,7 +66,8 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .offset(getArticlesDto.getOffset())
                 .fetch();
 
-        List<ArticleListItem> articleList = fetchResult.stream()
+        List<ArticleListItem> articleList = fetchResult
+                .stream()
                 .map(Article::toArticleListItem)
                 .collect(Collectors.toList());
 
@@ -88,19 +88,22 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                     .innerJoin(like)
                     .where(like.member.id.eq(getActivityDto.getId()));
             default -> jpaQueryFactory.selectFrom(article)
-                    .where(article.id.eq(getActivityDto.getId()));
+                    .where(article.member.id.eq(getActivityDto.getId()));
         };
-
-        List<Article> articleList = query.limit(getActivityDto.getSize())
-                .offset(getActivityDto.getOffset())
-                .fetch();
-
-        List<ActivityListItem> activityList = articleList.stream()
-                .map(Article::toActivityListItem)
-                .collect(Collectors.toList());
 
         long count = query.fetch().size();
         int maxPage = (int) Math.floorDiv(count, getActivityDto.getSize());
+
+        List<Article> fetchResult = query
+                .limit(getActivityDto.getSize())
+                .offset(getActivityDto.getOffset())
+                .fetch();
+
+        List<ActivityListItem> activityList = fetchResult
+                .stream()
+                .map(Article::toActivityListItem)
+                .collect(Collectors.toList());
+
 
         return ActivityListResponseDto.builder()
                 .id(member.getId())
