@@ -7,8 +7,10 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
+import com.codein.requestdto.article.Activity;
 import com.codein.requestdto.member.*;
 import com.codein.responsedto.SettingsAccountResponseDto;
+import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -21,17 +23,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,6 +52,8 @@ class MemberControllerTest {
     private String uploadPath;
     @Autowired
     private ProfileImageRepository profileImageRepository;
+    @Autowired
+    private ArticleService articleService;
 
     public void deleteOrphanProfileImage() {
         File file = new File(uploadPath);
@@ -105,7 +106,6 @@ class MemberControllerTest {
 
         return new Cookie("accesstoken", token);
     }
-
 
     @Test
     @DisplayName("회원가입")
@@ -639,6 +639,57 @@ class MemberControllerTest {
                 )
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(settingsAccountResponseDto)))
                 .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("멤버 활동내역 가져오기 성공")
+    void test12_1() throws Exception {
+        // given
+        signup();
+        login();
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        articleService.createDummies(member);
+
+        // expected
+        mockMvc.perform(get("/members/{id}",member.getId()).cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("멤버 활동내역 가져오기 성공: activity 설정")
+    void test12_2() throws Exception {
+        // given
+        signup();
+        login();
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        articleService.createDummies(member);
+
+        // expected
+        mockMvc.perform(get("/members/{id}/{activity}",member.getId(), Activity.ARTICLES).cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("멤버 활동내역 가져오기 실패: 존재하지 않는 멤버")
+    void test12_3() throws Exception {
+        // given
+        signup();
+        login();
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        articleService.createDummies(member);
+
+        // expected
+        mockMvc.perform(get("/members/{id}", 4321).cookie(getCookie())
+                        .contentType(APPLICATION_JSON)
+                )
+                .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
 }
