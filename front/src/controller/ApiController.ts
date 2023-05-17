@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { refreshToken } from "@/api/member";
+import { refreshToken } from "@/controller/api/member";
 import { useResponseStore } from "@/stores/Response";
 
 const apiController = axios.create({

@@ -12,20 +12,23 @@
 </template>
 <script setup lang="ts">
 import {inject, onMounted, ref} from "vue";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useResponseStore} from "@/stores/Response";
 import {useArticlesStore} from "@/stores/articles";
+import {useActivitiesStore} from "@/stores/activities";
+import {usePageStore} from "@/stores/page";
 const router = useRouter();
+const route = useRoute();
+const pageStore = usePageStore();
 
 const currentPage = ref(1);
 const maxPage = ref(1);
 const pageSize = 20;
 
 onMounted(()=>{
-    const page:any = inject('page');
-    if(typeof page.page === 'number'){
-        currentPage.value = page.page;
-        maxPage.value = useArticlesStore().getMaxPage;
+    currentPage.value = pageStore.getCurrentPage;
+    if(pageStore.getMaxPage !== 0) {
+        maxPage.value = pageStore.getMaxPage;
     }
 })
 

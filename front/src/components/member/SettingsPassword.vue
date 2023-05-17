@@ -27,7 +27,7 @@ import { reactive, ref } from 'vue';
 import type { FormRules } from 'element-plus';
 import { useAuthStore } from "@/stores/auth";
 import {useRoute, useRouter} from "vue-router";
-import {changePassword} from "@/api/member";
+import {changePassword} from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
 const auth = useAuthStore();
 const router = useRouter();
@@ -93,7 +93,7 @@ const onChangePassword = async function () {
 </script>
 
 <style scoped>
-@import "../components/css/contentBase.css";
+@import "../css/contentBase.css";
 
 .el-form-item {
     margin-bottom: 20px;

@@ -27,7 +27,7 @@ import type { FormRules } from 'element-plus';
 import { useAuthStore } from "@/stores/auth";
 import {useRoute, useRouter} from "vue-router";
 import type { Profile } from "@/components/custom-types/profile";
-import {login} from "@/api/member";
+import {login} from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
 
 const auth = useAuthStore();

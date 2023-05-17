@@ -84,7 +84,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
             case COMMENTS -> jpaQueryFactory.select(comment.article)
                     .innerJoin(comment)
                     .where(comment.commenter.id.eq(getActivityDto.getId()));
-            case LIKES -> jpaQueryFactory.select(like.article)
+            case LIKED_ARTICLES -> jpaQueryFactory.select(like.article)
                     .innerJoin(like)
                     .where(like.member.id.eq(getActivityDto.getId()));
             default -> jpaQueryFactory.selectFrom(article)
@@ -95,6 +95,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         int maxPage = (int) Math.floorDiv(count, getActivityDto.getSize());
 
         List<Article> fetchResult = query
+                .orderBy(article.id.desc())
                 .limit(getActivityDto.getSize())
                 .offset(getActivityDto.getOffset())
                 .fetch();

@@ -1,11 +1,11 @@
 import SignupView from '@/views/SignupView.vue';
 import LoginView from "@/views/LoginView.vue";
 import SettingsView from "@/views/SettingsView.vue";
-import SettingsProfile from "@/components/SettingsProfile.vue";
-import SettingsAccount from "@/components/SettingsAccount.vue";
-import SettingsPassword from "@/components/SettingsPassword.vue";
+import SettingsProfile from "@/components/member/SettingsProfile.vue";
+import SettingsAccount from "@/components/member/SettingsAccount.vue";
+import SettingsPassword from "@/components/member/SettingsPassword.vue";
 import MembersView from "@/views/MembersView.vue";
-import MemberActivities from "@/components/MemberActivities.vue";
+import MemberActivities from "@/components/member/MemberActivities.vue";
 import CategoryView from "@/views/CategoryView.vue";
 
 export default [
@@ -71,24 +71,24 @@ export default [
             component: MembersView,
             children: [{
                 path: '',
-                name: 'articles',
+                name: 'members-default',
                 component: MemberActivities,
             },{
                 path: 'articles',
-                name: 'articles',
+                name: 'members-articles',
                 component: MemberActivities,
             },{
                 path: 'comments',
-                name: 'comments',
+                name: 'members-comments',
                 component: MemberActivities,
             },{
-                path: 'liked-articles',
-                name: 'liked-articles',
+                path: 'liked_articles',
+                name: 'members-liked-articles',
                 component: MemberActivities,
             },{
-                path: 'chatting-rooms',
-                name: 'chatting-rooms',
+                path: 'chatting_rooms',
+                name: 'members-chatting-rooms',
                 component: MemberActivities,
             }]
-        }
+        },
 ]

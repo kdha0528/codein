@@ -2,11 +2,11 @@
     <el-header height="80px">
         <el-menu mode="horizontal" router class="navbar d-flex justify-content-between">
             <div class="d-flex align-items-center justify-content-center" >
-                <div class="d-flex align-items-center justify-content-center ms-3 ">
+                <div class="d-flex align-items-center justify-content-center ms-3" @click="replacePath('/')" style="cursor: pointer">
                   <el-icon size="40">
                       <Loading />
                   </el-icon>
-                  <div class="d-flex ms-1 me-2" style="cursor: default; font-size: larger; font-weight: bold;">Code In</div>
+                  <div class="d-flex ms-1 me-2" style="font-size: larger; font-weight: bold;">Code In</div>
                 </div>
                 <el-menu-item index="/community" style="font-size: 1rem; font-weight: 500;">
                     커뮤니티
@@ -75,7 +75,7 @@
                     </template>
                 </el-dropdown>
             </div>
-            <div v-else class="d-flex">
+            <div v-else class="d-flex justify-content-center align-items-center me-4">
                 <el-menu-item index="/signup">회원가입</el-menu-item>
                 <el-menu-item index="/login">로그인</el-menu-item>
             </div>
@@ -86,7 +86,7 @@
 import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
-import { logout } from "@/api/member";
+import { logout } from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
 import {Loading, Avatar, CloseBold, Setting} from "@element-plus/icons-vue";
 
@@ -96,6 +96,10 @@ const route = useRoute();
 const resStore = useResponseStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
+
+const replacePath = function (path: string) {
+    router.replace(path);
+}
 
 const toActivity = function(): string {
     return '/members/' + auth.getProfile.id;

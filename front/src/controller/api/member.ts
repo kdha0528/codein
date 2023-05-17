@@ -1,4 +1,4 @@
-import apiController from '@/utils/ApiController';
+import apiController from '@/controller/ApiController';
 
 export async function signup(data:any) {
     try {
@@ -123,13 +123,13 @@ export async function deleteAccount() {
     }
 }
 
-export async function getMember(id: any) {
+export async function getActivities(path: string) {
     try {
         const response = await apiController({
-            url: '/members/'+id,
+            url: path,
             method: 'get',
         })
-        return response.data
+        return response.data;
     } catch (error) {
         return error;
     }

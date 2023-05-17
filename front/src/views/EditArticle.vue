@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import Header from "@/components/Header.vue";
-import Write from "@/components/Write.vue";
+import Write from "@/components/article/Write.vue";
 </script>
 
 <style scoped lang="scss">

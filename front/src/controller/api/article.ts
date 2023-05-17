@@ -1,4 +1,4 @@
-import apiController from "@/utils/ApiController";
+import apiController from "@/controller/ApiController";
 
 export async function getArticles(path: string) {
     try {
@@ -11,6 +11,8 @@ export async function getArticles(path: string) {
         return error;
     }
 }
+
+
 
 export async function createDummies() {
     try {

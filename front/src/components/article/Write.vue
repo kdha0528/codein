@@ -40,7 +40,7 @@ import {onMounted, reactive, ref} from 'vue';
 import { useAuthStore } from "@/stores/auth";
 import { useRoute, useRouter } from "vue-router";
 import {useResponseStore} from "@/stores/Response";
-import {write} from "@/api/article";
+import {write} from "@/controller/api/article";
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -118,5 +118,5 @@ const onCancel = function(){
 }
 </script>
 <style scoped>
-@import "../components/css/contentBase.css";
+@import "../css/contentBase.css";
 </style>

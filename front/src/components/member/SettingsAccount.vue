@@ -67,7 +67,7 @@ import {onMounted, ref} from 'vue';
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import {Delete, Iphone, Message, Lock, Search} from '@element-plus/icons-vue'
-import {changeEmail, changePassword, changePhone, deleteAccount, getAccount, getProfile} from "@/api/member";
+import {changeEmail, changePassword, changePhone, deleteAccount, getAccount, getProfile} from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
 import Header from "@/components/Header.vue";
 const auth = useAuthStore();
@@ -180,6 +180,6 @@ const onDelete = async function () {
 </script>
 
 <style scoped>
-@import "../components/css/contentBase.css";
+@import "../css/contentBase.css";
 
 </style>

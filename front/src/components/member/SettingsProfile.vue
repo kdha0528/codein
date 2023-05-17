@@ -52,7 +52,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import type { UploadProps } from 'element-plus'
 import { ElMessage } from "element-plus";
-import { getProfile, editProfile } from "@/api/member";
+import { getProfile, editProfile } from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
 import {Avatar} from "@element-plus/icons-vue";
 
@@ -150,7 +150,7 @@ const onEdit = async function () {
 </script>
 
 <style scoped>
-@import "../components/css/contentBase.css";
+@import "../css/contentBase.css";
 
 .el-form {
   margin-top: 2.5rem;

@@ -66,7 +66,7 @@ import Header from '@/components/Header.vue';
 import { reactive, ref } from 'vue';
 import type { FormRules } from 'element-plus';
 import { useRouter } from 'vue-router';
-import { signup } from '@/api/member';
+import { signup } from '@/controller/api/member';
 import {useResponseStore} from '@/stores/Response';
 
 const router = useRouter();

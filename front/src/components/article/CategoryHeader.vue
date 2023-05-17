@@ -29,7 +29,7 @@
                       </el-button>
                   </div>
                   <div v-if="isAdmin()" class="create-dummies-button">
-                      <el-button plain @click="onCreateDummies()" style="border: none;">
+                      <el-button plain @click="onCreateDummies()&onGetArticles()" style="border: none;">
                           <el-icon style="vertical-align: middle">
                               <Plus />
                           </el-icon>
@@ -70,7 +70,7 @@
             <Articles />
           </keep-alive>
           <keep-alive>
-            <Pagination />
+            <Pagination  :key="route.fullPath"/>
           </keep-alive>
       </div>
 </template>
@@ -79,20 +79,22 @@
 
 import {onMounted, provide, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import Articles from "@/components/Articles.vue";
-import {createDummies, getArticles} from "@/api/article";
+import Articles from "@/components/article/Articles.vue";
+import {createDummies, getArticles} from "@/controller/api/article";
 import {useResponseStore} from "@/stores/Response";
 import {useAuthStore} from "@/stores/auth";
 import {useArticlesStore} from "@/stores/articles";
 import type {Article} from "@/components/custom-types/article";
-import Pagination from "@/components/Pagination.vue";
-import CategoryIntro from "@/components/CategoryIntro.vue";
+import Pagination from "@/components/article/Pagination.vue";
+import CategoryIntro from "@/components/article/CategoryIntro.vue";
 import type {Intro} from "@/components/custom-types/intro";
+import {usePageStore} from "@/stores/page";
 
 const route = useRoute();
 const router = useRouter();
 const resStore = useResponseStore();
 const articlesStore = useArticlesStore();
+const pageStore = usePageStore();
 
 const isNotice = ref(false);
 
@@ -109,10 +111,7 @@ const search = ref({
     isSearch: false,
 })
 
-const page = reactive({
-    page: 1,
-    isSetPage: false,
-})
+const isSetPage = ref(false);
 
 const selectList = reactive({
     search: [
@@ -178,11 +177,12 @@ const onSort = function (){
 const onPeriod = function(){
     sort.value.isSetPeriod = true;
 }
-const onPaging = function(p: number){
-    page.page = p;
-    page.isSetPage = true;
-    onGetArticles();
+const onPaging = async function(page: number){
+    await pageStore.setCurrentPage(page);
+    isSetPage.value = true;
+    await onGetArticles();
 }
+
 
 const isAdmin = function(){
     return useAuthStore().isAdmin;
@@ -204,14 +204,16 @@ function setDefaultFromPath(path: string):void {
     const regex = /[?&]([^=]+)=([^&]*)/g;
     let match: RegExpExecArray | null;
 
+    pageStore.setCurrentPage(1);
+
     while ((match = regex.exec(path)) !== null) {
         const paramName = match[1];
         const paramValue = decodeURIComponent(match[2]);
 
         switch (paramName) {
             case "page":
-                page.page = parseInt(paramValue, 10);
-                page.isSetPage = true;
+                pageStore.setCurrentPage(parseInt(paramValue, 10));
+                isSetPage.value = true;
                 break;
             case "period":
                 sort.value.period = paramValue;
@@ -279,8 +281,8 @@ const getPath = function(){
         path = path+route.name;
     }
 
-    if(page.isSetPage) {
-        checkChanges.value.push('page='+page.page)
+    if(isSetPage.value) {
+        checkChanges.value.push('page='+pageStore.getCurrentPage)
     }
     if(sort.value.isSetPeriod) {
         checkChanges.value.push('period='+sort.value.period)
@@ -324,9 +326,10 @@ const onGetArticles = async function() {
                     }
                     articlesStore.addArticle(article);
                 });
-                articlesStore.setMaxPage(response.maxPage);
+                pageStore.setMaxPage(response.maxPage);
                 setIntro(route.name);
                 router.replace(getPath());
+                scrollTo(0, 0);
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
@@ -338,7 +341,6 @@ const onGetArticles = async function() {
 }
 
 provide('onPaging', onPaging);
-provide('page', page);
 
 const onCreateDummies = async function(){
     await createDummies()
@@ -356,7 +358,7 @@ const onCreateDummies = async function(){
 </script>
 
 <style scoped>
-@import "../components/css/contentBase.css";
+@import "../css/contentBase.css";
 .select-search{
     width: 65px;
     font-size: 0.8rem;

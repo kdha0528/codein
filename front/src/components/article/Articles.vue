@@ -6,13 +6,13 @@
                     <img v-if="article.imagePath" :src="article.imagePath"
                          style="width: 2rem; height: 2rem; border-radius: 100%; cursor: pointer;"
                          alt=""
-                         @click="replacePath('/members/'+article.authorId)"/>
+                         @click="router.replace( '/members/'+article.authorId)"/>
                     <el-icon v-else size="40"
                              style="width: 2rem;  height:2rem; border-radius: 100%; color:white; background-color: #E2E2E2; cursor: pointer;"
-                             @click="replacePath('/members/'+article.authorId)">
+                             @click="router.replace( '/members/'+article.authorId)">
                         <Avatar/>
                     </el-icon>
-                    <div class="ms-2"  @click="replacePath('/members/'+article.authorId)" style="cursor: pointer; font-size:1rem;">{{ article.nickname }}</div>
+                    <div class="ms-2"  @click="router.replace( '/members/'+article.authorId)" style="cursor: pointer; font-size:1rem;">{{ article.nickname }}</div>
                     <div class="ms-2"  style="font-size:1rem;">{{ article.createdAt }}</div>
                 </div>
                 <div class="d-flex">
@@ -42,16 +42,17 @@
             <el-divider class="mt-3 mb-3"/>
         </li>
     </ul>
-
 </template>
 <script setup lang="ts">
 import {ChatDotSquare, Star} from "@element-plus/icons-vue";
 import {useArticlesStore} from "@/stores/articles";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
 const articlesStore = useArticlesStore();
 const router = useRouter();
+const route = useRoute();
 const replacePath = function (path: string) {
+
     router.replace(path);
 }
 

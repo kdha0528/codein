@@ -3,8 +3,7 @@ package com.codein.requestdto.article;
 public enum Activity {
     ARTICLES("ARTICLES"),
     COMMENTS("COMMENTS"),
-    LIKES("LIKES");
-
+    LIKED_ARTICLES("LIKED_ARTICLES");
     private final String activity;
 
     Activity(String activity) {
