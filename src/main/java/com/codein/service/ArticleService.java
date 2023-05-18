@@ -5,18 +5,16 @@ import com.codein.domain.article.ArticleEditor;
 import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
-import com.codein.error.exception.article.ArticlePostNotExistsException;
+import com.codein.error.exception.article.ArticleNotExistsException;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.article.GetActivityDto;
-import com.codein.requestdto.article.GetArticlesDto;
-import com.codein.requestservicedto.article.EditArticleServiceDto;
-import com.codein.requestservicedto.article.NewArticleServiceDto;
-import com.codein.responsedto.ActivityListResponseDto;
-import com.codein.responsedto.ArticleListResponseDto;
+import com.codein.requestservicedto.article.*;
+import com.codein.responsedto.article.ActivityListResponseDto;
+import com.codein.responsedto.article.ArticleListResponseDto;
+import com.codein.responsedto.article.GetArticleResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,7 +40,7 @@ public class ArticleService {
     @Transactional
     public void editArticle(EditArticleServiceDto editArticleServiceDto) {
         Article article = articleRepository.findById(editArticleServiceDto.getId())
-                .orElseThrow(ArticlePostNotExistsException::new);
+                .orElseThrow(ArticleNotExistsException::new);
 
         ArticleEditor articleEditor = ArticleEditor.builder()
                 .category(editArticleServiceDto.getCategory())
@@ -52,17 +50,22 @@ public class ArticleService {
 
         article.edit(articleEditor);
     }
+    @Transactional
+    public GetArticleResponseDto getArticle(GetArticleServiceDto getArticleServiceDto) {
+        return getArticleServiceDto.toGetArticleResponseDto();
+    }
+
 
     @Transactional
-    public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto) {
-        return articleRepository.getArticleList(getArticlesDto);
+    public ArticleListResponseDto getArticleList(GetArticlesServiceDto getArticlesServiceDto) {
+        return articleRepository.getArticleList(getArticlesServiceDto);
     }
 
     @Transactional
-    public ActivityListResponseDto getActivityList(GetActivityDto getActivityDto) {
-        Member member = memberRepository.findById(getActivityDto.getId())
+    public ActivityListResponseDto getActivityList(GetActivitiesServiceDto getActivitiesServiceDto) {
+        Member member = memberRepository.findById(getActivitiesServiceDto.getId())
                 .orElseThrow(MemberNotExistsException::new);
-        return articleRepository.getActivityListResponseDto(getActivityDto, member);
+        return articleRepository.getActivityListResponseDto(getActivitiesServiceDto, member);
     }
 
     @Transactional

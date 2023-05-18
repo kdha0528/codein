@@ -9,7 +9,7 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.article.Activity;
 import com.codein.requestdto.member.*;
-import com.codein.responsedto.SettingsAccountResponseDto;
+import com.codein.responsedto.member.SettingsAccountResponseDto;
 import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;

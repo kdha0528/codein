@@ -2,15 +2,10 @@ package com.codein.repository.member;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.member.Member;
-import com.codein.requestdto.article.GetArticlesDto;
-import com.codein.responsedto.MemberListResponseDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.codein.domain.member.QMember.member;
 
@@ -23,17 +18,6 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
     private final PasswordEncoder passwordEncoder;
 
-
-    public List<MemberListResponseDto> getMemberResponseList(GetArticlesDto getArticlesDto) {
-        List<Member> memberList = jpaQueryFactory.selectFrom(member)
-                .limit(getArticlesDto.getSize())
-                .offset(getArticlesDto.getOffset())
-                .orderBy(member.id.desc())
-                .fetch();
-
-        return memberList.stream().map(Member::toMemberListResponseDto)
-                .collect(Collectors.toList());
-    }
 
     public Member findByEmail(String email) {
         return jpaQueryFactory.selectFrom(member)

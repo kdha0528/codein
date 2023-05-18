@@ -1,4 +1,4 @@
-package com.codein.responsedto;
+package com.codein.responsedto.article;
 
 import com.codein.domain.image.ProfileImage;
 import lombok.Builder;

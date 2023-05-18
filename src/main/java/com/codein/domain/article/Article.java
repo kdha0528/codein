@@ -1,9 +1,9 @@
 package com.codein.domain.article;
 
 import com.codein.domain.member.Member;
-import com.codein.requestdto.article.Activity;
-import com.codein.responsedto.ActivityListItem;
-import com.codein.responsedto.ArticleListItem;
+import com.codein.requestservicedto.article.GetArticleServiceDto;
+import com.codein.responsedto.article.ActivityListItem;
+import com.codein.responsedto.article.ArticleListItem;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -81,6 +81,21 @@ public class Article {
                 .title(this.getTitle())
                 .nickname(this.member.getNickname())
                 .createdAt(this.getCreatedAt())
+                .build();
+    }
+
+    public GetArticleServiceDto toGetArticleServiceDto(){
+        return GetArticleServiceDto.builder()
+                .id(this.id)
+                .deleted(this.deleted)
+                .category(this.category)
+                .commentNum(this.commentNum)
+                .content(this.content)
+                .createdAt(this.createdAt)
+                .likeNum(this.likeNum)
+                .member(this.member)
+                .title(this.title)
+                .viewNum(this.viewNum)
                 .build();
     }
 }

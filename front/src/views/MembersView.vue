@@ -3,7 +3,7 @@
   <RouterView :key="route.fullPath" />
 </template>
 <script lang="ts" setup>
-import Header from '@/components/Header.vue';
+import Header from '@/components/header/Header.vue';
 import {useRoute, useRouter} from "vue-router";
 const router = useRouter();
 const route = useRoute();

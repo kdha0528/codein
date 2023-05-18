@@ -1,30 +1,28 @@
-package com.codein.responsedto;
+package com.codein.responsedto.member;
 
 import com.codein.domain.image.ProfileImage;
-import com.codein.domain.member.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.IOException;
+
 @Getter
 @ToString
-public class MemberResponseDto {
+public class SettingsProfileResponseDto {
 
-    private final Long id;
+    private final String name;
     private final String nickname;
-    private final String role;
     private final String imagePath;
 
     @Builder
-    public MemberResponseDto(Long id, String nickname, Role role, ProfileImage profileImage) {
-        this.id = id;
+    public SettingsProfileResponseDto(String name, String nickname, ProfileImage profileImage) {
+        this.name = name;
         this.nickname = nickname;
-        this.role = role.getRole();
         if (profileImage != null) {
             this.imagePath = "/my-backend-api/images/profile/" + profileImage.getImgFileName();
         } else {
             this.imagePath = null;
         }
     }
-
 }

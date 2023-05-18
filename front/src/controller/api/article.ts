@@ -1,6 +1,6 @@
 import apiController from "@/controller/ApiController";
 
-export async function getArticles(path: string) {
+export async function getArticle(path: string) {
     try {
         const response = await apiController({
             url: path,
@@ -12,7 +12,17 @@ export async function getArticles(path: string) {
     }
 }
 
-
+export async function getArticles(path: string) {
+    try {
+        const response = await apiController({
+            url: path,
+            method: 'get',
+        })
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
 
 export async function createDummies() {
     try {

@@ -2,12 +2,12 @@ package com.codein.repository.article;
 
 import com.codein.domain.article.Article;
 import com.codein.domain.member.Member;
-import com.codein.requestdto.article.GetActivityDto;
-import com.codein.requestdto.article.GetArticlesDto;
-import com.codein.responsedto.ActivityListItem;
-import com.codein.responsedto.ActivityListResponseDto;
-import com.codein.responsedto.ArticleListItem;
-import com.codein.responsedto.ArticleListResponseDto;
+import com.codein.requestservicedto.article.GetActivitiesServiceDto;
+import com.codein.requestservicedto.article.GetArticlesServiceDto;
+import com.codein.responsedto.article.ActivityListItem;
+import com.codein.responsedto.article.ActivityListResponseDto;
+import com.codein.responsedto.article.ArticleListItem;
+import com.codein.responsedto.article.ArticleListResponseDto;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -36,34 +36,34 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public ArticleListResponseDto getArticleList(GetArticlesDto getArticlesDto) {
+    public ArticleListResponseDto getArticleList(GetArticlesServiceDto getArticlesServiceDto) {
 
         JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
                 .where(
-                        article.category.eq(getArticlesDto.getCategory()),
-                        article.createdAt.between(getArticlesDto.getStartDate(),LocalDateTime.now())
+                        article.category.eq(getArticlesServiceDto.getCategory()),
+                        article.createdAt.between(getArticlesServiceDto.getStartDate(),LocalDateTime.now())
                 );
 
         long count = query.fetch().size();
-        int maxPage = (int) Math.floorDiv(count, getArticlesDto.getSize());
+        int maxPage = (int) Math.floorDiv(count, getArticlesServiceDto.getSize());
 
-        if (getArticlesDto.getKeyword() != null) {
-            switch(getArticlesDto.getCondition()) {
-                case TITLE -> query.where(article.title.contains(getArticlesDto.getKeyword()));
-                case AUTHOR -> query.where(article.member.nickname.contains(getArticlesDto.getKeyword()));
-                default -> query.where(article.title.contains(getArticlesDto.getKeyword()).or(article.content.contains(getArticlesDto.getKeyword())));
+        if (getArticlesServiceDto.getKeyword() != null) {
+            switch(getArticlesServiceDto.getCondition()) {
+                case TITLE -> query.where(article.title.contains(getArticlesServiceDto.getKeyword()));
+                case AUTHOR -> query.where(article.member.nickname.contains(getArticlesServiceDto.getKeyword()));
+                default -> query.where(article.title.contains(getArticlesServiceDto.getKeyword()).or(article.content.contains(getArticlesServiceDto.getKeyword())));
             }
         }
 
-        switch (getArticlesDto.getSort()) {
+        switch (getArticlesServiceDto.getSort()) {
             case VIEW -> query.orderBy(article.viewNum.desc(), article.id.desc());
             case LIKE -> query.orderBy(article.likeNum.desc(), article.id.desc());
             default -> query.orderBy(article.id.desc());
         }
 
         List<Article> fetchResult = query
-                .limit(getArticlesDto.getSize())
-                .offset(getArticlesDto.getOffset())
+                .limit(getArticlesServiceDto.getSize())
+                .offset(getArticlesServiceDto.getOffset())
                 .fetch();
 
         List<ArticleListItem> articleList = fetchResult
@@ -78,26 +78,26 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public ActivityListResponseDto getActivityListResponseDto(GetActivityDto getActivityDto, Member member) {
+    public ActivityListResponseDto getActivityListResponseDto(GetActivitiesServiceDto getActivitiesServiceDto, Member member) {
 
-        JPAQuery<Article> query = switch (getActivityDto.getActivity()) {
+        JPAQuery<Article> query = switch (getActivitiesServiceDto.getActivity()) {
             case COMMENTS -> jpaQueryFactory.select(comment.article)
                     .innerJoin(comment)
-                    .where(comment.commenter.id.eq(getActivityDto.getId()));
+                    .where(comment.commenter.id.eq(getActivitiesServiceDto.getId()));
             case LIKED_ARTICLES -> jpaQueryFactory.select(like.article)
                     .innerJoin(like)
-                    .where(like.member.id.eq(getActivityDto.getId()));
+                    .where(like.member.id.eq(getActivitiesServiceDto.getId()));
             default -> jpaQueryFactory.selectFrom(article)
-                    .where(article.member.id.eq(getActivityDto.getId()));
+                    .where(article.member.id.eq(getActivitiesServiceDto.getId()));
         };
 
         long count = query.fetch().size();
-        int maxPage = (int) Math.floorDiv(count, getActivityDto.getSize());
+        int maxPage = (int) Math.floorDiv(count, getActivitiesServiceDto.getSize());
 
         List<Article> fetchResult = query
                 .orderBy(article.id.desc())
-                .limit(getActivityDto.getSize())
-                .offset(getActivityDto.getOffset())
+                .limit(getActivitiesServiceDto.getSize())
+                .offset(getActivitiesServiceDto.getOffset())
                 .fetch();
 
         List<ActivityListItem> activityList = fetchResult

@@ -1,7 +1,6 @@
 package com.codein.service;
 
 import com.codein.domain.article.Article;
-import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
@@ -11,9 +10,10 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.*;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
-import com.codein.responsedto.ActivityListResponseDto;
-import com.codein.responsedto.ArticleListItem;
-import com.codein.responsedto.ArticleListResponseDto;
+import com.codein.requestservicedto.article.GetActivitiesServiceDto;
+import com.codein.responsedto.article.ActivityListResponseDto;
+import com.codein.responsedto.article.ArticleListResponseDto;
+import com.codein.responsedto.article.GetArticleResponseDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -159,7 +159,7 @@ class ArticleServiceTest {
                 .build();
 
         // when
-        ArticleListResponseDto articleList = articleService.getArticleList(getArticlesDto);
+        ArticleListResponseDto articleList = articleService.getArticleList(getArticlesDto.toGetArticlesServiceDto());
 
         //then
         Assertions.assertEquals(20L, articleList.getArticleList().size());
@@ -171,14 +171,15 @@ class ArticleServiceTest {
         // given
         createDummies();
         Member member = memberRepository.findByAccessToken(getToken());
-        GetActivityDto getActivityDto = GetActivityDto.builder()
+        GetActivitiesDto getActivitiesDto = GetActivitiesDto.builder()
                 .id(member.getId())
                 .build();
 
         // when
-        ActivityListResponseDto activityList = articleService.getActivityList(getActivityDto);
+        ActivityListResponseDto activityList = articleService.getActivityList(getActivitiesDto.toGetActivitiesServiceDto());
 
         //then
         Assertions.assertEquals(20L,activityList.getActivityList().size()) ;
     }
+
 }

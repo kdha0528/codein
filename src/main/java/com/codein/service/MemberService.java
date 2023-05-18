@@ -10,10 +10,7 @@ import com.codein.error.exception.profileimage.ImageTooLargeException;
 import com.codein.error.exception.profileimage.InvalidImageException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.repository.profileimage.ProfileImageRepository;
-import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestservicedto.member.*;
-import com.codein.responsedto.MemberListResponseDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,7 +35,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokensRepository tokensRepository;
-    private final ProfileImageRepository profileImageRepository;
 
     @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
@@ -80,11 +75,6 @@ public class MemberService {
         tokens.add(token.getRefreshToken());
         tokens.add(token.getAccessToken());
         return tokens;
-    }
-
-
-    public List<MemberListResponseDto> getMemberList(GetArticlesDto getArticlesDto) {
-        return memberRepository.getMemberResponseList(getArticlesDto);
     }
 
     @Transactional

@@ -6,9 +6,12 @@ import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.article.GetActivityDto;
+import com.codein.requestdto.article.GetActivitiesDto;
 import com.codein.requestdto.member.*;
-import com.codein.responsedto.*;
+import com.codein.responsedto.article.ActivityListResponseDto;
+import com.codein.responsedto.member.LoginResponseDto;
+import com.codein.responsedto.member.SettingsAccountResponseDto;
+import com.codein.responsedto.member.SettingsProfileResponseDto;
 import com.codein.service.ArticleService;
 import com.codein.service.AuthService;
 import com.codein.service.MemberService;
@@ -63,9 +66,9 @@ public class MemberController {
             @PathVariable(value = "id") Long id,
             @PathVariable(value = "activity", required = false) String activity,
             @RequestParam(value = "page", required = false) Integer page,
-            @ModelAttribute GetActivityDto getActivityDto
+            @ModelAttribute GetActivitiesDto getActivitiesDto
     ) {
-        return articleService.getActivityList(getActivityDto);
+        return articleService.getActivityList(getActivitiesDto.toGetActivitiesServiceDto());
     }
 
     @MySecured(role = Role.MEMBER)

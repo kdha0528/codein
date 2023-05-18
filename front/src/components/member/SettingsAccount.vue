@@ -69,7 +69,7 @@ import { useRouter } from "vue-router";
 import {Delete, Iphone, Message, Lock, Search} from '@element-plus/icons-vue'
 import {changeEmail, changePassword, changePhone, deleteAccount, getAccount, getProfile} from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
-import Header from "@/components/Header.vue";
+import Header from "@/components/header/Header.vue";
 const auth = useAuthStore();
 const router = useRouter();
 const resStore = useResponseStore();

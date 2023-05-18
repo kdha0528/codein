@@ -1,4 +1,4 @@
-package com.codein.responsedto;
+package com.codein.responsedto.member;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,12 +1,11 @@
 package com.codein.requestdto.article;
 
 import com.codein.domain.article.Category;
+import com.codein.requestservicedto.article.GetArticlesServiceDto;
 import lombok.Builder;
 import lombok.Getter;
-import java.time.LocalDateTime;
 import java.util.Objects;
 
-import static java.lang.Math.max;
 
 @Getter
 public class GetArticlesDto {
@@ -47,35 +46,15 @@ public class GetArticlesDto {
         this.keyword = keyword;
     }
 
-    public long getOffset() {
-        return (long) (max(1, page) - 1) * SIZE;
-    }
-
-    public int getSize() {
-        return SIZE;
-    }
-
-    public LocalDateTime getStartDate() {
-        switch (this.period) {
-            case ALL ->{
-                return LocalDateTime.now().minusYears(100);
-            }
-            case DAY -> {
-                return LocalDateTime.now().minusDays(1);
-            }
-            case WEEK -> {
-                return LocalDateTime.now().minusWeeks(1);
-            }
-            case MONTH -> {
-                return LocalDateTime.now().minusMonths(1);
-            }
-            case YEAR -> {
-                return LocalDateTime.now().minusYears(1);
-            }
-            default -> {
-                return LocalDateTime.now();
-            }
-        }
+    public GetArticlesServiceDto toGetArticlesServiceDto(){
+        return GetArticlesServiceDto.builder()
+                .keyword(this.keyword)
+                .page(this.page)
+                .condition(this.condition)
+                .sort(this.sort)
+                .category(this.category)
+                .period(this.period)
+                .build();
     }
 
 }

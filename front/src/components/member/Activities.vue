@@ -13,7 +13,8 @@
                             <span>을&nbsp;작성하였습니다.</span>
                         </div>
                         <div v-else-if="route.name === 'members-comments'">
-                            <span>{{activity.authorId}}님의&nbsp;게시물에&nbsp;</span>
+                            <span @click="router.replace('/members/'+activity.authorId)">{{activity.authorId}}</span>
+                            <span>님의&nbsp;게시물에&nbsp;</span>
                             <span style="color:#409eff;">댓글</span>
                             <span>을&nbsp;달았습니다.</span>
                         </div>

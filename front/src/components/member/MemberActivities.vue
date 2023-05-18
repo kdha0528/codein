@@ -51,7 +51,7 @@ import type {Activity} from "@/components/custom-types/activity";
 import {Avatar} from "@element-plus/icons-vue";
 import {useActivitiesStore} from "@/stores/activities";
 import Activities from "@/components/member/Activities.vue";
-import Pagination from "@/components/article/Pagination.vue";
+import Pagination from "@/components/pagination/Pagination.vue";
 import {usePageStore} from "@/stores/page";
 
 const router = useRouter();

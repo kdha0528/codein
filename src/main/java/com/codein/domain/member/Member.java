@@ -2,7 +2,7 @@ package com.codein.domain.member;
 
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.image.ProfileImage;
-import com.codein.responsedto.*;
+import com.codein.responsedto.member.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

@@ -2,13 +2,17 @@ package com.codein.controller;
 
 import com.codein.config.SecurityConfig.MySecured;
 import com.codein.crypto.PasswordEncoder;
+import com.codein.domain.article.Article;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
+import com.codein.error.exception.article.ArticleNotExistsException;
+import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
-import com.codein.responsedto.ArticleListResponseDto;
+import com.codein.responsedto.article.ArticleListResponseDto;
+import com.codein.responsedto.article.GetArticleResponseDto;
 import com.codein.service.ArticleService;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class ArticleController {
+    private final ArticleRepository articleRepository;
     private final MemberRepository memberRepository;
     private final ArticleService articleService;
 
@@ -44,7 +49,7 @@ public class ArticleController {
             memberRepository.save(member);
         }   // 관리자 계정 없으면 생성
 
-        return articleService.getArticleList(getArticlesDto);
+        return articleService.getArticleList(getArticlesDto.toGetArticlesServiceDto());
     }
 
     @MySecured(role = Role.ADMIN)
@@ -63,5 +68,13 @@ public class ArticleController {
     @PostMapping("/article/edit")
     public void editArticle(@RequestBody @Valid EditArticleDto editArticleDto) {
         articleService.editArticle(editArticleDto.toEditArticleServiceDto());
+    }
+
+
+    @GetMapping("/articles/{id}")
+    public GetArticleResponseDto getArticle(@PathVariable(value = "id") Long id) {
+        Article article = articleRepository.findById(id)
+                .orElseThrow(ArticleNotExistsException::new);
+        return articleService.getArticle(article.toGetArticleServiceDto());
     }
 }
