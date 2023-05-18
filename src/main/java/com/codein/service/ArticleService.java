@@ -30,15 +30,17 @@ public class ArticleService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
+    public Article newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
         Tokens tokens = tokensRepository.findByAccessToken(accesstoken)
                 .orElseThrow(MemberNotLoginException::new);
         Member member = tokens.getMember();
-        articleRepository.save(newArticleServiceDto.toEntity(member));
+        Article article = newArticleServiceDto.toEntity(member);
+        articleRepository.save(article);
+        return article;
     }
 
     @Transactional
-    public void editArticle(EditArticleServiceDto editArticleServiceDto) {
+    public Article editArticle(EditArticleServiceDto editArticleServiceDto) {
         Article article = articleRepository.findById(editArticleServiceDto.getId())
                 .orElseThrow(ArticleNotExistsException::new);
 
@@ -48,7 +50,7 @@ public class ArticleService {
                 .content(editArticleServiceDto.getContent())
                 .build();
 
-        article.edit(articleEditor);
+        return article.edit(articleEditor);
     }
     @Transactional
     public GetArticleResponseDto getArticle(GetArticleServiceDto getArticleServiceDto) {

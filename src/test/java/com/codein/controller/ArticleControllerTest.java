@@ -349,4 +349,44 @@ class ArticleControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("게시글 가져오기 성공")
+    void test4_1() throws Exception {
+        // given
+        newArticle();
+
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        List<Article> articles = articleRepository.findByMember(member);
+        Article article = articles.get(0);
+
+        Long id = article.getId();
+
+        // expected
+        mockMvc.perform(get("/articles/{id}",id))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시글 가져오기 실패: 존재하지 않는 id")
+    void test4_2() throws Exception {
+        // given
+        Long id = 3213523521L;
+
+        // expected
+        mockMvc.perform(get("/articles/{id}",id))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시글 가져오기 실패: id를 입력하지 않은 경우")
+    void test4_3() throws Exception {
+
+        // expected
+        mockMvc.perform(get("/articles/"))
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
 }

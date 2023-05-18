@@ -10,7 +10,7 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.*;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
-import com.codein.requestservicedto.article.GetActivitiesServiceDto;
+import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.article.ActivityListResponseDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
 import com.codein.responsedto.article.GetArticleResponseDto;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
 
 @SpringBootTest
 class ArticleServiceTest {
@@ -36,7 +35,7 @@ class ArticleServiceTest {
     @BeforeEach
     void signupLogin() {
         SignupDto signupDto = SignupDto.builder()
-                .name("데일이")
+                .name("김동하")
                 .email("kdha4585@gmail.com")
                 .nickname("데일이")
                 .password("12341234")
@@ -66,7 +65,7 @@ class ArticleServiceTest {
         return tokens.getAccessToken();
     }
 
-    void newArticle() {
+    Article newArticle() {
         String accessToken = getToken();
 
         NewArticleDto newArticleDto = NewArticleDto.builder()
@@ -75,7 +74,7 @@ class ArticleServiceTest {
                 .content("내용입니다.")
                 .build();
 
-        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
+        return articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
     }
 
     void createDummies(){
@@ -103,12 +102,9 @@ class ArticleServiceTest {
                 .content("내용입니다.")
                 .build();
         // when
-        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
+        Article article = articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
 
         //then
-        Member member = memberRepository.findByAccessToken(accessToken);
-        List<Article> articles = articleRepository.findByMember(member);
-        Article article = articles.get(0);
 
         Assertions.assertEquals(newArticleDto.getCategory(), article.getCategory().getName());
         Assertions.assertEquals(newArticleDto.getTitle(), article.getTitle());
@@ -126,11 +122,7 @@ class ArticleServiceTest {
                 .title("제목입니다.")
                 .content("내용입니다.")
                 .build();
-        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
-
-        Member member = memberRepository.findByAccessToken(accessToken);
-        List<Article> articles = articleRepository.findByMember(member);
-        Article article = articles.get(0);
+        Article article = articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
                 .id(article.getId())
@@ -139,11 +131,9 @@ class ArticleServiceTest {
                 .content("내용")
                 .build();
         // when
-        articleService.editArticle(editArticleDto.toEditArticleServiceDto());
+        Article editedArticle = articleService.editArticle(editArticleDto.toEditArticleServiceDto());
 
         //then
-        List<Article> editedArticles = articleRepository.findByMember(member);
-        Article editedArticle = editedArticles.get(0);
 
         Assertions.assertEquals(editArticleDto.getCategory(), editedArticle.getCategory().getName());
         Assertions.assertEquals(editArticleDto.getTitle(), editedArticle.getTitle());
@@ -186,26 +176,31 @@ class ArticleServiceTest {
     @Test
     @DisplayName("게시글 가져오기")
     void test5() {
-        String accessToken = getToken();
+        // given
+        Article article = newArticle();
+        Member member = memberRepository.findByAccessToken(getToken());
 
-        NewArticleDto newArticleDto = NewArticleDto.builder()
-                .category("NOTICE")
-                .title("제목입니다.")
-                .content("내용입니다.")
+        GetArticleServiceDto getArticleServiceDto = GetArticleServiceDto.builder()
+                .id(article.getId())
+                .category(article.getCategory().getName())
+                .title(article.getTitle())
+                .content(article.getContent())
+                .createdAt(article.getCreatedAt())
+                .commentNum(article.getCommentNum())
+                .viewNum(article.getViewNum())
+                .likeNum(article.getLikeNum())
+                .authorId(member.getId())
+                .nickname(member.getNickname())
+                .profileImage(member.getProfileImage())
+                .deleted(article.isDeleted())
                 .build();
-        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
-
-        Member member = memberRepository.findByAccessToken(accessToken);
-        List<Article> articles = articleRepository.findByMember(member);
-        Article article = articles.get(0);
 
         // when
-        GetArticleResponseDto getArticleResponseDto = articleService.getArticle(article.toGetArticleServiceDto());
+        GetArticleResponseDto getArticleResponseDto = articleService.getArticle(getArticleServiceDto);
 
         //then
-
-        Assertions.assertEquals(getArticleResponseDto.getCategory().getName(), newArticleDto.getCategory());
-        Assertions.assertEquals(getArticleResponseDto.getTitle(), newArticleDto.getTitle());
-        Assertions.assertEquals(getArticleResponseDto.getContent(), newArticleDto.getContent());
+        Assertions.assertEquals(getArticleResponseDto.getCategory(), article.getCategory().getName());
+        Assertions.assertEquals(getArticleResponseDto.getTitle(), article.getTitle());
+        Assertions.assertEquals(getArticleResponseDto.getContent(), article.getContent());
     }
 }

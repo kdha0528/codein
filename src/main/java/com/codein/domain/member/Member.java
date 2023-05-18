@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +23,13 @@ public class Member {
     @Column(unique = true)
     @NotNull
     private String email;
+
     @NotNull
     private String password;
 
     @NotNull
     private String name;
+
     @Column(unique = true)
     @NotNull
     private String nickname;
@@ -36,10 +37,13 @@ public class Member {
     @NotNull
     @Column(unique = true)
     private String phone;
+
     @NotNull
     private String birth;
+
     @NotNull
     private String sex;
+
     @NotNull
     private LocalDateTime createdAt;
 
@@ -95,7 +99,7 @@ public class Member {
                 .build();
     }
 
-    public SettingsProfileResponseDto toSettingsProfileResponseDto() throws IOException {
+    public SettingsProfileResponseDto toSettingsProfileResponseDto() {
         return SettingsProfileResponseDto.builder()
                 .name(this.getName())
                 .nickname(this.getNickname())
@@ -103,7 +107,7 @@ public class Member {
                 .build();
     }
 
-    public SettingsAccountResponseDto toSettingsAccountResponseDto() throws IOException {
+    public SettingsAccountResponseDto toSettingsAccountResponseDto() {
         return SettingsAccountResponseDto.builder()
                 .email(this.getEmail())
                 .phone(this.getPhone())

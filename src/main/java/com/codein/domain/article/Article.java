@@ -53,10 +53,11 @@ public class Article {
         this.deleted = false;
     }
 
-    public void edit(ArticleEditor articleEditor) {
+    public Article edit(ArticleEditor articleEditor) {
         this.category = Category.valueOf(articleEditor.getCategory());
         this.title = articleEditor.getTitle();
         this.content = articleEditor.getContent();
+        return this;
     }
 
     public ArticleListItem toArticleListItem(){
@@ -87,15 +88,17 @@ public class Article {
     public GetArticleServiceDto toGetArticleServiceDto(){
         return GetArticleServiceDto.builder()
                 .id(this.id)
-                .deleted(this.deleted)
-                .category(this.category)
-                .commentNum(this.commentNum)
+                .category(this.category.getName())
+                .title(this.title)
                 .content(this.content)
                 .createdAt(this.createdAt)
-                .likeNum(this.likeNum)
-                .member(this.member)
-                .title(this.title)
+                .commentNum(this.commentNum)
                 .viewNum(this.viewNum)
+                .likeNum(this.likeNum)
+                .authorId(this.member.getId())
+                .nickname(this.member.getNickname())
+                .profileImage(this.member.getProfileImage())
+                .deleted(this.deleted)
                 .build();
     }
 }

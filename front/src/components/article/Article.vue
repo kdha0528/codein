@@ -30,10 +30,13 @@ const article = ref({
     title:'',
     content:'',
     createdAt:'',
-    viewNum:'',
-    likeNum:'',
-    commentNum:'',
+    commentNum:0,
+    viewNum:0,
+    likeNum:0,
     authorId:0,
+    nickname:'',
+    imagePath:'',
+    deleted:false,
 })
 
 onMounted( ()=>{
