@@ -182,4 +182,30 @@ class ArticleServiceTest {
         Assertions.assertEquals(20L,activityList.getActivityList().size()) ;
     }
 
+
+    @Test
+    @DisplayName("게시글 가져오기")
+    void test5() {
+        String accessToken = getToken();
+
+        NewArticleDto newArticleDto = NewArticleDto.builder()
+                .category("NOTICE")
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
+
+        Member member = memberRepository.findByAccessToken(accessToken);
+        List<Article> articles = articleRepository.findByMember(member);
+        Article article = articles.get(0);
+
+        // when
+        GetArticleResponseDto getArticleResponseDto = articleService.getArticle(article.toGetArticleServiceDto());
+
+        //then
+
+        Assertions.assertEquals(getArticleResponseDto.getCategory().getName(), newArticleDto.getCategory());
+        Assertions.assertEquals(getArticleResponseDto.getTitle(), newArticleDto.getTitle());
+        Assertions.assertEquals(getArticleResponseDto.getContent(), newArticleDto.getContent());
+    }
 }
