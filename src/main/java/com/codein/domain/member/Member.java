@@ -58,6 +58,8 @@ public class Member {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private ProfileImage profileImage;
 
+    private boolean deleted;
+
     @Builder
     public Member(String email, String password, String name, String nickname, String phone, String birth, String sex) {
         this.email = email;
@@ -69,6 +71,7 @@ public class Member {
         this.sex = sex;
         this.createdAt = LocalDateTime.now();
         this.point = 0;
+        this.deleted = false;
     }
 
     public MemberListResponseDto toMemberListResponseDto() {

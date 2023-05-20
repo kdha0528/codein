@@ -23,15 +23,12 @@ public class Comment {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Article article;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member recipient;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member commenter;
 
     @NotNull

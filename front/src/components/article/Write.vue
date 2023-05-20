@@ -22,9 +22,10 @@
           <el-form-item label="내용" prop="content">
               <el-input v-model="form.content"
                         size="large"
-                        :autosize="{ minRows: 8 }"
+                        :autosize="{ minRows: 16 }"
                         placeholder="Please input"
                         show-word-limit
+                        maxlength="5000"
                         type="textarea"
                         style="font-size:1rem;"/>
           </el-form-item>
@@ -94,7 +95,7 @@ const onSubmit = async function(){
     form.value.category = select.value.category;
     if(id.value.article){   // 글 수정
 
-    } else{ //글 생성
+    } else { //글 생성
         await write(form.value)
             .then((response: any)=>{
                 if(resStore.isOK){

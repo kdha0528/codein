@@ -19,7 +19,7 @@ public class NewArticleDto {
     private final String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
-    @Size(min = 5, message = "내용을 5글자 이상 입력해주세요.")
+    @Size(min = 5, max = 5000, message = "내용을 5글자 이상 입력해주세요.")
     private final String content;
 
     @Builder

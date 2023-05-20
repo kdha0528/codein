@@ -2,6 +2,7 @@ import CategoryHeader from "@/components/article/CategoryHeader.vue";
 import CategoryView from "@/views/CategoryView.vue";
 import NewArticle from "@/views/NewArticle.vue";
 import EditArticle from "@/views/EditArticle.vue";
+import ArticleView from "@/views/ArticleView.vue";
 
 export default [
     {
@@ -46,5 +47,10 @@ export default [
         meta: {
             authRequire: true
         },
+    },
+    {
+        path: '/articles/:id',
+        name: 'article',
+        component: ArticleView,
     }
 ]

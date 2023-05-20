@@ -24,13 +24,13 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
     @NotNull
     private Category category;
     @NotNull
     private String title;
     @NotNull
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
     private Integer viewNum;
     private Integer commentNum;

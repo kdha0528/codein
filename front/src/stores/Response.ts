@@ -23,8 +23,8 @@ export const useResponseStore = defineStore("response", {
         },
     },
     actions: {
-        setError(state: boolean, code: string, message: string){
-            this.state = state;
+        setError(code: string, message: string){
+            this.state = false;
             this.errorCode = code;
             this.errorMessage = message;
         },

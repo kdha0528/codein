@@ -29,20 +29,19 @@ apiController.interceptors.response.use(
         const errorAPI = error.config;
         await console.log("error = ", error)
         if(error.response === undefined){
-            await console.log(error.message)
-            await useResponseStore().setError(false, error.code, error.message);
+            await console.log("ERROR RESPONSE IS UNDEFINED : "+error.message)
+            await useResponseStore().setError(error.code, error.message);
             return await Promise.reject(error);
-        }
-        if (error.response.data.code === 'A001' && errorAPI.retry === undefined) {
+        } else if (error.response.data.code === 'A001' && errorAPI.retry === undefined) {
             errorAPI.retry = true;
             await useResponseStore().setRetry(true);
             await refreshToken();
             await console.log("refresh token")
             return axios(errorAPI);
+        } else {
+            await useResponseStore().setError(error.response.data.code, error.response.data.message);
+            return await Promise.reject(error);
         }
-        await console.log("last error")
-        await useResponseStore().setError(false, error.response.data.code, error.response.data.message);
-        return await Promise.reject(error);
     }
 );
 

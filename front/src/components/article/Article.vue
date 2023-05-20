@@ -1,18 +1,52 @@
 <template>
-  <div>카테고리</div>
-  <div>
-      <div>이미지</div>
-      <div>닉네임</div>
-      <div>작성일</div>
-      <div>조회수</div>
-  </div>
-  <div>제목</div>
-  <div>
-      내용
-  </div>
-  <div>추천버튼</div>
-  <div>댓글</div>
+    <div class="content d-flex flex-column">
+        <el-divider content-position="left" class="mt-5">
+            <div class="text_link category"
+                @click="router.replace('/'+category)"
+                 style="font-size: 1rem; cursor: pointer;">
+                {{article.category}}
+            </div>
+        </el-divider>
+        <div class="member_info d-flex mt-5">
+            <img v-if="article.imagePath" :src="article.imagePath"
+                 style="width: 3rem; height: 3rem; border-radius: 100%; cursor: pointer;"
+                 alt=""
+                 @click="router.replace( '/members/'+article.authorId)"/>
+            <el-icon v-else size="40"
+                     style="width: 3rem;  height:3rem; border-radius: 100%; color:white; background-color: #E2E2E2; cursor: pointer;"
+                     @click="router.replace( '/members/'+article.authorId)">
+                <Avatar/>
+            </el-icon>
+            <div class="d-flex flex-column justify-content-center ms-3">
+                <div class="text_link" @click="router.replace( '/members/'+article.authorId)" style="cursor: pointer; margin-bottom:0.2rem;">{{ article.nickname }}</div>
+                <div class="d-flex align-content-lg-start" >
+                    <div style="margin-right: 0.5rem;">{{article.createdAt}}</div>
+                    <span style="content: '\00B7';">&#183;</span>
+                    <div style="margin-left: 0.5rem;">{{ article.viewNum }}</div>
+                </div>
+            </div>
 
+        </div>
+        <div class="mt-5"
+             style="font-size: 2.5rem;">
+            {{article.title}}
+        </div>
+        <div class="mt-5" style="white-space: pre-line; line-height: 2rem;">
+            {{article.content}}
+        </div>
+        <el-button class="like_button pe-3 ps-3"
+                   size="large">
+            <el-icon size="25"
+                     style="cursor: pointer;"
+                     @click="onLike()">
+                <Star />
+            </el-icon>
+            <span style="font-size: 1.2rem;">
+                {{article.likeNum}}
+            </span>
+        </el-button>
+        <div>댓글</div>
+    </div>
 </template>
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
@@ -29,15 +63,17 @@ const article = ref({
     category:'',
     title:'',
     content:'',
-    createdAt:'',
     commentNum:0,
     viewNum:0,
     likeNum:0,
+    createdAt:'',
     authorId:0,
     nickname:'',
     imagePath:'',
     deleted:false,
 })
+
+const category = ref('');
 
 onMounted( ()=>{
     onGetArticle();
@@ -47,11 +83,12 @@ const onGetArticle = async function() {
     await getArticle(route.path)
         .then((response: any)=>{
             if(resStore.isOK){
-                if(response.deleted === true) {
+                if(response.deleted) {
                     alert("삭제된 게시물입니다.");
                     router.go(-1);
                 } else {
                     article.value = {...response};
+                    getKoreanCategory(response.category);
                 }
             } else {
                 alert(resStore.getErrorMessage);
@@ -62,10 +99,58 @@ const onGetArticle = async function() {
             console.log(error)
         })
 }
+
+const getKoreanCategory = function (c: string){
+    switch(c){
+        case 'COMMUNITY' :
+            article.value.category = '커뮤니티';
+            category.value = c.toLowerCase();
+            break;
+        case 'QUESTION' :
+            article.value.category = 'Q&A';
+            category.value = c.toLowerCase();
+            break;
+        case 'INFORMATION' :
+            article.value.category = '정보공유';
+            category.value = c.toLowerCase();
+            break;
+        case 'NOTICE' :
+            article.value.category = '공지사항';
+            category.value = c.toLowerCase();
+            break;
+        default:
+            alert("존재하지 않는 카테고리");
+            router.back();
+    }
+}
+
+const onLike = function (){
+
+}
 </script>
 <style scoped>
+@import "../css/contentBase.css";
 
 li {
     list-style: none;
+}
+
+.category {
+    color:#B2B2B2;
+    font-weight: normal;
+}
+
+.text_link:hover{
+    color: #409eff;
+}
+
+.like_button {
+    --el-button-hover-bg-color: white;
+    border:solid 0.1rem #b1b3b8;
+    margin: 3rem auto 3rem auto;
+}
+
+.like_button:hover{
+    border: solid 0.1rem #409eff;
 }
 </style>

@@ -45,15 +45,17 @@ public class GetArticleServiceDto {
     public GetArticleResponseDto toGetArticleResponseDto () {
         return GetArticleResponseDto.builder()
                 .id(this.id)
-                .deleted(this.deleted)
                 .category(this.category)
-                .commentNum(this.commentNum)
-                .content(this.content)
-                .createdAt(this.createdAt)
-                .likeNum(this.likeNum)
-                .authorId(this.authorId)
                 .title(this.title)
+                .content(this.content)
                 .viewNum(this.viewNum)
+                .commentNum(this.commentNum)
+                .likeNum(this.likeNum)
+                .createdAt(this.createdAt)
+                .authorId(this.authorId)
+                .nickname(this.nickname)
+                .imagePath(this.imagePath)
+                .deleted(this.deleted)
                 .build();
     }
 
