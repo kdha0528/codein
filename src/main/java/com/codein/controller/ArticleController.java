@@ -15,10 +15,13 @@ import com.codein.responsedto.article.ArticleListResponseDto;
 import com.codein.responsedto.article.GetArticleResponseDto;
 import com.codein.service.ArticleService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -72,9 +75,11 @@ public class ArticleController {
 
 
     @GetMapping("/articles/{id}")
-    public GetArticleResponseDto getArticle(@PathVariable(value = "id") Long id) {
+    public GetArticleResponseDto getArticle(@PathVariable(value = "id") Long id, HttpServletRequest request) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(ArticleNotExistsException::new);
+        articleService.addView(article, request.getRemoteAddr());
+
         return articleService.getArticle(article.toGetArticleServiceDto());
     }
 }

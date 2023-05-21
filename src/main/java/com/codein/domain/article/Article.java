@@ -24,6 +24,7 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
     @NotNull
     private Category category;
@@ -32,23 +33,17 @@ public class Article {
     @NotNull
     @Column(columnDefinition = "LONGTEXT")
     private String content;
-    private Integer viewNum;
-    private Integer commentNum;
-    private Integer likeNum;
     @NotNull
     private LocalDateTime createdAt;
     private boolean deleted;
 
 
     @Builder
-    public Article(Member member, Category category, String title, String content, Integer viewNum, Integer commentNum, Integer likeNum) {
+    public Article(Member member, Category category, String title, String content) {
         this.member = member;
         this.category = category;
         this.title = title;
         this.content = content;
-        this.viewNum = (viewNum == null) ? 0 : viewNum;
-        this.commentNum = (commentNum == null) ? 0 : commentNum;
-        this.likeNum = (likeNum == null) ? 0 : likeNum;
         this.createdAt = LocalDateTime.now();
         this.deleted = false;
     }
@@ -68,9 +63,6 @@ public class Article {
                 .profileImage(this.member.getProfileImage())
                 .nickname(this.member.getNickname())
                 .createdAt(this.getCreatedAt())
-                .commentNum(this.getCommentNum())
-                .likeNum(this.getLikeNum())
-                .viewNum(this.getViewNum())
                 .build();
     }
 
@@ -92,13 +84,11 @@ public class Article {
                 .title(this.title)
                 .content(this.content)
                 .createdAt(this.createdAt)
-                .commentNum(this.commentNum)
-                .viewNum(this.viewNum)
-                .likeNum(this.likeNum)
                 .authorId(this.member.getId())
                 .nickname(this.member.getNickname())
                 .profileImage(this.member.getProfileImage())
                 .deleted(this.deleted)
                 .build();
     }
+
 }

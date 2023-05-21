@@ -1,12 +1,14 @@
 package com.codein.controller;
 
 import com.codein.domain.article.Article;
+import com.codein.domain.article.ArticleLike;
 import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
+import com.codein.repository.like.ArticleLikeRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
@@ -48,6 +50,8 @@ class ArticleControllerTest {
     private MemberService memberService;
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private ArticleLikeRepository likeRepository;
 
     @BeforeEach
     void signupLogin() {
@@ -115,13 +119,26 @@ class ArticleControllerTest {
                     .category(category)
                     .title("Title No."+i)
                     .content("카테고리는 " + category.getName() + "입니다.")
-                    .viewNum(random.nextInt(100))
-                    .commentNum(random.nextInt(100))
-                    .likeNum(random.nextInt(100))
                     .build();
             articleRepository.save(article);
-        }
 
+        }
+    }
+
+    void createLikeDummies(){
+        Cookie cookie = getCookie();
+        Random random = new Random();
+        Member member = memberRepository.findByAccessToken(cookie.getValue());
+        List<Article> articleList = articleRepository.findAll();
+        for (Article article : articleList) {
+            for (int j = 0; j < random.nextInt(20); j++) {
+                ArticleLike articleLike = ArticleLike.builder()
+                        .member(member)
+                        .article(article)
+                        .build();
+                likeRepository.save(articleLike);
+            }
+        }
     }
 
     @Test
@@ -291,8 +308,8 @@ class ArticleControllerTest {
     void test3_3() throws Exception {
         // given
         createDummies();
+        createLikeDummies();
         String category = "community";
-
         // expected
         mockMvc.perform(get("/{category}?page=1&sort=LIKE&period=ALL",category).cookie(getCookie()))
                 .andExpect(status().isOk())

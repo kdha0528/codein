@@ -1,9 +1,9 @@
 package com.codein.domain.article;
 
-import com.codein.domain.member.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -12,26 +12,26 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "article_like")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Like {
+public class ArticleView {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Article article;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    @NotNull
+    private String clientIp;
 
     @NotNull
-    private LocalDateTime likedAt;
-
-    public Like(Article article, Member member) {
+    private LocalDateTime viewedAt;
+    @Builder
+    public ArticleView(Article article, String clientIp) {
         this.article = article;
-        this.member = member;
-        this.likedAt = LocalDateTime.now();
+        this.clientIp = clientIp;
+        this.viewedAt = LocalDateTime.now();
     }
 }

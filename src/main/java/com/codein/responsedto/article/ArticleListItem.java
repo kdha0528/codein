@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.Random;
 
 @ToString
 @Getter
@@ -21,13 +22,14 @@ public class ArticleListItem {
     private final String imagePath;
 
     @Builder
-    public ArticleListItem(Long id, String title, LocalDateTime createdAt, Integer viewNum, Integer commentNum, Integer likeNum, Long authorId, String nickname, ProfileImage profileImage) {
+    public ArticleListItem(Long id, String title, LocalDateTime createdAt, Long authorId, String nickname, ProfileImage profileImage) {
+        Random random = new Random();
         this.id = id;
         this.title = title;
         this.createdAt = compareDate(createdAt);
-        this.viewNum = viewNum;
-        this.commentNum = commentNum;
-        this.likeNum = likeNum;
+        this.viewNum = random.nextInt(99);
+        this.commentNum = random.nextInt(99);
+        this.likeNum = random.nextInt(99);
         this.authorId = authorId;
         this.nickname = nickname;
         if (profileImage != null) {

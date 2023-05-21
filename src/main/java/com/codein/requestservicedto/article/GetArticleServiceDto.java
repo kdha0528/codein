@@ -23,14 +23,14 @@ public class GetArticleServiceDto {
     private final boolean deleted;
 
     @Builder
-    public GetArticleServiceDto(Long id, String category, String title, String content, Integer viewNum, Integer commentNum, Integer likeNum, LocalDateTime createdAt, Long authorId, String nickname, ProfileImage profileImage, boolean deleted) {
+    public GetArticleServiceDto(Long id, String category, String title, String content, LocalDateTime createdAt, Long authorId, String nickname, ProfileImage profileImage, boolean deleted) {
         this.id = id;
         this.category = category;
         this.title = title;
         this.content = content;
-        this.viewNum = viewNum;
-        this.commentNum = commentNum;
-        this.likeNum = likeNum;
+        this.viewNum = 0;
+        this.commentNum = 0;
+        this.likeNum = 0;
         this.createdAt = compareDate(createdAt);
         this.authorId = authorId;
         this.nickname = nickname;

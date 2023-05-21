@@ -11,6 +11,7 @@ import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.repository.view.ArticleViewRepository;
 import com.codein.requestservicedto.article.*;
 import com.codein.responsedto.article.ActivityListResponseDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
@@ -28,6 +29,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final TokensRepository tokensRepository;
     private final MemberRepository memberRepository;
+    private final ArticleViewRepository articleViewRepository;
 
     @Transactional
     public Article newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
@@ -93,13 +95,16 @@ public class ArticleService {
                         .category(category)
                         .title("Title No."+i)
                         .content("카테고리는 " + category.getName() + "입니다.")
-                        .viewNum(random.nextInt(100))
-                        .commentNum(random.nextInt(100))
-                        .likeNum(random.nextInt(100))
                         .build();
                 articleRepository.save(article);
             }
         }
     }
+
+    @Transactional
+    public void addView(Article article, String clientIp) {
+        articleViewRepository.addView(article, clientIp);
+    }
+
 
 }

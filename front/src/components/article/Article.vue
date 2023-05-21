@@ -25,7 +25,6 @@
                     <div style="margin-left: 0.5rem;">{{ article.viewNum }}</div>
                 </div>
             </div>
-
         </div>
         <div class="mt-5"
              style="font-size: 2.5rem;">
