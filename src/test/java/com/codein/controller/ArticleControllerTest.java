@@ -87,13 +87,13 @@ class ArticleControllerTest {
         return new Cookie("accesstoken", token);
     }
 
-    void newArticle() {
+    Article newArticle() {
         NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
                 .title("제목입니다.")
                 .content("내용입니다.")
                 .build();
-        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), getCookie().getValue());
+        return articleService.newArticle(newArticleDto.toNewArticleServiceDto(), getCookie().getValue());
     }
 
     void createDummies(){
@@ -400,4 +400,32 @@ class ArticleControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    @DisplayName("게시글 좋아요 누르기 성공")
+    void test5_1() throws Exception {
+        // given
+        Article article = newArticle();
+        Long id = article.getId();
+
+        // expected
+        mockMvc.perform(get("/articles/{id}/like",id).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시글 좋아요 누르기 실패: 중복 좋아요")
+    void test5_2() throws Exception {
+        // given
+        Article article = newArticle();
+        Long id = article.getId();
+        mockMvc.perform(get("/articles/{id}/like",id).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        // expected
+        mockMvc.perform(get("/articles/{id}/like",id).cookie(getCookie()))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
 }

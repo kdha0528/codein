@@ -3,14 +3,17 @@ package com.codein.controller;
 import com.codein.config.SecurityConfig.MySecured;
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.article.Article;
+import com.codein.domain.article.ArticleLike;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.article.ArticleNotExistsException;
 import com.codein.repository.article.ArticleRepository;
+import com.codein.repository.article.like.ArticleLikeRepositoryCustom;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
+import com.codein.requestservicedto.article.ArticleLikeServiceDto;
 import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
 import com.codein.responsedto.article.GetArticleResponseDto;
@@ -28,6 +31,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequiredArgsConstructor
 public class ArticleController {
+    private final ArticleLikeRepositoryCustom articleLikeRepository;
     private final ArticleRepository articleRepository;
     private final MemberRepository memberRepository;
     private final ArticleService articleService;
@@ -77,5 +81,16 @@ public class ArticleController {
     @GetMapping("/articles/{id}")
     public GetArticleResponseDto getArticle(@PathVariable(value = "id") Long id, HttpServletRequest request) {
         return articleService.getArticle(new GetArticleServiceDto(id, request.getRemoteAddr()));
+    }
+    @MySecured(role = Role.MEMBER)
+    @GetMapping("/articles/{id}/like")
+    public void likeArticle(@PathVariable(value = "id") Long id, @CookieValue(value = "accesstoken") Cookie cookie) {
+
+        ArticleLikeServiceDto articleLikeServiceDto = ArticleLikeServiceDto.builder()
+                .articleId(id)
+                .member(memberRepository.findByAccessToken(cookie.getValue()))
+                .build();
+
+        articleService.likeArticle(articleLikeServiceDto);
     }
 }

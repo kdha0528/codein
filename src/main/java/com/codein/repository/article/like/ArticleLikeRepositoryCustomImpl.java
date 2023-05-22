@@ -19,7 +19,8 @@ public class ArticleLikeRepositoryCustomImpl implements ArticleLikeRepositoryCus
     public boolean existsArticleLike(ArticleLikeServiceDto articleLikeServiceDto) {
 
         ArticleLike fetchResult = jpaQueryFactory.selectFrom(articleLike)
-                .where(articleLike.article.id.eq(articleLikeServiceDto.getArticleId()).and(articleLike.member.id.eq(articleLikeServiceDto.getClientId())))
+                .where(articleLike.article.id.eq(articleLikeServiceDto.getArticleId())
+                        .and(articleLike.member.id.eq(articleLikeServiceDto.getMember().getId())))
                 .fetchOne();
 
         return fetchResult != null;
