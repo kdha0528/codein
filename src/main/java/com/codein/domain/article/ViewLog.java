@@ -3,7 +3,6 @@ package com.codein.domain.article;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ArticleView {
+public class ViewLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,8 +27,8 @@ public class ArticleView {
 
     @NotNull
     private LocalDateTime viewedAt;
-    @Builder
-    public ArticleView(Article article, String clientIp) {
+
+    public ViewLog(Article article, String clientIp) {
         this.article = article;
         this.clientIp = clientIp;
         this.viewedAt = LocalDateTime.now();

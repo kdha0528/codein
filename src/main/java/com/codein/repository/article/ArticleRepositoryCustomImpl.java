@@ -8,7 +8,6 @@ import com.codein.responsedto.article.ActivityListItem;
 import com.codein.responsedto.article.ActivityListResponseDto;
 import com.codein.responsedto.article.ArticleListItem;
 import com.codein.responsedto.article.ArticleListResponseDto;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +19,7 @@ import java.util.stream.Collectors;
 
 import static com.codein.domain.article.QArticle.article;
 import static com.codein.domain.article.QArticleLike.articleLike;
-import static com.codein.domain.article.QArticleView.articleView;
 import static com.codein.domain.comment.QComment.comment;
-import static com.querydsl.core.types.ExpressionUtils.count;
 
 
 @Repository
@@ -33,16 +30,16 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
 
     @Override
     public List<Article> findByMember(Member member) {
-        return jpaQueryFactory.select(article)
+        return jpaQueryFactory.selectFrom(article)
                 .where(article.member.eq(member))
                 .fetch();
     }
 
+
     @Override
     public ArticleListResponseDto getArticleList(GetArticlesServiceDto getArticlesServiceDto) {
 
-        JPAQuery<Article> query = jpaQueryFactory.select(article)
-                .from(article)
+        JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
                 .where(
                         article.category.eq(getArticlesServiceDto.getCategory()),
                         article.createdAt.between(getArticlesServiceDto.getStartDate(),LocalDateTime.now())
@@ -63,18 +60,8 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         }
 
         switch (getArticlesServiceDto.getSort()) {
-            case VIEW -> query
-                    .leftJoin(articleView)
-                    .on(article.id.eq(articleLike.article.id))
-                    .groupBy(article.id)
-                    .orderBy(article.id.count().nullif(0L).desc(), article.id.desc());
-
-            case LIKE -> query
-                    .leftJoin(articleLike)
-                    .on(article.id.eq(articleLike.article.id))
-                    .groupBy(article.id)
-                    .orderBy(article.id.count().nullif(0L).desc(), article.id.desc());
-
+            case VIEW -> query.orderBy(article.viewNum.desc());
+            case LIKE -> query.orderBy(article.likeNum.desc());
             default -> query.orderBy(article.id.desc());
         }
 
@@ -82,8 +69,6 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .limit(getArticlesServiceDto.getSize())
                 .offset(getArticlesServiceDto.getOffset())
                 .fetch();
-
-        System.out.println("result = " + fetchResult);
 
         List<ArticleListItem> articleList = fetchResult
                 .stream()
@@ -100,10 +85,10 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     public ActivityListResponseDto getActivityListResponseDto(GetActivitiesServiceDto getActivitiesServiceDto, Member member) {
 
         JPAQuery<Article> query = switch (getActivitiesServiceDto.getActivity()) {
-            case COMMENTS -> jpaQueryFactory.select(comment.article)
+            case COMMENTS -> jpaQueryFactory.selectFrom(article)
                     .innerJoin(comment)
                     .where(comment.commenter.id.eq(getActivitiesServiceDto.getId()));
-            case LIKED_ARTICLES -> jpaQueryFactory.select(articleLike.article)
+            case LIKED_ARTICLES -> jpaQueryFactory.selectFrom(article)
                     .innerJoin(articleLike)
                     .where(articleLike.member.id.eq(getActivitiesServiceDto.getId()));
             default -> jpaQueryFactory.selectFrom(article)
@@ -133,5 +118,6 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .maxPage(maxPage)
                 .build();
     }
+
 
 }

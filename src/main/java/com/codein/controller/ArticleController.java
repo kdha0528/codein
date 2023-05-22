@@ -11,6 +11,7 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
+import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
 import com.codein.responsedto.article.GetArticleResponseDto;
 import com.codein.service.ArticleService;
@@ -73,13 +74,8 @@ public class ArticleController {
         articleService.editArticle(editArticleDto.toEditArticleServiceDto());
     }
 
-
     @GetMapping("/articles/{id}")
     public GetArticleResponseDto getArticle(@PathVariable(value = "id") Long id, HttpServletRequest request) {
-        Article article = articleRepository.findById(id)
-                .orElseThrow(ArticleNotExistsException::new);
-        articleService.addView(article, request.getRemoteAddr());
-
-        return articleService.getArticle(article.toGetArticleServiceDto());
+        return articleService.getArticle(new GetArticleServiceDto(id, request.getRemoteAddr()));
     }
 }

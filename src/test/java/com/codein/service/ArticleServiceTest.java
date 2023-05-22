@@ -180,20 +180,8 @@ class ArticleServiceTest {
         Article article = newArticle();
         Member member = memberRepository.findByAccessToken(getToken());
 
-        GetArticleServiceDto getArticleServiceDto = GetArticleServiceDto.builder()
-                .id(article.getId())
-                .category(article.getCategory().getName())
-                .title(article.getTitle())
-                .content(article.getContent())
-                .createdAt(article.getCreatedAt())
-                .authorId(member.getId())
-                .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
-                .deleted(article.isDeleted())
-                .build();
-
         // when
-        GetArticleResponseDto getArticleResponseDto = articleService.getArticle(getArticleServiceDto);
+        GetArticleResponseDto getArticleResponseDto = articleService.getArticle(new GetArticleServiceDto(article.getId(), "client ip"));
 
         //then
         Assertions.assertEquals(getArticleResponseDto.getCategory(), article.getCategory().getName());

@@ -1,9 +1,9 @@
 package com.codein.domain.article;
 
 import com.codein.domain.member.Member;
-import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.article.ActivityListItem;
 import com.codein.responsedto.article.ArticleListItem;
+import com.codein.responsedto.article.GetArticleResponseDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -35,6 +35,9 @@ public class Article {
     private String content;
     @NotNull
     private LocalDateTime createdAt;
+    private Integer viewNum;
+    private Integer commentNum;
+    private Integer likeNum;
     private boolean deleted;
 
 
@@ -45,6 +48,9 @@ public class Article {
         this.title = title;
         this.content = content;
         this.createdAt = LocalDateTime.now();
+        this.viewNum = 0;
+        this.commentNum = 0;
+        this.likeNum = 0;
         this.deleted = false;
     }
 
@@ -57,32 +63,43 @@ public class Article {
 
     public ArticleListItem toArticleListItem(){
         return ArticleListItem.builder()
-                .id(this.getId())
-                .title(this.getTitle())
+                .id(this.id)
+                .title(this.title)
                 .authorId(this.member.getId())
                 .profileImage(this.member.getProfileImage())
                 .nickname(this.member.getNickname())
-                .createdAt(this.getCreatedAt())
+                .createdAt(this.createdAt)
+                .viewNum(this.viewNum)
+                .commentNum(this.commentNum)
+                .likeNum(this.likeNum)
+                .deleted(this.deleted)
                 .build();
     }
 
     public ActivityListItem toActivityListItem(){
         return ActivityListItem.builder()
-                .id(this.getId())
+                .id(this.id)
                 .authorId(this.member.getId())
                 .category(this.category.getName())
-                .title(this.getTitle())
+                .title(this.title)
                 .nickname(this.member.getNickname())
-                .createdAt(this.getCreatedAt())
+                .createdAt(this.createdAt)
+                .viewNum(this.viewNum)
+                .commentNum(this.commentNum)
+                .likeNum(this.likeNum)
+                .deleted(this.deleted)
                 .build();
     }
 
-    public GetArticleServiceDto toGetArticleServiceDto(){
-        return GetArticleServiceDto.builder()
+    public GetArticleResponseDto toGetArticleResponseDto(boolean viewCount){
+        return GetArticleResponseDto.builder()
                 .id(this.id)
-                .category(this.category.getName())
+                .category(this.category)
                 .title(this.title)
                 .content(this.content)
+                .viewNum(viewCount ? ++this.viewNum : this.viewNum)
+                .commentNum(this.commentNum)
+                .likeNum(this.likeNum)
                 .createdAt(this.createdAt)
                 .authorId(this.member.getId())
                 .nickname(this.member.getNickname())
@@ -90,5 +107,10 @@ public class Article {
                 .deleted(this.deleted)
                 .build();
     }
+
+    public void increaseLikeNum(){
+        this.likeNum++;
+    }
+
 
 }

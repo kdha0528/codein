@@ -1,19 +1,19 @@
 package com.codein.controller;
 
 import com.codein.domain.article.Article;
-import com.codein.domain.article.ArticleLike;
 import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
-import com.codein.repository.like.ArticleLikeRepository;
+import com.codein.repository.article.viewlog.ViewLogRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
+import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -50,8 +51,6 @@ class ArticleControllerTest {
     private MemberService memberService;
     @Autowired
     private ArticleService articleService;
-    @Autowired
-    private ArticleLikeRepository likeRepository;
 
     @BeforeEach
     void signupLogin() {
@@ -125,18 +124,12 @@ class ArticleControllerTest {
         }
     }
 
-    void createLikeDummies(){
-        Cookie cookie = getCookie();
+    void createViewDummies(){
         Random random = new Random();
-        Member member = memberRepository.findByAccessToken(cookie.getValue());
         List<Article> articleList = articleRepository.findAll();
         for (Article article : articleList) {
             for (int j = 0; j < random.nextInt(20); j++) {
-                ArticleLike articleLike = ArticleLike.builder()
-                        .member(member)
-                        .article(article)
-                        .build();
-                likeRepository.save(articleLike);
+                articleService.getArticle(new GetArticleServiceDto(article.getId(),UUID.randomUUID().toString()));
             }
         }
     }
@@ -304,14 +297,15 @@ class ArticleControllerTest {
     }
 
     @Test
-    @DisplayName("글 목록 가져오기 성공: 추천수로 정렬하기")
+    @DisplayName("글 목록 가져오기 성공: 조회수로 정렬하기")
     void test3_3() throws Exception {
         // given
         createDummies();
-        createLikeDummies();
+        createViewDummies();
         String category = "community";
+
         // expected
-        mockMvc.perform(get("/{category}?page=1&sort=LIKE&period=ALL",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=1&sort=VIEW&period=ALL",category).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

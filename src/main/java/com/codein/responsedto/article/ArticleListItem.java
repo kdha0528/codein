@@ -14,24 +14,25 @@ public class ArticleListItem {
     private final Long id;
     private final String title;
     private final String createdAt;
-    private final Integer viewNum;
-    private final Integer commentNum;
-    private final Integer likeNum;
     private final Long authorId;
     private final String nickname;
     private final String imagePath;
+    private final Integer viewNum;
+    private final Integer commentNum;
+    private final Integer likeNum;
+    private final boolean deleted;
 
     @Builder
-    public ArticleListItem(Long id, String title, LocalDateTime createdAt, Long authorId, String nickname, ProfileImage profileImage) {
-        Random random = new Random();
+    public ArticleListItem(Long id, String title, LocalDateTime createdAt, Long authorId, String nickname, ProfileImage profileImage, Integer viewNum, Integer commentNum, Integer likeNum, boolean deleted) {
         this.id = id;
         this.title = title;
         this.createdAt = compareDate(createdAt);
-        this.viewNum = random.nextInt(99);
-        this.commentNum = random.nextInt(99);
-        this.likeNum = random.nextInt(99);
         this.authorId = authorId;
         this.nickname = nickname;
+        this.viewNum = viewNum;
+        this.commentNum = commentNum;
+        this.likeNum = likeNum;
+        this.deleted = deleted;
         if (profileImage != null) {
             this.imagePath = "/my-backend-api/images/profile/" + profileImage.getImgFileName();
         } else {

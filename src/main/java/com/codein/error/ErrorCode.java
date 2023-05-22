@@ -35,8 +35,9 @@ public enum ErrorCode {
     PHONE_ALREADY_EXISTS(400, "M007", "Phone is already exists"),
     NICKNAME_ALREADY_EXISTS(400, "M008", "Nickname is already exists"),
 
-    // Post
+    // Article
     ARTICLE_NOT_EXISTS(400, "C001", "Article is not exists."),
+    ARTICLE_LIKE_EXISTS(400, "C001", "Article like exists."),
 
     // Comment
 
