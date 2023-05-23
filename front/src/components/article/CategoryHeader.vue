@@ -29,7 +29,7 @@
                       </el-button>
                   </div>
                   <div v-if="isAdmin()" class="create-dummies-button">
-                      <el-button plain @click="onCreateDummies()&onGetArticles()" style="border: none;">
+                      <el-button plain @click="onCreateDummies()" style="border: none;">
                           <el-icon style="vertical-align: middle">
                               <Plus />
                           </el-icon>
@@ -345,7 +345,10 @@ provide('onPaging', onPaging);
 const onCreateDummies = async function(){
     await createDummies()
         .then((response: any)=>{
-            if(resStore.isError){
+            if(resStore.isOK){
+                alert("생성이 완료되었습니다.");
+                onGetArticles();
+            } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
             }

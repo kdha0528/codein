@@ -1,5 +1,7 @@
 package com.codein.requestservicedto.article;
 
+import com.codein.domain.article.Article;
+import com.codein.domain.article.ArticleLike;
 import com.codein.domain.member.Member;
 import lombok.Builder;
 import lombok.Getter;

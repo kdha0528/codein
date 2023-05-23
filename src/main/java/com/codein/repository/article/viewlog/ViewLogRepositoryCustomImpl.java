@@ -21,6 +21,6 @@ public class ViewLogRepositoryCustomImpl implements ViewLogRepositoryCustom {
                 .where(viewLog.article.id.eq(getArticleServiceDto.getArticleId())
                         .and(viewLog.clientIp.eq(getArticleServiceDto.getClientIp())))
                 .orderBy(viewLog.id.desc())
-                .fetchOne();
+                .fetchFirst();
     }
 }

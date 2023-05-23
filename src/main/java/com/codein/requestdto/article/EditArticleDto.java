@@ -12,9 +12,6 @@ import lombok.ToString;
 @ToString
 public class EditArticleDto {
 
-    @NotNull(message = "존재하지 않는 게시글입니다.")
-    private final Long id;
-
     @NotBlank(message = "카테고리를 입력해주세요.")
     private final String category;
 
@@ -27,16 +24,15 @@ public class EditArticleDto {
     private final String content;
 
     @Builder
-    public EditArticleDto(Long id, String category, String title, String content) {
-        this.id = id;
+    public EditArticleDto(String category, String title, String content) {
         this.category = category;
         this.title = title;
         this.content = content;
     }
 
-    public EditArticleServiceDto toEditArticleServiceDto() {
+    public EditArticleServiceDto toEditArticleServiceDto(Long id) {
         return EditArticleServiceDto.builder()
-                .id(this.id)
+                .id(id)
                 .category(this.category)
                 .title(this.title)
                 .content(this.content)

@@ -51,9 +51,20 @@ export async function write(data:any) {
 export async function edit(data:any, id:any) {
     try {
        await apiController({
-            url: '/article/edit',
+            url: '/articles/'+id+'/edit',
             method: 'post',
-            data:[data,id]
+            data:data,
+        })
+    } catch (error) {
+        return error;
+    }
+}
+
+export async function likeArticle(id:any) {
+    try {
+        await apiController({
+            url: '/articles/'+id+'/like',
+            method: 'post'
         })
     } catch (error) {
         return error;

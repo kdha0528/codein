@@ -19,7 +19,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class ArticleService {
     private final MemberRepository memberRepository;
     private final ViewLogRepository viewLogRepository;
     private final ArticleLikeRepository articleLikeRepository;
+    private final MemberService memberService;
 
     @Transactional
     public Article newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
@@ -78,16 +82,17 @@ public class ArticleService {
     public void likeArticle(ArticleLikeServiceDto articleLikeServiceDto) {
         Article article = articleRepository.findById(articleLikeServiceDto.getArticleId())
                 .orElseThrow(ArticleNotExistsException::new);
+
         boolean exists = articleLikeRepository.existsArticleLike(articleLikeServiceDto);
 
         if (!exists) {
             // 해당 article id와 client id로 like가 존재하지 않으면 like 생성
             article.increaseLikeNum();
-            articleLikeRepository.save(ArticleLike.builder()
+            ArticleLike articleLike = ArticleLike.builder()
                     .article(article)
                     .member(article.getMember())
-                    .build());
-
+                    .build();
+            articleLikeRepository.save(articleLike);
         } else {    // 존재할 경우 예외처리
             throw new ArticleLikeExistsException();
         }
@@ -129,5 +134,41 @@ public class ArticleService {
         }
     }
 
+    @Transactional
+    public void createViewDummies(){
+        Random random = new Random();
+        List<Article> articleList = articleRepository.findAll();
+        for (Article article : articleList) {
+            for (int j = 0; j < random.nextInt(20); j++) {
+                getArticle(new GetArticleServiceDto(article.getId(), UUID.randomUUID().toString()));
+            }
+        }
+    }
+    @Transactional
+    public void createLikeDummies(ArrayList<Member> memberList){
+        Random random = new Random();
+        List<Article> articleList = articleRepository.findAll();
+        boolean exists;
+        for (Article article : articleList) {
+            for (int j = 0; j < random.nextInt(20); j++) {
+                ArticleLikeServiceDto articleLikeServiceDto = ArticleLikeServiceDto.builder()
+                        .articleId(article.getId())
+                        .member(memberList.get(j))
+                        .build();
 
+                exists = articleLikeRepository.existsArticleLike(articleLikeServiceDto);
+
+                if (!exists) {
+                    article.increaseLikeNum();
+                    ArticleLike articleLike = ArticleLike.builder()
+                            .article(article)
+                            .member(memberList.get(j))
+                            .build();
+                    articleLikeRepository.save(articleLike);
+                } else {
+                    throw new ArticleLikeExistsException();
+                }
+            }
+        }
+    }
 }

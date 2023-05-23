@@ -34,10 +34,10 @@
             {{article.content}}
         </div>
         <el-button class="like_button pe-3 ps-3"
-                   size="large">
+                   size="large"
+                   @click="onLikeArticle()">
             <el-icon size="25"
-                     style="cursor: pointer;"
-                     @click="onLike()">
+                     style="cursor: pointer;">
                 <Star />
             </el-icon>
             <span style="font-size: 1.2rem;">
@@ -49,7 +49,7 @@
 </template>
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import {getArticle} from "@/controller/api/article";
+import {getArticle, likeArticle} from "@/controller/api/article";
 import {useRoute, useRouter} from "vue-router";
 import {useResponseStore} from "@/stores/Response";
 
@@ -58,15 +58,15 @@ const router = useRouter();
 const resStore = useResponseStore();
 
 const article = ref({
-    id:0,
+    id:'',
     category:'',
     title:'',
     content:'',
-    commentNum:0,
-    viewNum:0,
-    likeNum:0,
+    commentNum:'',
+    viewNum:'',
+    likeNum:'',
     createdAt:'',
-    authorId:0,
+    authorId:'',
     nickname:'',
     imagePath:'',
     deleted:false,
@@ -123,8 +123,20 @@ const getKoreanCategory = function (c: string){
     }
 }
 
-const onLike = function (){
-
+const onLikeArticle = async function () {
+    await likeArticle(article.value.id)
+        .then((response:any)=>{
+            if(resStore.isOK){
+                alert("추천이 완료되었습니다.");
+                onGetArticle();
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response);
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error)
+        })
 }
 </script>
 <style scoped>

@@ -10,6 +10,7 @@ import com.codein.error.exception.profileimage.ImageTooLargeException;
 import com.codein.error.exception.profileimage.InvalidImageException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.member.SignupDto;
 import com.codein.requestservicedto.member.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
@@ -23,9 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service
@@ -40,7 +39,7 @@ public class MemberService {
     private String uploadPath;
 
     @Transactional
-    public void signup(SignupServiceDto signupServiceDto) {
+    public Member signup(SignupServiceDto signupServiceDto) {
 
         if (memberRepository.findByEmail(signupServiceDto.getEmail()) != null) {
             throw new EmailAlreadyExistsException();
@@ -49,8 +48,9 @@ public class MemberService {
         } else if (memberRepository.findByNickname(signupServiceDto.getNickname()) != null) {
             throw new NicknameAlreadyExistsException();
         }
-
-        memberRepository.save(signupServiceDto.toEntity());
+        Member member = signupServiceDto.toEntity();
+        memberRepository.save(member);
+        return member;
     }
 
 
@@ -211,4 +211,23 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
+    @Transactional
+    public ArrayList<Member> createMemberDummies() {
+        Random random = new Random();
+        ArrayList<Member> memberList = new ArrayList<>();
+        for(int i = 0; i < 20; i++) {
+            SignupDto signupDto = SignupDto.builder()
+                    .name("데일이")
+                    .email("kdha"+ i + "@gmail.com")
+                    .nickname(UUID.randomUUID().toString().replace("-", "").substring(0, 12))
+                    .password(UUID.randomUUID().toString().replace("-", "").substring(0, 16))
+                    .phone("010" + (random.nextInt(90000000) + 10000000))
+                    .birth("1996-05-28")
+                    .sex("male")
+                    .build();
+            Member member = signup(signupDto.toSignupServiceDto());
+            memberList.add(member);
+        }
+        return memberList;
+    }
 }

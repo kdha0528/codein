@@ -200,16 +200,16 @@ class ArticleControllerTest {
         Member member = memberRepository.findByAccessToken(getCookie().getValue());
         List<Article> articles = articleRepository.findByMember(member);
         Article article = articles.get(0);
+        Long articleId = article.getId();
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
-                .id(article.getId())
                 .category("COMMUNITY")
                 .title("타이틀입니다.")
                 .content("내용입니다.")
                 .build();
 
         // expected
-        mockMvc.perform(post("/article/edit").cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
@@ -229,14 +229,13 @@ class ArticleControllerTest {
         Long articleId = article.getId();
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
-                .id(articleId)
                 .category("COMMUNITY")
                 .title("타이틀")
                 .content("내용입니다.")
                 .build();
 
         // expected
-        mockMvc.perform(post("/article/edit").cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
@@ -256,14 +255,13 @@ class ArticleControllerTest {
         Long articleId = article.getId();
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
-                .id(articleId)
                 .category("COMMUNITY")
                 .title("타이틀입니다.")
                 .content("내용")
                 .build();
 
         // expected
-        mockMvc.perform(post("/article/edit").cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
@@ -408,7 +406,7 @@ class ArticleControllerTest {
         Long id = article.getId();
 
         // expected
-        mockMvc.perform(get("/articles/{id}/like",id).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/like",id).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -419,12 +417,12 @@ class ArticleControllerTest {
         // given
         Article article = newArticle();
         Long id = article.getId();
-        mockMvc.perform(get("/articles/{id}/like",id).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/like",id).cookie(getCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
         // expected
-        mockMvc.perform(get("/articles/{id}/like",id).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/like",id).cookie(getCookie()))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }

@@ -20,8 +20,8 @@ public class ArticleLikeRepositoryCustomImpl implements ArticleLikeRepositoryCus
 
         ArticleLike fetchResult = jpaQueryFactory.selectFrom(articleLike)
                 .where(articleLike.article.id.eq(articleLikeServiceDto.getArticleId())
-                        .and(articleLike.member.id.eq(articleLikeServiceDto.getMember().getId())))
-                .fetchOne();
+                        .and(articleLike.member.eq(articleLikeServiceDto.getMember())))
+                .fetchFirst();
 
         return fetchResult != null;
 

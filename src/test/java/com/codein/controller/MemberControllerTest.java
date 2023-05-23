@@ -1,5 +1,6 @@
 package com.codein.controller;
 
+import com.codein.domain.article.Article;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
@@ -9,6 +10,7 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.article.Activity;
 import com.codein.requestdto.member.*;
+import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.member.SettingsAccountResponseDto;
 import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
@@ -28,6 +30,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -105,6 +111,12 @@ class MemberControllerTest {
         String token = tokens.getAccessToken();
 
         return new Cookie("accesstoken", token);
+    }
+    void createDummies(){
+        articleService.createDummies(memberRepository.findByAccessToken(getCookie().getValue()));
+        ArrayList<Member> memberList = memberService.createMemberDummies();
+        articleService.createViewDummies();
+        articleService.createLikeDummies(memberList);
     }
 
     @Test
@@ -649,7 +661,7 @@ class MemberControllerTest {
         signup();
         login();
         Member member = memberRepository.findByAccessToken(getCookie().getValue());
-        articleService.createDummies(member);
+        createDummies();
 
         // expected
         mockMvc.perform(get("/members/{id}",member.getId()).cookie(getCookie())
@@ -666,7 +678,7 @@ class MemberControllerTest {
         signup();
         login();
         Member member = memberRepository.findByAccessToken(getCookie().getValue());
-        articleService.createDummies(member);
+        createDummies();
 
         // expected
         mockMvc.perform(get("/members/{id}/{activity}",member.getId(), Activity.ARTICLES).cookie(getCookie())
@@ -682,8 +694,7 @@ class MemberControllerTest {
         // given
         signup();
         login();
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
-        articleService.createDummies(member);
+        createDummies();
 
         // expected
         mockMvc.perform(get("/members/{id}", 4321).cookie(getCookie())

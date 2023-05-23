@@ -4,7 +4,7 @@ import { useResponseStore } from "@/stores/Response";
 
 const apiController = axios.create({
     baseURL: 'https://codein.loca.lt/my-backend-api',
-    timeout: 10000
+    timeout: 60000,
 });
 
 apiController.interceptors.request.use(

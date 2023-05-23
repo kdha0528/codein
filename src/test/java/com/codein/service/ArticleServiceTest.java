@@ -18,6 +18,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+
 
 @SpringBootTest
 class ArticleServiceTest {
@@ -78,17 +80,10 @@ class ArticleServiceTest {
     }
 
     void createDummies(){
-        String accessToken = getToken();
-        for(int i = 0; i < 100; i ++){
-            NewArticleDto newArticleDto = NewArticleDto.builder()
-                    .category("COMMUNITY")
-                    .title("Title No."+i)
-                    .content("내용입니다.")
-                    .build();
-
-            articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
-        }
-
+        articleService.createDummies(memberRepository.findByAccessToken(getToken()));
+        ArrayList<Member> memberList = memberService.createMemberDummies();
+        articleService.createViewDummies();
+        articleService.createLikeDummies(memberList);
     }
 
     @Test
@@ -125,13 +120,12 @@ class ArticleServiceTest {
         Article article = articleService.newArticle(newArticleDto.toNewArticleServiceDto(), accessToken);
 
         EditArticleDto editArticleDto = EditArticleDto.builder()
-                .id(article.getId())
                 .category("COMMUNITY")
                 .title("타이틀")
                 .content("내용")
                 .build();
         // when
-        Article editedArticle = articleService.editArticle(editArticleDto.toEditArticleServiceDto());
+        Article editedArticle = articleService.editArticle(editArticleDto.toEditArticleServiceDto(article.getId()));
 
         //then
 

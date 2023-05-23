@@ -109,7 +109,7 @@ public class MemberController {
     @MySecured(role = Role.MEMBER)
     @PostMapping("/settings/account/email")
     public String changeEmail(@CookieValue(value = "accesstoken") Cookie cookie,  @RequestBody @Valid EmailDto emailDto) {
-        System.out.println("email dto = " + emailDto.getEmail());
+
         memberService.changeEmail(cookie.getValue(), emailDto.toEmailServiceDto());
         return "redirect:/logout";
     }

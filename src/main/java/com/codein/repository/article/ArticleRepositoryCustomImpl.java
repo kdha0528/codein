@@ -60,8 +60,8 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         }
 
         switch (getArticlesServiceDto.getSort()) {
-            case VIEW -> query.orderBy(article.viewNum.desc());
-            case LIKE -> query.orderBy(article.likeNum.desc());
+            case VIEW -> query.orderBy(article.viewNum.desc(),article.id.desc());
+            case LIKE -> query.orderBy(article.likeNum.desc(),article.id.desc());
             default -> query.orderBy(article.id.desc());
         }
 
