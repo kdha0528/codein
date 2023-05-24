@@ -48,10 +48,10 @@ export async function write(data:any) {
     }
 }
 
-export async function edit(data:any, id:any) {
+export async function editArticle(path:any, data:any) {
     try {
        await apiController({
-            url: '/articles/'+id+'/edit',
+            url: path,
             method: 'post',
             data:data,
         })
@@ -59,7 +59,16 @@ export async function edit(data:any, id:any) {
         return error;
     }
 }
-
+export async function deleteArticle(path:any) {
+    try {
+        await apiController({
+            url: path,
+            method: 'delete'
+        })
+    } catch (error) {
+        return error;
+    }
+}
 export async function likeArticle(id:any) {
     try {
         await apiController({
@@ -70,5 +79,3 @@ export async function likeArticle(id:any) {
         return error;
     }
 }
-
-

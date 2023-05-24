@@ -41,7 +41,7 @@ export default [
         },
     },
     {
-        path: '/article/:articleId/edit',
+        path: '/articles/:id/edit',
         name: 'edit-article',
         component: EditArticle,
         meta: {

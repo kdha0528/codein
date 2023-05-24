@@ -98,4 +98,10 @@ public class ArticleController {
             throw new MemberNotExistsException();
         }
     }
+
+    @MySecured(role = Role.MEMBER)
+    @DeleteMapping("/articles/{id}")
+    public void deleteArticle(@PathVariable(value = "id") Long id, @CookieValue(value = "accesstoken") Cookie cookie) {
+        
+    }
 }

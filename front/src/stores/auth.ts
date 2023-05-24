@@ -6,6 +6,9 @@ export const useAuthStore = defineStore("auth", {
         member: null as Profile | any
     }),
     getters: {
+        getId: (state) => {
+            return state.member.id;
+        },
         isLoggedIn: (state) => {
             return state.member != null;
         },

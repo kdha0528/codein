@@ -1,29 +1,61 @@
 <template>
     <div class="content d-flex flex-column">
-        <el-divider content-position="left" class="mt-5">
+        <el-divider content-position="left" class="mt-4">
             <div class="text_link category"
                 @click="router.replace('/'+category)"
                  style="font-size: 1rem; cursor: pointer;">
                 {{article.category}}
             </div>
         </el-divider>
-        <div class="member_info d-flex mt-5">
-            <img v-if="article.imagePath" :src="article.imagePath"
-                 style="width: 3rem; height: 3rem; border-radius: 100%; cursor: pointer;"
-                 alt=""
-                 @click="router.replace( '/members/'+article.authorId)"/>
-            <el-icon v-else size="40"
-                     style="width: 3rem;  height:3rem; border-radius: 100%; color:white; background-color: #E2E2E2; cursor: pointer;"
-                     @click="router.replace( '/members/'+article.authorId)">
-                <Avatar/>
-            </el-icon>
-            <div class="d-flex flex-column justify-content-center ms-3">
-                <div class="text_link" @click="router.replace( '/members/'+article.authorId)" style="cursor: pointer; margin-bottom:0.2rem;">{{ article.nickname }}</div>
-                <div class="d-flex align-content-lg-start" >
-                    <div style="margin-right: 0.5rem;">{{article.createdAt}}</div>
-                    <span style="content: '\00B7';">&#183;</span>
-                    <div style="margin-left: 0.5rem;">{{ article.viewNum }}</div>
+        <div class="member_info d-flex mt-4 justify-content-between">
+            <div class="d-flex">
+                <img v-if="article.imagePath" :src="article.imagePath"
+                     style="width: 3rem; height: 3rem; border-radius: 100%; cursor: pointer;"
+                     alt=""
+                     @click="router.replace( '/members/'+article.authorId)"/>
+                <el-icon v-else size="40"
+                         style="width: 3rem;  height:3rem; border-radius: 100%; color:white; background-color: #E2E2E2; cursor: pointer;"
+                         @click="router.replace( '/members/'+article.authorId)">
+                    <Avatar/>
+                </el-icon>
+                <div class="d-flex flex-column justify-content-center ms-3">
+                    <div class="text_link" @click="router.replace( '/members/'+article.authorId)" style="cursor: pointer; margin-bottom:0.2rem;">{{ article.nickname }}</div>
+                    <div class="d-flex align-content-lg-start" >
+                        <div style="margin-right: 0.5rem;">{{article.createdAt}}</div>
+                        <span style="content: '\00B7';">&#183;</span>
+                        <div style="margin-left: 0.5rem;">{{ article.viewNum }}</div>
+                    </div>
                 </div>
+            </div>
+            <div v-if="isAuthor()" class="d-flex">
+                <el-dropdown  trigger="click">
+                    <span class="el-dropdown-link">
+                    <el-icon size="25" color="#B2B2B2" class="dropdown" style="cursor: pointer">
+                        <MoreFilled/>
+                    </el-icon>
+                    </span>
+                    <template #dropdown>
+                        <el-dropdown-menu class="dropdown_menu d-flex flex-column"
+                                          style="
+                                        --el-dropdown-menuItem-hover-fill: white;
+                                        --el-menu-hover-bg-color: white;
+                                        --el-menu-hover-text-color: #409eff;
+                                        --el-menu-active-color: #409eff">
+                            <el-dropdown-item class="d-flex" style="padding-right: 5rem;" @click="toEditArticle()">
+                                    <el-icon>
+                                        <Edit />
+                                    </el-icon>
+                                    수정하기
+                            </el-dropdown-item>
+                            <el-dropdown-item class="d-flex" @click="onDeleteArticle()">
+                                    <el-icon>
+                                        <Delete />
+                                    </el-icon>
+                                    삭제하기
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </template>
+                </el-dropdown>
             </div>
         </div>
         <div class="mt-5"
@@ -49,13 +81,16 @@
 </template>
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import {getArticle, likeArticle} from "@/controller/api/article";
+import {deleteArticle, getArticle, likeArticle} from "@/controller/api/article";
 import {useRoute, useRouter} from "vue-router";
 import {useResponseStore} from "@/stores/Response";
+import {Avatar, MoreFilled} from "@element-plus/icons-vue";
+import {useAuthStore} from "@/stores/auth";
 
 const route = useRoute();
 const router = useRouter();
 const resStore = useResponseStore();
+const authStore = useAuthStore();
 
 const article = ref({
     id:'',
@@ -73,6 +108,10 @@ const article = ref({
 })
 
 const category = ref('');
+
+const isAuthor = function () {
+    return article.value.authorId === authStore.getId;
+}
 
 onMounted( ()=>{
     onGetArticle();
@@ -138,6 +177,26 @@ const onLikeArticle = async function () {
             console.log(error)
         })
 }
+
+const toEditArticle = function () {
+    router.replace('/articles/' + article.value.id + '/edit');
+}
+
+const onDeleteArticle = async function () {
+    await deleteArticle(route.path)
+        .then((response:any)=>{
+            if(resStore.isOK){
+                alert("게시물의 삭제가 완료되었습니다.");
+                router.replace({name: category.value as string});
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response);
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error)
+        })
+}
 </script>
 <style scoped>
 @import "../css/contentBase.css";
@@ -163,5 +222,20 @@ li {
 
 .like_button:hover{
     border: solid 0.1rem #409eff;
+}
+
+.dropdown_menu {
+    .el-dropdown-item {
+        font-size: 1rem;
+        .el-icon{
+            font-size:22px;
+            width: 2.2rem;
+            height: 2.2rem;
+        }
+    }
+}
+
+.dropdown:hover{
+    color: #409eff;
 }
 </style>
