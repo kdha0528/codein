@@ -39,8 +39,13 @@ apiController.interceptors.response.use(
             await console.log("refresh token")
             return axios(errorAPI);
         } else {
-            await useResponseStore().setError(error.response.data.code, error.response.data.message);
-            return await Promise.reject(error);
+            if(error.response.data.errors.size === 0) {
+                await useResponseStore().setError(error.response.data.code, error.response.data.message);
+                return await Promise.reject(error);
+            } else {
+                await useResponseStore().setError(error.response.data.code, error.response.data.message);
+                return await Promise.reject(error);
+            }
         }
     }
 );

@@ -51,8 +51,8 @@ public enum ErrorCode {
 
     ErrorCode(final int status, final String code, final String message) {
         this.status = status;
-        this.message = message;
         this.code = code;
+        this.message = message;
     }
 
     public String getMessage() {

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,13 @@ public class ErrorResponseDto {
     private int status;
     private List<FieldError> errors;
     private String code;
+
+    private ErrorResponseDto(int status, String code, String message, List<FieldError> errors) {
+        this.status = status;
+        this.code = code;
+        this.message = message;
+        this.errors = errors;
+    }
 
     private ErrorResponseDto(ErrorCode code, List<FieldError> errors) {
         this.message = code.getMessage();
@@ -34,6 +42,17 @@ public class ErrorResponseDto {
         this.code = code.getCode();
     }
 
+    public static ErrorResponseDto of(int status, String code, final BindingResult bindingResult) {
+        List<FieldError> fieldError = FieldError.of(bindingResult);
+        StringBuilder message = new StringBuilder();
+        for (FieldError field : fieldError) {
+            message.append(field.getReason()).append("\n\n");
+        }
+        if (message.length() > 0) {
+            message.setLength(message.length() - 2);
+        }
+        return new ErrorResponseDto(status, code, message.toString(), fieldError);
+    }
     public static ErrorResponseDto of(final ErrorCode code, final BindingResult bindingResult) {
         return new ErrorResponseDto(code, FieldError.of(bindingResult));
     }

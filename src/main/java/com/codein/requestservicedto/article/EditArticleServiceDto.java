@@ -1,8 +1,6 @@
 package com.codein.requestservicedto.article;
 
 
-import com.codein.domain.member.Member;
-import jakarta.servlet.http.Cookie;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
