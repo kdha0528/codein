@@ -3,6 +3,7 @@ package com.codein.service;
 import com.codein.domain.article.Article;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
+import com.codein.error.exception.article.ArticleNotExistsException;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
@@ -10,6 +11,7 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.*;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
+import com.codein.requestservicedto.article.DeleteArticleServiceDto;
 import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.article.ActivityListResponseDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
@@ -124,8 +126,9 @@ class ArticleServiceTest {
                 .title("타이틀")
                 .content("내용")
                 .build();
+
         // when
-        Article editedArticle = articleService.editArticle(editArticleDto.toEditArticleServiceDto(article.getId()));
+        Article editedArticle = articleService.editArticle(editArticleDto.toEditArticleServiceDto(article.getId(), getToken()));
 
         //then
 
@@ -172,7 +175,6 @@ class ArticleServiceTest {
     void test5() {
         // given
         Article article = newArticle();
-        Member member = memberRepository.findByAccessToken(getToken());
 
         // when
         GetArticleResponseDto getArticleResponseDto = articleService.getArticle(new GetArticleServiceDto(article.getId(), "client ip"));
@@ -181,5 +183,25 @@ class ArticleServiceTest {
         Assertions.assertEquals(getArticleResponseDto.getCategory(), article.getCategory().getName());
         Assertions.assertEquals(getArticleResponseDto.getTitle(), article.getTitle());
         Assertions.assertEquals(getArticleResponseDto.getContent(), article.getContent());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    void test6() {
+        // given
+        Article article = newArticle();
+
+        // when
+        DeleteArticleServiceDto deleteArticleServiceDto = DeleteArticleServiceDto.builder()
+                .articleId(article.getId())
+                .accessToken(getToken())
+                .build();
+        articleService.deleteArticle(deleteArticleServiceDto);
+
+        //then
+        Article deletedArticle = articleRepository.findById(article.getId())
+                .orElseThrow(ArticleNotExistsException::new);
+
+        Assertions.assertTrue(deletedArticle.isDeleted());
     }
 }

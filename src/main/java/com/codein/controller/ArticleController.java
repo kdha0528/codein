@@ -10,6 +10,7 @@ import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestservicedto.article.ArticleLikeServiceDto;
+import com.codein.requestservicedto.article.DeleteArticleServiceDto;
 import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
 import com.codein.responsedto.article.GetArticleResponseDto;
@@ -79,29 +80,28 @@ public class ArticleController {
     @MySecured(role = Role.MEMBER)
     @PostMapping("/articles/{id}/edit")
     public void editArticle(@PathVariable(value = "id") Long id,
+                            @CookieValue(value = "accesstoken") Cookie cookie,
                             @RequestBody @Valid EditArticleDto editArticleDto) {
-        articleService.editArticle(editArticleDto.toEditArticleServiceDto(id));
+        articleService.editArticle(editArticleDto.toEditArticleServiceDto(id, cookie.getValue()));
     }
 
     @MySecured(role = Role.MEMBER)
     @PostMapping("/articles/{id}/like")
     public void likeArticle(@PathVariable(value = "id") Long id, @CookieValue(value = "accesstoken") Cookie cookie) {
-        Member member = memberRepository.findByAccessToken(cookie.getValue());
-
-        if(member != null) {
             ArticleLikeServiceDto articleLikeServiceDto = ArticleLikeServiceDto.builder()
                     .articleId(id)
-                    .member(member)
+                    .accessToken(cookie.getValue())
                     .build();
             articleService.likeArticle(articleLikeServiceDto);
-        } else {
-            throw new MemberNotExistsException();
-        }
     }
 
     @MySecured(role = Role.MEMBER)
     @DeleteMapping("/articles/{id}")
     public void deleteArticle(@PathVariable(value = "id") Long id, @CookieValue(value = "accesstoken") Cookie cookie) {
-        
+        DeleteArticleServiceDto deleteArticleServiceDto = DeleteArticleServiceDto.builder()
+                .articleId(id)
+                .accessToken(cookie.getValue())
+                .build();
+        articleService.deleteArticle(deleteArticleServiceDto);
     }
 }

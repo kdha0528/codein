@@ -80,9 +80,9 @@ const form = ref({
 })
 
 onMounted(()=>{
-    if(route.params.category){
+    if(route.name === 'new-article'){
         select.value.category = (route.params.category as string).toUpperCase();
-    } else if(route.params.id){
+    } else {
         id.value.article = route.params.id;
         onGetArticle()
     }
@@ -108,23 +108,7 @@ const onGetArticle = async function() {
 
 const onSubmit = async function(){
     form.value.category = select.value.category;
-    if(id.value.article){   // 글 수정
-        await editArticle(route.path,form.value)
-            .then((response: any)=> {
-                if(resStore.isOK){
-                    alert("수정이 완료되었습니다.")
-                    router.replace({name:form.value.category.toString().toLowerCase()});
-                } else {
-                    alert(resStore.getErrorMessage);
-                    console.log(response)
-                    router.replace({name:form.value.category.toString().toLowerCase()});
-                }
-            }).catch(error => {
-                alert(error);
-                console.log(error)
-                router.replace({name:form.value.category.toString().toLowerCase()});
-            })
-    } else { //글 생성
+    if(route.name === 'new-article'){   // 글 생성
         await write(form.value)
             .then((response: any)=>{
                 if(resStore.isOK){
@@ -140,15 +124,32 @@ const onSubmit = async function(){
                 console.log(error);
                 router.replace('/'+ route.params.category+'/new');
             })
+    } else { //글 수정
+
+        await editArticle(route.path,form.value)
+            .then((response: any)=> {
+                if(resStore.isOK){
+                    alert("수정이 완료되었습니다.")
+                    router.replace({name:form.value.category.toString().toLowerCase()});
+                } else {
+                    alert(resStore.getErrorMessage);
+                    console.log(response)
+                    router.replace({name:form.value.category.toString().toLowerCase()});
+                }
+            }).catch(error => {
+                alert(error);
+                console.log(error)
+                router.replace({name:form.value.category.toString().toLowerCase()});
+            })
     }
 }
 
 const onCancel = function() {
-    if(id.value.article){   // 글 수정
-        alert("수정을 취소하였습니다.");
+    if(route.name === 'new-article'){   // 글 수정
+        alert("등록을 취소하였습니다.");
         router.back();
     } else {
-        alert("등록을 취소하였습니다.");
+        alert("수정을 취소하였습니다.");
         router.back();
     }
 }

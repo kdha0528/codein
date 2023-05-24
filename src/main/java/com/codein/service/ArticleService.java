@@ -1,8 +1,7 @@
 package com.codein.service;
 import com.codein.domain.article.*;
 import com.codein.domain.member.Member;
-import com.codein.error.exception.article.ArticleLikeExistsException;
-import com.codein.error.exception.article.ArticleNotExistsException;
+import com.codein.error.exception.article.*;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.error.exception.member.MemberNotLoginException;
 import com.codein.repository.article.ArticleRepository;
@@ -32,41 +31,57 @@ public class ArticleService {
     private final MemberRepository memberRepository;
     private final ViewLogRepository viewLogRepository;
     private final ArticleLikeRepository articleLikeRepository;
-    private final MemberService memberService;
 
     @Transactional
     public Article newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
         Member member = memberRepository.findByAccessToken(accesstoken);
-        Article article = newArticleServiceDto.toEntity(member);
-        articleRepository.save(article);
-        return article;
+        Article latestArticle = articleRepository.findByMemberLatest(member);
+
+        // 한 유저는 1분에 1번씩만 게시글을 작성할 수 있습니다.
+        if(latestArticle == null || LocalDateTime.now().minus(1, ChronoUnit.MINUTES).isAfter(latestArticle.getCreatedAt())){
+            Article article = newArticleServiceDto.toEntity(member);
+            articleRepository.save(article);
+            return article;
+        } else {
+            throw new FrequentWriteException();
+        }
     }
 
     @Transactional
     public Article editArticle(EditArticleServiceDto editArticleServiceDto) {
         Article article = articleRepository.findById(editArticleServiceDto.getId())
                 .orElseThrow(ArticleNotExistsException::new);
+        Member member = memberRepository.findByAccessToken(editArticleServiceDto.getAccessToken());
+        if(article.getMember() == member) {
 
-        ArticleEditor articleEditor = ArticleEditor.builder()
-                .category(editArticleServiceDto.getCategory())
-                .title(editArticleServiceDto.getTitle())
-                .content(editArticleServiceDto.getContent())
-                .build();
+            ArticleEditor articleEditor = ArticleEditor.builder()
+                    .category(editArticleServiceDto.getCategory())
+                    .title(editArticleServiceDto.getTitle())
+                    .content(editArticleServiceDto.getContent())
+                    .build();
 
-        return article.edit(articleEditor);
+            return article.edit(articleEditor);
+        }else{
+            throw new InvalidAuthorException();
+        }
     }
     @Transactional
     public GetArticleResponseDto getArticle(GetArticleServiceDto getArticleServiceDto) {
         Article article = articleRepository.findById(getArticleServiceDto.getArticleId())
                 .orElseThrow(ArticleNotExistsException::new);
-        ViewLog viewLog = viewLogRepository.findByGetArticleServiceDto(getArticleServiceDto);
 
         boolean isNewView = false;
 
-        if (viewLog == null || LocalDateTime.now().minus(10, ChronoUnit.MINUTES).isAfter(viewLog.getViewedAt())) {
-            // view log가 없거나 10분 이상 지난 경우
-            viewLogRepository.save(new ViewLog(article, getArticleServiceDto.getClientIp()));
-            isNewView = true;
+        if(!article.isDeleted()) {
+            ViewLog viewLog = viewLogRepository.findByGetArticleServiceDto(getArticleServiceDto);
+
+            if (viewLog == null || LocalDateTime.now().minus(10, ChronoUnit.MINUTES).isAfter(viewLog.getViewedAt())) {
+                // view log가 없거나 10분 이상 지난 경우
+                viewLogRepository.save(new ViewLog(article, getArticleServiceDto.getClientIp()));
+                isNewView = true;
+            }
+        } else {
+            throw new DeletedArticleException();
         }
 
         return article.toGetArticleResponseDto(isNewView);
@@ -83,18 +98,24 @@ public class ArticleService {
         Article article = articleRepository.findById(articleLikeServiceDto.getArticleId())
                 .orElseThrow(ArticleNotExistsException::new);
 
-        boolean exists = articleLikeRepository.existsArticleLike(articleLikeServiceDto);
+        Member member = memberRepository.findByAccessToken(articleLikeServiceDto.getAccessToken());
 
-        if (!exists) {
-            // 해당 article id와 client id로 like가 존재하지 않으면 like 생성
-            article.increaseLikeNum();
-            ArticleLike articleLike = ArticleLike.builder()
-                    .article(article)
-                    .member(article.getMember())
-                    .build();
-            articleLikeRepository.save(articleLike);
-        } else {    // 존재할 경우 예외처리
-            throw new ArticleLikeExistsException();
+        if(member != null) {
+            boolean exists = articleLikeRepository.existsArticleLike(article, member);
+
+            if (!exists) {
+                // 해당 article id와 client id로 like가 존재하지 않으면 like 생성
+                article.increaseLikeNum();
+                ArticleLike articleLike = ArticleLike.builder()
+                        .article(article)
+                        .member(member)
+                        .build();
+                articleLikeRepository.save(articleLike);
+            } else {    // 존재할 경우 예외처리
+                throw new ArticleLikeExistsException();
+            }
+        } else {
+            throw new MemberNotExistsException();
         }
     }
 
@@ -151,12 +172,8 @@ public class ArticleService {
         boolean exists;
         for (Article article : articleList) {
             for (int j = 0; j < random.nextInt(20); j++) {
-                ArticleLikeServiceDto articleLikeServiceDto = ArticleLikeServiceDto.builder()
-                        .articleId(article.getId())
-                        .member(memberList.get(j))
-                        .build();
 
-                exists = articleLikeRepository.existsArticleLike(articleLikeServiceDto);
+                exists = articleLikeRepository.existsArticleLike(article, memberList.get(j));
 
                 if (!exists) {
                     article.increaseLikeNum();
@@ -171,4 +188,20 @@ public class ArticleService {
             }
         }
     }
+    @Transactional
+    public void deleteArticle(DeleteArticleServiceDto deleteArticleServiceDto){
+        Article article = articleRepository.findById(deleteArticleServiceDto.getArticleId())
+                .orElseThrow(ArticleNotExistsException::new);
+
+        Member member = memberRepository.findByAccessToken(deleteArticleServiceDto.getAccessToken());
+
+        if(article.getMember() == member){
+            article.deleteArticle();
+        } else if (member == null){
+            throw new MemberNotExistsException();
+        } else{
+            throw new InvalidAuthorException();
+        }
+    }
+
 }

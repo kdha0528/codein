@@ -1,6 +1,8 @@
 package com.codein.requestservicedto.article;
 
 
+import com.codein.domain.member.Member;
+import jakarta.servlet.http.Cookie;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -13,12 +15,14 @@ public class EditArticleServiceDto {
     private final String category;
     private final String title;
     private final String content;
+    private final String accessToken;
 
     @Builder
-    public EditArticleServiceDto(Long id,String category, String title, String content) {
+    public EditArticleServiceDto(Long id,String category, String title, String content,String accessToken) {
         this.id = id;
         this.category = category;
         this.title = title;
         this.content = content;
+        this.accessToken = accessToken;
     }
 }

@@ -1,6 +1,9 @@
 package com.codein.requestdto.article;
 
+import com.codein.domain.member.Member;
+import com.codein.repository.member.MemberRepository;
 import com.codein.requestservicedto.article.EditArticleServiceDto;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -30,9 +33,10 @@ public class EditArticleDto {
         this.content = content;
     }
 
-    public EditArticleServiceDto toEditArticleServiceDto(Long id) {
+    public EditArticleServiceDto toEditArticleServiceDto(Long id, String accessToken) {
         return EditArticleServiceDto.builder()
                 .id(id)
+                .accessToken(accessToken)
                 .category(this.category)
                 .title(this.title)
                 .content(this.content)

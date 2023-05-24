@@ -13,6 +13,7 @@ import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
+import com.codein.requestservicedto.article.DeleteArticleServiceDto;
 import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
@@ -29,6 +30,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -399,6 +401,25 @@ class ArticleControllerTest {
     }
 
     @Test
+    @DisplayName("게시글 가져오기 실패: 삭제된 게시글")
+    void test4_4() throws Exception {
+        Article article = newArticle();
+        Long id = article.getId();
+
+        DeleteArticleServiceDto deleteArticleServiceDto = DeleteArticleServiceDto.builder()
+                .accessToken(getCookie().getValue())
+                .articleId(id)
+                .build();
+
+        articleService.deleteArticle(deleteArticleServiceDto);
+
+        // expected
+        mockMvc.perform(get("/articles/{id}",id))
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+    }
+
+    @Test
     @DisplayName("게시글 좋아요 누르기 성공")
     void test5_1() throws Exception {
         // given
@@ -424,6 +445,19 @@ class ArticleControllerTest {
         // expected
         mockMvc.perform(post("/articles/{id}/like",id).cookie(getCookie()))
                 .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 성공")
+    void test6_1() throws Exception {
+        // given
+        Article article = newArticle();
+        Long id = article.getId();
+
+        // expected
+        mockMvc.perform(delete("/articles/{id}",id).cookie(getCookie()))
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 }

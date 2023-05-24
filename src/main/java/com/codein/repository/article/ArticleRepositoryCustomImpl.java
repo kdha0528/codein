@@ -1,6 +1,7 @@
 package com.codein.repository.article;
 
 import com.codein.domain.article.Article;
+import com.codein.domain.article.ArticleLike;
 import com.codein.domain.member.Member;
 import com.codein.requestservicedto.article.GetActivitiesServiceDto;
 import com.codein.requestservicedto.article.GetArticlesServiceDto;
@@ -31,10 +32,22 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     @Override
     public List<Article> findByMember(Member member) {
         return jpaQueryFactory.selectFrom(article)
-                .where(article.member.eq(member))
+                .where(article.member.eq(member)
+                        ,article.deleted.eq(false))
                 .fetch();
     }
 
+    @Override
+    public Article findByMemberLatest(Member member) {
+
+        return jpaQueryFactory.selectFrom(article)
+                .where(
+                        article.member.eq(member)
+                        ,article.deleted.eq(false)
+                       )
+                .orderBy(article.id.desc())
+                .fetchFirst();
+    }
 
     @Override
     public ArticleListResponseDto getArticleList(GetArticlesServiceDto getArticlesServiceDto) {
@@ -43,6 +56,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .where(
                         article.category.eq(getArticlesServiceDto.getCategory()),
                         article.createdAt.between(getArticlesServiceDto.getStartDate(),LocalDateTime.now())
+                        ,article.deleted.eq(false)
                 );
 
         long count = query.fetch().size();
@@ -87,12 +101,15 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         JPAQuery<Article> query = switch (getActivitiesServiceDto.getActivity()) {
             case COMMENTS -> jpaQueryFactory.selectFrom(article)
                     .innerJoin(comment)
-                    .where(comment.commenter.id.eq(getActivitiesServiceDto.getId()));
+                    .where(comment.commenter.id.eq(getActivitiesServiceDto.getId())
+                            ,article.deleted.eq(false));
             case LIKED_ARTICLES -> jpaQueryFactory.selectFrom(article)
                     .innerJoin(articleLike)
-                    .where(articleLike.member.id.eq(getActivitiesServiceDto.getId()));
+                    .where(articleLike.member.id.eq(getActivitiesServiceDto.getId())
+                            ,article.deleted.eq(false));
             default -> jpaQueryFactory.selectFrom(article)
-                    .where(article.member.id.eq(getActivitiesServiceDto.getId()));
+                    .where(article.member.id.eq(getActivitiesServiceDto.getId())
+                            ,article.deleted.eq(false));
         };
 
         long count = query.fetch().size();

@@ -1,18 +1,16 @@
 package com.codein.requestservicedto.article;
 
-import com.codein.domain.article.Article;
-import com.codein.domain.article.ArticleLike;
-import com.codein.domain.member.Member;
 import lombok.Builder;
 import lombok.Getter;
+
 @Getter
 public class ArticleLikeServiceDto {
         private final Long articleId;
-        private final Member member;
+        private final String accessToken;
 
         @Builder
-        public ArticleLikeServiceDto(Long articleId, Member member) {
+        public ArticleLikeServiceDto(Long articleId,  String accessToken) {
             this.articleId = articleId;
-            this.member = member;
+            this.accessToken = accessToken;
         }
 }

@@ -6,10 +6,7 @@ import com.codein.responsedto.article.ArticleListItem;
 import com.codein.responsedto.article.GetArticleResponseDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -111,6 +108,8 @@ public class Article {
     public void increaseLikeNum(){
         this.likeNum++;
     }
+
+    public void deleteArticle(){ this.deleted = true;}
 
 
 }

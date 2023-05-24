@@ -1,6 +1,8 @@
 package com.codein.repository.article.like;
 
+import com.codein.domain.article.Article;
 import com.codein.domain.article.ArticleLike;
+import com.codein.domain.member.Member;
 import com.codein.requestservicedto.article.ArticleLikeServiceDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +18,15 @@ public class ArticleLikeRepositoryCustomImpl implements ArticleLikeRepositoryCus
 
 
     @Override
-    public boolean existsArticleLike(ArticleLikeServiceDto articleLikeServiceDto) {
+    public boolean existsArticleLike(Article article, Member member) {
 
         ArticleLike fetchResult = jpaQueryFactory.selectFrom(articleLike)
-                .where(articleLike.article.id.eq(articleLikeServiceDto.getArticleId())
-                        .and(articleLike.member.eq(articleLikeServiceDto.getMember())))
+                .where(articleLike.article.eq(article)
+                        .and(articleLike.member.eq(member)))
                 .fetchFirst();
 
         return fetchResult != null;
-
     }
+
+
 }

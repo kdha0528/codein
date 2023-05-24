@@ -60,11 +60,11 @@ public class MemberService {
         Member member = memberRepository.findByEmail(loginServiceDto.getEmail());
 
         if (member == null) {
-            throw new InvalidLoginInputException();
+            throw new MismatchLoginInputException();
         }
 
         if (!passwordEncoder.matches(loginServiceDto.getPassword(), member.getPassword())) {
-            throw new InvalidLoginInputException();
+            throw new MismatchLoginInputException();
         }
 
         Tokens token = Tokens.builder()
@@ -100,7 +100,7 @@ public class MemberService {
         Member member = tokens.getMember();
 
         if (!passwordEncoder.matches(passwordServiceDto.getOriginPassword(), member.getPassword())) {
-            throw new InvalidLoginInputException();
+            throw new MismatchLoginInputException();
         }
 
         member.setPassword(passwordEncoder.encrypt(passwordServiceDto.getNewPassword()));

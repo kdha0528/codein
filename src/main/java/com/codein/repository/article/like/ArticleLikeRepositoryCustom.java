@@ -1,7 +1,8 @@
 package com.codein.repository.article.like;
 
-import com.codein.requestservicedto.article.ArticleLikeServiceDto;
+import com.codein.domain.article.Article;
+import com.codein.domain.member.Member;
 
 public interface ArticleLikeRepositoryCustom {
-    boolean existsArticleLike(ArticleLikeServiceDto articleLikeServiceDto);
+    boolean existsArticleLike(Article article, Member member);
 }

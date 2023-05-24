@@ -95,7 +95,7 @@ const onGetProfile = async function (){
                 imageUrl.value = response.imagePath;
                 profile.value.name = response.name;
                 profile.value.nickname = response.nickname;
-            }else{
+            } else {
                 auth.logout()
                 alert(resStore.getErrorMessage);
                 console.log(response)
