@@ -121,16 +121,14 @@ const onGetArticle = async function() {
     await getArticle(route.path)
         .then((response: any)=>{
             if(resStore.isOK){
-                if(response.deleted) {
-                    alert("삭제된 게시물입니다.");
-                    router.go(-1);
-                } else {
-                    article.value = {...response};
-                    getKoreanCategory(response.category);
-                }
+                article.value = {...response};
+                getKoreanCategory(response.category);
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
+                if(resStore.getErrorCode === 'A004') {
+                    router.back();
+                }
             }
         }).catch(error => {
             alert(error);
@@ -190,7 +188,7 @@ const onDeleteArticle = async function () {
                 router.replace({name: category.value as string});
             } else {
                 alert(resStore.getErrorMessage);
-                console.log(response);
+                console.log(resStore.getErrorMessage);
             }
         }).catch(error => {
             alert(error);

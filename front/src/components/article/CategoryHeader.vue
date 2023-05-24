@@ -70,7 +70,7 @@
             <Articles />
           </keep-alive>
           <keep-alive>
-            <Pagination  :key="route.fullPath"/>
+            <Pagination :key="route.fullPath"/>
           </keep-alive>
       </div>
 </template>

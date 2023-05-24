@@ -52,6 +52,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     @Override
     public ArticleListResponseDto getArticleList(GetArticlesServiceDto getArticlesServiceDto) {
 
+        // category 와 period 조건 쿼리 추가
         JPAQuery<Article> query = jpaQueryFactory.selectFrom(article)
                 .where(
                         article.category.eq(getArticlesServiceDto.getCategory()),
@@ -59,12 +60,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                         ,article.deleted.eq(false)
                 );
 
-        long count = query.fetch().size();
-        int maxPage = (int) Math.floorDiv(count, getArticlesServiceDto.getSize());
-        if (count % getArticlesServiceDto.getSize() != 0) {
-            maxPage++;
-        }
-
+        // 검색어 있을 시 검색
         if (getArticlesServiceDto.getKeyword() != null) {
             switch(getArticlesServiceDto.getCondition()) {
                 case TITLE -> query.where(article.title.contains(getArticlesServiceDto.getKeyword()));
@@ -73,6 +69,13 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
             }
         }
 
+        long count = query.fetch().size();
+        int maxPage = (int) Math.floorDiv(count, getArticlesServiceDto.getSize());
+        if (count % getArticlesServiceDto.getSize() != 0) {
+            maxPage++;
+        }
+
+        // 정렬
         switch (getArticlesServiceDto.getSort()) {
             case VIEW -> query.orderBy(article.viewNum.desc(),article.id.desc());
             case LIKE -> query.orderBy(article.likeNum.desc(),article.id.desc());
