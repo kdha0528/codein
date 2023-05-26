@@ -193,7 +193,7 @@ class ArticleServiceTest {
 
         // when
         DeleteArticleServiceDto deleteArticleServiceDto = DeleteArticleServiceDto.builder()
-                .articleId(article.getId())
+                .id(article.getId())
                 .accessToken(getToken())
                 .build();
         articleService.deleteArticle(deleteArticleServiceDto);

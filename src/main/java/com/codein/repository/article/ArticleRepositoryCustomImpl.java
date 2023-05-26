@@ -33,7 +33,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     public List<Article> findByMember(Member member) {
         return jpaQueryFactory.selectFrom(article)
                 .where(article.member.eq(member)
-                        ,article.deleted.eq(false))
+                        ,article.deleted.isFalse())
                 .fetch();
     }
 
@@ -43,7 +43,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         return jpaQueryFactory.selectFrom(article)
                 .where(
                         article.member.eq(member)
-                        ,article.deleted.eq(false)
+                        ,article.deleted.isFalse()
                        )
                 .orderBy(article.id.desc())
                 .fetchFirst();
@@ -57,7 +57,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .where(
                         article.category.eq(getArticlesServiceDto.getCategory()),
                         article.createdAt.between(getArticlesServiceDto.getStartDate(),LocalDateTime.now())
-                        ,article.deleted.eq(false)
+                        ,article.deleted.isFalse()
                 );
 
         // 검색어 있을 시 검색
@@ -104,15 +104,15 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         JPAQuery<Article> query = switch (getActivitiesServiceDto.getActivity()) {
             case COMMENTS -> jpaQueryFactory.selectFrom(article)
                     .innerJoin(comment)
-                    .where(comment.commenter.id.eq(getActivitiesServiceDto.getId())
-                            ,article.deleted.eq(false));
+                    .where(comment.member.id.eq(getActivitiesServiceDto.getId())
+                            ,article.deleted.isFalse());
             case LIKED_ARTICLES -> jpaQueryFactory.selectFrom(article)
                     .innerJoin(articleLike)
                     .where(articleLike.member.id.eq(getActivitiesServiceDto.getId())
-                            ,article.deleted.eq(false));
+                            ,article.deleted.isFalse());
             default -> jpaQueryFactory.selectFrom(article)
                     .where(article.member.id.eq(getActivitiesServiceDto.getId())
-                            ,article.deleted.eq(false));
+                            ,article.deleted.isFalse());
         };
 
         long count = query.fetch().size();
@@ -127,7 +127,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
         List<ActivityListItem> activityList = fetchResult
                 .stream()
                 .map(Article::toActivityListItem)
-                .collect(Collectors.toList());
+                .toList();
 
 
         return ActivityListResponseDto.builder()

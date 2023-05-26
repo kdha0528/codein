@@ -35,6 +35,7 @@ public class Article {
     private Integer viewNum;
     private Integer commentNum;
     private Integer likeNum;
+    private Integer dislikeNum;
     private boolean deleted;
 
 
@@ -48,6 +49,7 @@ public class Article {
         this.viewNum = 0;
         this.commentNum = 0;
         this.likeNum = 0;
+        this.dislikeNum = 0;
         this.deleted = false;
     }
 
@@ -105,8 +107,11 @@ public class Article {
                 .build();
     }
 
-    public void increaseLikeNum(){
-        this.likeNum++;
+    public void changeLikeNum(Integer changes){
+        this.likeNum += changes;
+    }
+    public void changeDislikeNum(Integer changes) {
+        this.dislikeNum += changes;
     }
 
     public void deleteArticle(){ this.deleted = true;}

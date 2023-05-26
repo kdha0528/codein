@@ -16,7 +16,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useResponseStore} from "@/stores/Response";
 import {useArticlesStore} from "@/stores/articles";
 import {useActivitiesStore} from "@/stores/activities";
-import {usePageStore} from "@/stores/page";
+import {usePageStore} from "@/stores/articlePage";
 const router = useRouter();
 const route = useRoute();
 const pageStore = usePageStore();

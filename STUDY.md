@@ -15,4 +15,9 @@
     6. 서버는 refesh token을 받아 검사 후, 비정상일 시 로그아웃 처리를, 정상일 시 refesh token과 access token을 둘 다 새로 발급하여 쿠키 재생성
 
     7. 클라이언트는 재발급받은 token으로 재요청을 보낸다.
-   
+
+### jwt oauth..? spring security?
+
+### 각종 수정 정보에 대한 로그는 추후 추가 예정
+
+### 신고 기능 추가 예정

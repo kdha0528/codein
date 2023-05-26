@@ -408,7 +408,7 @@ class ArticleControllerTest {
 
         DeleteArticleServiceDto deleteArticleServiceDto = DeleteArticleServiceDto.builder()
                 .accessToken(getCookie().getValue())
-                .articleId(id)
+                .id(id)
                 .build();
 
         articleService.deleteArticle(deleteArticleServiceDto);

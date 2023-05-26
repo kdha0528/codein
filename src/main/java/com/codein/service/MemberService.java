@@ -202,13 +202,13 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(String accessToken) {
-        Tokens tokens = tokensRepository.findByAccessToken(accessToken)
-                .orElseThrow(MemberNotLoginException::new);
-        Member member = tokens.getMember();
-        if (member.getProfileImage() != null) {
-            removeProfileImage(member.getProfileImage().getImgFileName());
+        Member member = memberRepository.findByAccessToken(accessToken);
+
+        if(member != null){
+            member.deleteMember();
+        } else {
+            throw new MemberNotExistsException();
         }
-        memberRepository.delete(member);
     }
 
     @Transactional

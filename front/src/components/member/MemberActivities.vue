@@ -52,7 +52,7 @@ import {Avatar} from "@element-plus/icons-vue";
 import {useActivitiesStore} from "@/stores/activities";
 import Activities from "@/components/member/Activities.vue";
 import Pagination from "@/components/pagination/Pagination.vue";
-import {usePageStore} from "@/stores/page";
+import {usePageStore} from "@/stores/articlePage";
 
 const router = useRouter();
 const route = useRoute();

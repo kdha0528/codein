@@ -91,15 +91,27 @@ public class ArticleController {
             ArticleLikeServiceDto articleLikeServiceDto = ArticleLikeServiceDto.builder()
                     .articleId(id)
                     .accessToken(cookie.getValue())
+                    .isLike(true)
                     .build();
             articleService.likeArticle(articleLikeServiceDto);
+    }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping("/articles/{id}/dislike")
+    public void dislikeArticle(@PathVariable(value = "id") Long id, @CookieValue(value = "accesstoken") Cookie cookie) {
+        ArticleLikeServiceDto articleLikeServiceDto = ArticleLikeServiceDto.builder()
+                .articleId(id)
+                .accessToken(cookie.getValue())
+                .isLike(false)
+                .build();
+        articleService.likeArticle(articleLikeServiceDto);
     }
 
     @MySecured(role = Role.MEMBER)
     @DeleteMapping("/articles/{id}")
     public void deleteArticle(@PathVariable(value = "id") Long id, @CookieValue(value = "accesstoken") Cookie cookie) {
         DeleteArticleServiceDto deleteArticleServiceDto = DeleteArticleServiceDto.builder()
-                .articleId(id)
+                .id(id)
                 .accessToken(cookie.getValue())
                 .build();
         articleService.deleteArticle(deleteArticleServiceDto);

@@ -18,14 +18,12 @@ public class ArticleLikeRepositoryCustomImpl implements ArticleLikeRepositoryCus
 
 
     @Override
-    public boolean existsArticleLike(Article article, Member member) {
+    public ArticleLike existsArticleLike(Article article, Member member) {
 
-        ArticleLike fetchResult = jpaQueryFactory.selectFrom(articleLike)
+        return jpaQueryFactory.selectFrom(articleLike)
                 .where(articleLike.article.eq(article)
                         .and(articleLike.member.eq(member)))
                 .fetchFirst();
-
-        return fetchResult != null;
     }
 
 

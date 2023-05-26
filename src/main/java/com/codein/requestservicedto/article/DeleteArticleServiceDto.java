@@ -5,12 +5,12 @@ import lombok.Getter;
 
 @Getter
 public class DeleteArticleServiceDto {
-    private final Long articleId;
+    private final Long id;
     private final String accessToken;
 
     @Builder
-    public DeleteArticleServiceDto(Long articleId, String accessToken) {
-        this.articleId = articleId;
+    public DeleteArticleServiceDto(Long id, String accessToken) {
+        this.id = id;
         this.accessToken = accessToken;
     }
 }

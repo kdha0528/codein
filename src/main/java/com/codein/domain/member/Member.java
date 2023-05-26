@@ -160,5 +160,5 @@ public class Member {
         this.phone = phone;
     }
 
-
+    public void deleteMember(){ this.deleted = true; }
 }

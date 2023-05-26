@@ -88,7 +88,7 @@ import type {Article} from "@/components/custom-types/article";
 import Pagination from "@/components/pagination/Pagination.vue";
 import CategoryIntro from "@/components/article/CategoryIntro.vue";
 import type {Intro} from "@/components/custom-types/intro";
-import {usePageStore} from "@/stores/page";
+import {usePageStore} from "@/stores/articlePage";
 
 const route = useRoute();
 const router = useRouter();

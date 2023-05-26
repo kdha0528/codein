@@ -1,6 +1,7 @@
 package com.codein.service;
 import com.codein.domain.article.*;
 import com.codein.domain.member.Member;
+import com.codein.domain.utils.LikeChanges;
 import com.codein.error.exception.article.*;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.error.exception.member.MemberNotLoginException;
@@ -100,19 +101,35 @@ public class ArticleService {
 
         Member member = memberRepository.findByAccessToken(articleLikeServiceDto.getAccessToken());
 
-        if(member != null) {
-            boolean exists = articleLikeRepository.existsArticleLike(article, member);
+        if (member != null) {
+            ArticleLike exists = articleLikeRepository.existsArticleLike(article, member);
 
-            if (!exists) {
-                // 해당 article id와 client id로 like가 존재하지 않으면 like 생성
-                article.increaseLikeNum();
-                ArticleLike articleLike = ArticleLike.builder()
-                        .article(article)
-                        .member(member)
-                        .build();
-                articleLikeRepository.save(articleLike);
-            } else {    // 존재할 경우 예외처리
-                throw new ArticleLikeExistsException();
+            if (exists == null) {   // 첫 추천 혹은 비추천
+                if (articleLikeServiceDto.isLike()) {
+                    ArticleLike articleLike = ArticleLike.builder()
+                            .article(article)
+                            .member(member)
+                            .like(true)
+                            .build();
+                    articleLikeRepository.save(articleLike);
+                    article.changeLikeNum(1);
+                } else {
+                    ArticleLike articleLike = ArticleLike.builder()
+                            .article(article)
+                            .member(member)
+                            .like(false)
+                            .build();
+                    articleLikeRepository.save(articleLike);
+                    article.changeDislikeNum(1);
+                }
+            } else { // 이미 추천 기록이 있다면 업데이트
+                if (LocalDateTime.now().minus(10, ChronoUnit.SECONDS).isAfter(exists.getLikedAt())) {
+                    LikeChanges changes = exists.change(articleLikeServiceDto.isLike());
+                    article.changeLikeNum(changes.getLike());
+                    article.changeDislikeNum(changes.getDislike());
+                } else {  // 10초에 1번씩만 업데이트 가능
+                    throw new FrequentLikeException();
+                }
             }
         } else {
             throw new MemberNotExistsException();
@@ -169,28 +186,41 @@ public class ArticleService {
     public void createLikeDummies(ArrayList<Member> memberList){
         Random random = new Random();
         List<Article> articleList = articleRepository.findAll();
-        boolean exists;
+        ArticleLike exists;
         for (Article article : articleList) {
             for (int j = 0; j < random.nextInt(20); j++) {
 
                 exists = articleLikeRepository.existsArticleLike(article, memberList.get(j));
 
-                if (!exists) {
-                    article.increaseLikeNum();
-                    ArticleLike articleLike = ArticleLike.builder()
-                            .article(article)
-                            .member(memberList.get(j))
-                            .build();
-                    articleLikeRepository.save(articleLike);
+                if (exists == null) {
+                    if(random.nextBoolean()){
+                        article.changeLikeNum(1);
+                        ArticleLike articleLike = ArticleLike.builder()
+                                .article(article)
+                                .member(memberList.get(j))
+                                .like(true)
+                                .build();
+                        articleLikeRepository.save(articleLike);
+                    } else {
+                        article.changeDislikeNum(1);
+                        ArticleLike articleLike = ArticleLike.builder()
+                                .article(article)
+                                .member(memberList.get(j))
+                                .like(false)
+                                .build();
+                        articleLikeRepository.save(articleLike);
+                    }
                 } else {
-                    throw new ArticleLikeExistsException();
+                    LikeChanges changes = exists.change(random.nextBoolean());
+                    article.changeLikeNum(changes.getLike());
+                    article.changeDislikeNum(changes.getDislike());
                 }
             }
         }
     }
     @Transactional
     public void deleteArticle(DeleteArticleServiceDto deleteArticleServiceDto){
-        Article article = articleRepository.findById(deleteArticleServiceDto.getArticleId())
+        Article article = articleRepository.findById(deleteArticleServiceDto.getId())
                 .orElseThrow(ArticleNotExistsException::new);
 
         Member member = memberRepository.findByAccessToken(deleteArticleServiceDto.getAccessToken());
