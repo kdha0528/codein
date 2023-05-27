@@ -18,9 +18,9 @@ public class NewCommentDto {
     private final Long targetId;
 
     @Builder
-    public NewCommentDto(String content, Long id) {
+    public NewCommentDto(String content, Long targetId) {
         this.content = content;
-        this.targetId = id;
+        this.targetId = targetId;
     }
 
     public NewCommentServiceDto toNewCommentServiceDto(String accessToken, Long articleId) {

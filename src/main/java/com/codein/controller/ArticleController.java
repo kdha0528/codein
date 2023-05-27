@@ -68,7 +68,7 @@ public class ArticleController {
     }
 
     @MySecured(role = Role.MEMBER)
-    @PostMapping( "/article/new")
+    @PostMapping( "/articles/new")
     public void newArticle(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid NewArticleDto newArticleDto) {
         articleService.newArticle(newArticleDto.toNewArticleServiceDto(), cookie.getValue());
     }

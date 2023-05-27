@@ -109,7 +109,7 @@ public class ArticleService {
                     ArticleLike articleLike = ArticleLike.builder()
                             .article(article)
                             .member(member)
-                            .like(true)
+                            .isLike(true)
                             .build();
                     articleLikeRepository.save(articleLike);
                     article.changeLikeNum(1);
@@ -117,7 +117,7 @@ public class ArticleService {
                     ArticleLike articleLike = ArticleLike.builder()
                             .article(article)
                             .member(member)
-                            .like(false)
+                            .isLike(false)
                             .build();
                     articleLikeRepository.save(articleLike);
                     article.changeDislikeNum(1);
@@ -198,7 +198,7 @@ public class ArticleService {
                         ArticleLike articleLike = ArticleLike.builder()
                                 .article(article)
                                 .member(memberList.get(j))
-                                .like(true)
+                                .isLike(true)
                                 .build();
                         articleLikeRepository.save(articleLike);
                     } else {
@@ -206,7 +206,7 @@ public class ArticleService {
                         ArticleLike articleLike = ArticleLike.builder()
                                 .article(article)
                                 .member(memberList.get(j))
-                                .like(false)
+                                .isLike(false)
                                 .build();
                         articleLikeRepository.save(articleLike);
                     }

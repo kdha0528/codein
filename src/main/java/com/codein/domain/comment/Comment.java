@@ -13,6 +13,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,6 +50,7 @@ public class Comment {
 
     @Builder
     public Comment(Article article, Comment target, Member member, String content) {
+        this.parentId = 0L; //  초기화
         this.article = article;
         this.target = target;
         this.member = member;
@@ -60,14 +62,24 @@ public class Comment {
     }
 
     public void setParentId() {
-        if(this.target == null) {
-            parentId = this.id;
+        if(this.target == null){
+            this.parentId = this.id;
         } else {
-            parentId = this.target.getParentId();
+            if (this.target.getParentId() == null) {     // terget이 parentId가 없다면(최상위 댓글이라면) parent id는 최상위 댓글의 id
+                this.parentId = this.target.getId();
+            } else {    // target이 parentId가 있다면(최상위 댓글이 아니라면) 최상위 댓글을 parent id로 설정
+                this.parentId = this.target.getParentId();
+            }
         }
     }
 
     public CommentListItem toCommentListItem() {
+        Long targetId = null;
+        String targetNickname = null;
+        if(this.target != null) {
+            targetNickname = this.target.getMember().getNickname();
+            targetId = this.target.getId();
+        }
         return  CommentListItem.builder()
                 .id(this.id)
                 .content(this.content)
@@ -76,8 +88,8 @@ public class Comment {
                 .commenterId(this.member.getId())
                 .commenterNickname(this.member.getNickname())
                 .commenterProfileImage(this.member.getProfileImage())
-                .targetId(this.target.getId())
-                .targetNickname(this.target.getMember().getNickname())
+                .targetId(targetId)
+                .targetNickname(targetNickname)
                 .build();
     }
 

@@ -147,7 +147,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/article/new").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newArticleDto))
                 )
@@ -166,7 +166,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/article/new").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newArticleDto))
                 )
@@ -185,7 +185,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/article/new").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(writePostDto))
                 )

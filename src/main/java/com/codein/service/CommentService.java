@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +44,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void newComment(NewCommentServiceDto newCommentServiceDto) {
+    public Comment newComment(NewCommentServiceDto newCommentServiceDto) {
 
         Article article = articleRepository.findById(newCommentServiceDto.getArticleId())
                 .orElseThrow(ArticleNotExistsException::new);
@@ -51,9 +52,14 @@ public class CommentService {
         Member member = memberRepository.findByAccessToken(newCommentServiceDto.getAccessToken());
 
         if(member != null){
-            Comment target = commentRepository.findTargetById(newCommentServiceDto.getTargetId());
+            Comment target = null;
+            if(newCommentServiceDto.getTargetId() != null){
+                target = commentRepository.findTargetById(newCommentServiceDto.getTargetId());
+            }
             Comment newComment = newCommentServiceDto.toEntity(member,article, target);
             commentRepository.save(newComment);
+            newComment.setParentId();
+            return newComment;
         } else {
             throw new MemberNotExistsException();
         }
@@ -74,7 +80,7 @@ public class CommentService {
                     CommentLike commentLike = CommentLike.builder()
                             .comment(comment)
                             .member(member)
-                            .like(true)
+                            .isLike(true)
                             .build();
                     commentLikeRepository.save(commentLike);
                     comment.changeLikeNum(1);
@@ -82,7 +88,7 @@ public class CommentService {
                     CommentLike commentLike = CommentLike.builder()
                             .comment(comment)
                             .member(member)
-                            .like(false)
+                            .isLike(false)
                             .build();
                     commentLikeRepository.save(commentLike);
                     comment.changeDislikeNum(1);
@@ -135,6 +141,30 @@ public class CommentService {
         } else {
             throw new InvalidAuthorException();
         }
+    }
 
+    @Transactional
+    public void createCommentDummies(Article article, Member member) {
+        Random random = new Random();
+        for(int i = 0; i < 50; i++){
+            Comment comment = Comment.builder()
+                    .content("댓글 테스트 "+i)
+                    .article(article)
+                    .member(member)
+                    .build();
+            commentRepository.save(comment);
+            comment.setParentId();
+
+            for(int j = 0; j < random.nextInt(4);j++){
+                Comment child = Comment.builder()
+                        .target(comment)
+                        .content(i+"의 "+j+"번 째 자식 댓글")
+                        .article(article)
+                        .member(member)
+                        .build();
+                commentRepository.save(child);
+                child.setParentId();
+            }
+        }
     }
 }

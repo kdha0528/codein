@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.Objects;
+
 import static java.lang.Math.max;
 
 @Getter
@@ -18,7 +20,7 @@ public class GetCommentListServiceDto {
     @Builder
     public GetCommentListServiceDto(Article article, Integer page) {
         this.article = article;
-        this.page = page;
+        this.page = Objects.requireNonNullElse(page, 1);
     }
 
     public long getOffset() {

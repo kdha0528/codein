@@ -30,22 +30,22 @@ public class CommentLike {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    private boolean like;
-    private boolean dislike;
+    private boolean isLike;
+    private boolean isDislike;
 
     @NotNull
     private LocalDateTime likedAt;
 
     @Builder
-    public CommentLike(Comment comment, Member member, boolean like) {
+    public CommentLike(Comment comment, Member member, boolean isLike) {
         this.comment = comment;
         this.member = member;
-        if(like){
-            this.like = true;
-            this.dislike = false;
+        if(isLike){
+            this.isLike = true;
+            this.isDislike = false;
         } else {
-            this.like = false;
-            this.dislike = true;
+            this.isLike = false;
+            this.isDislike = true;
         }
         this.likedAt = LocalDateTime.now();
     }
@@ -54,27 +54,27 @@ public class CommentLike {
         LikeChanges result = new LikeChanges();
 
         if(isLike){ // 클라이언트가 추천을 눌렀을 때
-            if(this.like){    // 이미 추천이 눌려있다면 추천을 취소
-                this.like = false;
+            if(this.isLike){    // 이미 추천이 눌려있다면 추천을 취소
+                this.isLike = false;
                 result.decreaseLike();
             } else {
-                if (this.dislike){ // 비추천이 눌려있다면, 비추천을 취소하고 추천
-                    this.dislike = false;
+                if (this.isDislike){ // 비추천이 눌려있다면, 비추천을 취소하고 추천
+                    this.isDislike = false;
                     result.decreaseDislike();
                 }
-                this.like = true; // 비추천이 안눌려있으면 그냥 추천
+                this.isLike = true; // 비추천이 안눌려있으면 그냥 추천
                 result.increaseLike();
             }
         } else {    // 클라이언트가 비추천을 누렀을 때
-            if(this.dislike){ // 이미 비추천이 눌려있다면 비추천을 취소
-                this.dislike = false;
+            if(this.isDislike){ // 이미 비추천이 눌려있다면 비추천을 취소
+                this.isDislike = false;
                 result.decreaseDislike();
             } else {
-                if(this.like){ // 추천이 눌려있다면, 추천을 취소하고 비추천
-                    this.like = false;
+                if(this.isLike){ // 추천이 눌려있다면, 추천을 취소하고 비추천
+                    this.isLike = false;
                     result.decreaseLike();
                 }
-                this.dislike = true;    // 추천이 안눌려있으면 그냥 비추천
+                this.isDislike = true;    // 추천이 안눌려있으면 그냥 비추천
                 result.increaseDislike();
             }
         }

@@ -90,7 +90,7 @@ class ArticleServiceTest {
 
     @Test
     @DisplayName("글 등록 성공")
-    void test1() {
+        void test1() {
         // given
         String accessToken = getToken();
         NewArticleDto newArticleDto = NewArticleDto.builder()

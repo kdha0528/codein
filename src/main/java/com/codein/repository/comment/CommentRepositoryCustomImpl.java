@@ -1,5 +1,6 @@
 package com.codein.repository.comment;
 
+import com.codein.domain.article.Article;
 import com.codein.domain.comment.Comment;
 import com.codein.requestdto.comment.GetCommentListServiceDto;
 import com.codein.responsedto.comment.CommentListItem;
@@ -51,5 +52,13 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
                 .commentList(commentList)
                 .maxPage(maxPage)
                 .build();
+    }
+
+    @Override
+    public List<Comment> findCommentsByArticle(Article article) {
+        return jpaQueryFactory.selectFrom(comment)
+                .where(comment.article.eq(article))
+                .orderBy(comment.id.desc())
+                .fetch();
     }
 }
