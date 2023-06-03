@@ -1,9 +1,25 @@
+* {
+    line-height: 1.5;
+    letter-spacing: 0.01rem;
+    white-space: pre-wrap;
+}
+
 .content {
     height: calc(100vh - 60px);
     width: 90%;
     max-width: 980px;
     margin: 40px auto 0 auto;
 }
+
+li {
+    list-style: none;
+}
+
+.el-button:disabled {
+    cursor: default !important;
+}
+
+
 
 pre {
     font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue',

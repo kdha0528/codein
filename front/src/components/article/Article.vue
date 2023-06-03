@@ -20,17 +20,26 @@
                 </el-icon>
                 <div class="d-flex flex-column justify-content-center ms-3">
                     <div class="text_link" @click="router.replace( '/members/'+article.authorId)" style="cursor: pointer; margin-bottom:0.2rem;">{{ article.nickname }}</div>
-                    <div class="d-flex align-content-lg-start" >
+                    <div class="d-flex align-items-center align-content-lg-start" >
                         <div style="margin-right: 0.5rem;">{{article.createdAt}}</div>
                         <span style="content: '\00B7';">&#183;</span>
-                        <div style="margin-left: 0.5rem;">{{ article.viewNum }}</div>
+                        <div class="d-flex align-items-center">
+                            <el-icon class="ms-2" style="width: 1.5rem;  height:1.5rem; border-radius: 100%;">
+                                <View/>
+                            </el-icon>
+                            {{ article.viewNum }}
+                        </div>
+                        <div v-if="false">
+                            <span style="content: '\00B7';">&#183;</span>
+                            <span>수정됨</span>
+                        </div>
                     </div>
                 </div>
             </div>
             <div v-if="isAuthor()" class="d-flex">
                 <el-dropdown  trigger="click">
                     <span class="el-dropdown-link">
-                    <el-icon size="25" color="#B2B2B2" class="dropdown" style="cursor: pointer">
+                    <el-icon size="25" color="#B2B2B2" class="dropdown pt-1" style="cursor: pointer;">
                         <MoreFilled/>
                     </el-icon>
                     </span>
@@ -62,35 +71,101 @@
              style="font-size: 2.5rem;">
             {{article.title}}
         </div>
-        <div class="mt-5" style="white-space: pre-line; line-height: 2rem;">
+        <p class="mt-5" style="font-size: 1.1rem;" >
             {{article.content}}
-        </div>
-        <el-button class="like_button pe-3 ps-3"
-                   size="large"
-                   @click="onLikeArticle()">
-            <el-icon size="25"
-                     style="cursor: pointer;">
-                <Star />
-            </el-icon>
-            <span style="font-size: 1.2rem;">
+        </p>
+        <div class="d-flex" style="margin: 3rem auto 3rem auto;">
+            <el-button class="like_button pe-3 ps-3"
+                       size="large"
+                       @click="onLikeArticle()"
+                       :disabled="!authStore.isLoggedIn">
+                <el-icon size="25">
+                    <CaretTop />
+                </el-icon>
+                <span style="font-size: 1.2rem;">
                 {{article.likeNum}}
             </span>
-        </el-button>
-        <div>댓글</div>
+            </el-button>
+            <el-button class="dislike_button pe-3 ps-3"
+                       size="large"
+                       @click="onDislikeArticle()"
+                       :disabled="!authStore.isLoggedIn">
+                <el-icon size="25">
+                    <CaretBottom />
+                </el-icon>
+                <span style="font-size: 1.2rem;">
+                {{article.dislikeNum}}
+            </span>
+            </el-button>
+        </div>
+
+        <el-divider/>
+        <div class="d-flex mt-3 mb-3">
+            <el-icon size="25">
+                <ChatDotSquare/>
+            </el-icon>
+            <span style="font-size: 1.2rem; padding-left: 3px;">
+                {{ article.commentNum }}개의 댓글
+            </span>
+        </div>
+        <div
+            class="d-flex flex-column mb-5 p-4"
+            style="border: solid thin #E2E2E2; border-radius: 5px;" >
+            <div class="d-flex justify-content-between">
+                <img v-if="article.imagePath" :src="article.imagePath"
+                     style="width: 3rem; height: 3rem; border-radius: 100%;"
+                     alt="">
+                <el-icon v-else size="40"
+                         style="width: 3rem;  height:3rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+                    <Avatar/>
+                </el-icon>
+                <el-input v-model="comment.content"
+                          class="comment-input ms-4"
+                          size="large"
+                          :autosize="{ minRows: 3, maxRows: 6 }"
+                          placeholder="댓글을 입력해주세요."
+                          show-word-limit
+                          maxlength="3000"
+                          type="textarea"
+                          resize="none"
+                          input-style="font-size: 1rem; line-height: 2rem; letter-spacing:0.05rem;"
+                          style="max-width: 76vw;">
+                </el-input>
+            </div>
+            <el-button class="comment-button"
+                type="primary"
+                @click="onWriteComment(comment)"
+                size="large"
+                :disabled="comment.content.length<1 || !authStore.isLoggedIn"
+                style="max-width: 5rem; margin: 1.5rem 0 auto auto;">
+                댓글 쓰기
+            </el-button>
+        </div>
+        <keep-alive>
+            <Comments />
+        </keep-alive>
     </div>
 </template>
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {deleteArticle, getArticle, likeArticle} from "@/controller/api/article";
+import {inject, onMounted, provide, ref} from "vue";
+import {deleteArticle, dislikeArticle, getArticle, likeArticle} from "@/controller/api/article";
 import {useRoute, useRouter} from "vue-router";
 import {useResponseStore} from "@/stores/Response";
-import {Avatar, MoreFilled} from "@element-plus/icons-vue";
+import {Avatar, CaretBottom, CaretTop, ChatDotSquare, MoreFilled, UserFilled} from "@element-plus/icons-vue";
 import {useAuthStore} from "@/stores/auth";
+import {useCommentsStore} from "@/stores/comments";
+import {usePageStore} from "@/stores/page";
+import type {Comment} from "@/custom-types/comment";
+import Comments from "@/components/comment/Comments.vue";
+import {write} from "@/controller/api/comment";
 
 const route = useRoute();
 const router = useRouter();
 const resStore = useResponseStore();
 const authStore = useAuthStore();
+const commentsStore = useCommentsStore();
+const pageStore = usePageStore();
+
 
 const article = ref({
     id:'',
@@ -100,6 +175,7 @@ const article = ref({
     commentNum:'',
     viewNum:'',
     likeNum:'',
+    dislikeNum:'',
     createdAt:'',
     authorId:'',
     nickname:'',
@@ -107,11 +183,32 @@ const article = ref({
     deleted:false,
 })
 
+const comment = ref({
+    content: '',
+})
+
+const commentKey = ref(0);
 const category = ref('');
 
 const isAuthor = function () {
-    return article.value.authorId === authStore.getId;
+    if(authStore.isLoggedIn){
+        return article.value.authorId === authStore.getId;
+    } else {
+        return false;
+    }
 }
+
+const onPaging = async function(page: number, componentName: string) {
+    if(componentName === 'Articles'){
+        await pageStore.setArticlesCurrentPage(page);
+        await onGetArticle();
+    } else if (componentName === 'Comments'){
+        await pageStore.setCommentsCurrentPage(page);
+        await onGetArticle();
+    }
+}
+
+provide('onPaging', onPaging);
 
 onMounted( ()=>{
     onGetArticle();
@@ -121,11 +218,16 @@ const onGetArticle = async function() {
     await getArticle(route.path)
         .then((response: any)=>{
             if(resStore.isOK){
-                article.value = {...response};
-                getKoreanCategory(response.category);
+                commentsStore.clean();
+                article.value = {...response.articleData};
+                response.commentsData.commentList.forEach((r: any) => {
+                    const comment: Comment = {...r}
+                    commentsStore.addComments(comment);
+                })
+                pageStore.setArticlesMaxPage(response.commentsData.maxPage);
+                getKoreanCategory(article.value.category);
             } else {
                 alert(resStore.getErrorMessage);
-                console.log(response)
                 if(resStore.getErrorCode === 'A004') {
                     router.back();
                 }
@@ -135,6 +237,8 @@ const onGetArticle = async function() {
             console.log(error)
         })
 }
+
+provide('onGetArticle',onGetArticle());
 
 const getKoreanCategory = function (c: string){
     switch(c){
@@ -160,11 +264,46 @@ const getKoreanCategory = function (c: string){
     }
 }
 
+const onWriteComment = async function(c:any) {
+    await write(route.path+'/comments', c)
+        .then((response: any)=>{
+            if(resStore.isOK){
+                commentKey.value++;
+                comment.value.content='';
+                onGetArticle();
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response);
+                commentKey.value++;
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error);
+            commentKey.value++;
+        })
+}
+
+provide('onWriteComment', onWriteComment);
+
 const onLikeArticle = async function () {
     await likeArticle(article.value.id)
         .then((response:any)=>{
             if(resStore.isOK){
-                alert("추천이 완료되었습니다.");
+                onGetArticle();
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response);
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error)
+        })
+}
+
+const onDislikeArticle = async function () {
+    await dislikeArticle(article.value.id)
+        .then((response:any)=>{
+            if(resStore.isOK){
                 onGetArticle();
             } else {
                 alert(resStore.getErrorMessage);
@@ -195,13 +334,10 @@ const onDeleteArticle = async function () {
             console.log(error)
         })
 }
+
 </script>
 <style scoped>
 @import "../css/contentBase.css";
-
-li {
-    list-style: none;
-}
 
 .category {
     color:#B2B2B2;
@@ -214,13 +350,28 @@ li {
 
 .like_button {
     --el-button-hover-bg-color: white;
-    border:solid 0.1rem #b1b3b8;
-    margin: 3rem auto 3rem auto;
+    border:solid thin #409eff;
+    color:#409eff;
 }
 
-.like_button:hover{
-    border: solid 0.1rem #409eff;
+.dislike_button {
+    --el-button-hover-bg-color: white;
+    border:solid thin #dc3545;
+    color:#dc3545;
 }
+
+.like_button:hover, .like_button:active{
+    border-color: #409eff;
+    background-color: lightcyan;
+    color:#409eff;
+}
+
+.dislike_button:hover, .dislike_button:active{
+    color:#dc3545;
+    background-color: #ffe0eb;
+    border-color:#dc3545;
+}
+
 
 .dropdown_menu {
     .el-dropdown-item {
@@ -234,6 +385,6 @@ li {
 }
 
 .dropdown:hover{
-    color: #409eff;
+    color: black;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <ul class=" d-flex flex-column" style="width:100%; margin-block:0; padding-inline-start: 0">
-        <li v-for="activity in activitiesStore.getActivities" :key="activity.id">
+        <li v-for="activity in activitiesStore.getActivities" :key="activity.createdAt">
             <div class="d-flex justify-content-between mb-3">
                 <div class="d-flex align-items-center">
                     <el-button plain round class="category" @click="router.replace('/'+activity.category.toLowerCase())">
@@ -13,13 +13,13 @@
                             <span>을&nbsp;작성하였습니다.</span>
                         </div>
                         <div v-else-if="route.name === 'members-comments'">
-                            <span @click="router.replace('/members/'+activity.authorId)">{{activity.authorId}}</span>
+                            <span class = "nameLink" @click="router.replace('/members/'+activity.authorId)">{{activity.nickname}}</span>
                             <span>님의&nbsp;게시물에&nbsp;</span>
                             <span style="color:#409eff;">댓글</span>
                             <span>을&nbsp;달았습니다.</span>
                         </div>
                         <div v-else-if="route.name === 'members-liked-articles'">
-                            <span>{{activity.authorId}}님의&nbsp;게시물을&nbsp;</span>
+                            <span class = "nameLink" @click = "router.replace('/members/'+activity.authorId)">{{activity.nickname}}님의&nbsp;게시물을&nbsp;</span>
                             <span style="color:#409eff;">추천</span>
                             <span>하였습니다.</span>
                         </div>
@@ -31,22 +31,28 @@
                     </div>
                 </div>
             </div>
-            <div style="font-size:1.25rem; cursor: pointer;" @click="replacePath('/articles/'+activity.id)">
+            <div style="font-size:1.25rem; cursor: pointer;" @click="router.replace('/articles/'+activity.id)">
                 {{ activity.title }}
             </div>
             <el-divider class="mt-3 mb-3"/>
         </li>
     </ul>
+    <Pagination :key="paginationKey"/>
 </template>
 <script setup lang="ts">
 import {useRoute, useRouter} from "vue-router";
 import {useActivitiesStore} from "@/stores/activities";
 import {onMounted, ref} from "vue";
+import Pagination from "@/components/pagination/Pagination.vue";
 
 const activitiesStore = useActivitiesStore();
 const router = useRouter();
 const route = useRoute();
+const paginationKey = ref(0);
 
+onMounted(async () => {
+    paginationKey.value++;
+})
 const getCategory = function (category: string) {
     switch(category){
         case "COMMUNITY":
@@ -63,12 +69,6 @@ const getCategory = function (category: string) {
 }
 
 
-const replacePath = function (path: string) {
-
-    router.replace(path);
-}
-
-
 
 </script>
 <style scoped>
@@ -79,5 +79,14 @@ li {
 
 .category{
     color: #409eff;
+}
+
+.nameLink {
+    color: #409eff;
+    cursor: pointer;
+}
+
+.nameLink:hover {
+    color: skyblue;
 }
 </style>

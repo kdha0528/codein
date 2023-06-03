@@ -1,7 +1,7 @@
 package com.codein.service;
 import com.codein.domain.article.*;
 import com.codein.domain.member.Member;
-import com.codein.domain.utils.LikeChanges;
+import com.codein.utils.LikeChanges;
 import com.codein.error.exception.article.*;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.error.exception.member.MemberNotLoginException;
@@ -9,10 +9,13 @@ import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.article.like.ArticleLikeRepository;
 import com.codein.repository.article.viewlog.ViewLogRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.comment.GetCommentListServiceDto;
 import com.codein.requestservicedto.article.*;
 import com.codein.responsedto.article.ActivityListResponseDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
+import com.codein.responsedto.article.ArticleResponseData;
 import com.codein.responsedto.article.GetArticleResponseDto;
+import com.codein.responsedto.comment.CommentListResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,7 @@ public class ArticleService {
     private final MemberRepository memberRepository;
     private final ViewLogRepository viewLogRepository;
     private final ArticleLikeRepository articleLikeRepository;
+    private final CommentService commentService;
 
     @Transactional
     public Article newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
@@ -85,7 +89,18 @@ public class ArticleService {
             throw new DeletedArticleException();
         }
 
-        return article.toGetArticleResponseDto(isNewView);
+        GetCommentListServiceDto getCommentListServiceDto = GetCommentListServiceDto.builder()
+                .article(article)
+                .page(getArticleServiceDto.getCommentPage())
+                .build();
+
+        CommentListResponseDto commentListResponseDto= commentService.getCommentList(getCommentListServiceDto);
+        ArticleResponseData articleResponseData = article.toArticleResponseData(isNewView);
+
+        return GetArticleResponseDto.builder()
+                .articleData(articleResponseData)
+                .commentsData(commentListResponseDto)
+                .build();
     }
 
 
@@ -178,7 +193,11 @@ public class ArticleService {
         List<Article> articleList = articleRepository.findAll();
         for (Article article : articleList) {
             for (int j = 0; j < random.nextInt(20); j++) {
-                getArticle(new GetArticleServiceDto(article.getId(), UUID.randomUUID().toString()));
+                GetArticleServiceDto getArticleServiceDto = GetArticleServiceDto.builder()
+                        .articleId(article.getId())
+                        .clientIp(UUID.randomUUID().toString())
+                        .build();
+                getArticle(getArticleServiceDto);
             }
         }
     }

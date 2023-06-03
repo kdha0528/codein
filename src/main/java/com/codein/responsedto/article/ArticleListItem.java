@@ -8,6 +8,8 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.Random;
 
+import static com.codein.utils.DateTimeUtils.toSimpleFormat;
+
 @ToString
 @Getter
 public class ArticleListItem {
@@ -26,7 +28,7 @@ public class ArticleListItem {
     public ArticleListItem(Long id, String title, LocalDateTime createdAt, Long authorId, String nickname, ProfileImage profileImage, Integer viewNum, Integer commentNum, Integer likeNum, boolean deleted) {
         this.id = id;
         this.title = title;
-        this.createdAt = compareDate(createdAt);
+        this.createdAt = toSimpleFormat(createdAt);
         this.authorId = authorId;
         this.nickname = nickname;
         this.viewNum = viewNum;
@@ -37,31 +39,6 @@ public class ArticleListItem {
             this.imagePath = "/my-backend-api/images/profile/" + profileImage.getImgFileName();
         } else {
             this.imagePath = null;
-        }
-    }
-
-    public String compareDate(LocalDateTime createdAt) {
-        LocalDateTime now = LocalDateTime.now();
-        if (now.getYear() == createdAt.getYear()) {
-            if (now.getMonth() == createdAt.getMonth()) {
-                if (now.getDayOfMonth() == createdAt.getDayOfMonth()) {
-                    if (now.getHour() == createdAt.getHour()) {
-                        if (now.getMinute() == createdAt.getMinute()) {
-                            return "0분 전";
-                        } else {
-                            return now.compareTo(createdAt)+"분 전";
-                        }
-                    } else {
-                        return now.compareTo(createdAt)+"시간 전";
-                    }
-                } else {
-                    return now.compareTo(createdAt)+"일 전";
-                }
-            } else {
-                return now.compareTo(createdAt)+"달 전";
-            }
-        } else {
-            return now.compareTo(createdAt)+"년 전";
         }
     }
 }

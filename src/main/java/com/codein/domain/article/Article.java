@@ -2,8 +2,8 @@ package com.codein.domain.article;
 
 import com.codein.domain.member.Member;
 import com.codein.responsedto.article.ActivityListItem;
+import com.codein.responsedto.article.ArticleResponseData;
 import com.codein.responsedto.article.ArticleListItem;
-import com.codein.responsedto.article.GetArticleResponseDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -28,15 +28,17 @@ public class Article {
     @NotNull
     private String title;
     @NotNull
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String content;
     @NotNull
     private LocalDateTime createdAt;
+    private LocalDateTime changedAt;
     private Integer viewNum;
     private Integer commentNum;
     private Integer likeNum;
     private Integer dislikeNum;
     private boolean deleted;
+    private boolean changed;
 
 
     @Builder
@@ -46,11 +48,13 @@ public class Article {
         this.title = title;
         this.content = content;
         this.createdAt = LocalDateTime.now();
+        this.changedAt = null;
         this.viewNum = 0;
         this.commentNum = 0;
         this.likeNum = 0;
         this.dislikeNum = 0;
         this.deleted = false;
+        this.changed = false;
     }
 
     public Article edit(ArticleEditor articleEditor) {
@@ -90,8 +94,8 @@ public class Article {
                 .build();
     }
 
-    public GetArticleResponseDto toGetArticleResponseDto(boolean viewCount){
-        return GetArticleResponseDto.builder()
+    public ArticleResponseData toArticleResponseData(boolean viewCount){
+        return ArticleResponseData.builder()
                 .id(this.id)
                 .category(this.category)
                 .title(this.title)
@@ -99,6 +103,7 @@ public class Article {
                 .viewNum(viewCount ? ++this.viewNum : this.viewNum)
                 .commentNum(this.commentNum)
                 .likeNum(this.likeNum)
+                .dislikeNum(this.dislikeNum)
                 .createdAt(this.createdAt)
                 .authorId(this.member.getId())
                 .nickname(this.member.getNickname())
@@ -114,6 +119,9 @@ public class Article {
         this.dislikeNum += changes;
     }
 
+    public void increaseCommentNum() {
+        this.commentNum++;
+    }
     public void deleteArticle(){ this.deleted = true;}
 
 

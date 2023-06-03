@@ -36,25 +36,29 @@
                     </div>
                 </div>
             </div>
-            <div style="font-size:1.25rem; cursor: pointer;" @click="replacePath('/articles/'+article.id)">
+            <div style="font-size:1.25rem; cursor: pointer;" @click="router.replace('/articles/'+article.id)">
                 {{ article.title }}
             </div>
             <el-divider class="mt-3 mb-3"/>
         </li>
     </ul>
+    <Pagination :key="paginationKey" />
 </template>
 <script setup lang="ts">
 import {ChatDotSquare, Star} from "@element-plus/icons-vue";
 import {useArticlesStore} from "@/stores/articles";
 import {useRoute, useRouter} from "vue-router";
+import Pagination from "@/components/pagination/Pagination.vue";
+import {onMounted, ref} from "vue";
 
 const articlesStore = useArticlesStore();
 const router = useRouter();
 const route = useRoute();
-const replacePath = function (path: string) {
+const paginationKey = ref(0);
 
-    router.replace(path);
-}
+onMounted(async () => {
+    paginationKey.value++;
+})
 
 </script>
 <style scoped>

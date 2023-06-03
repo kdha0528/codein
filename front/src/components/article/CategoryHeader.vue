@@ -39,8 +39,9 @@
               <div style="width: 50%;">
                   <el-input
                           v-model="search.keyword"
-                          placeholder="Please input"
+                          placeholder="검색어를 입력해주세요."
                           class="input-with-select"
+                          input-style="font-size: 1rem; letter-spacing:0.05rem;"
                           @keyup.enter="onSearch()&onGetArticles()"
                     ><template #prepend>
                           <el-select class="select-search" v-model="search.condition" suffix-icon="">
@@ -67,36 +68,32 @@
           </div>
           <el-divider/>
           <keep-alive>
-            <Articles />
-          </keep-alive>
-          <keep-alive>
-            <Pagination :key="route.fullPath"/>
+            <Articles :key="articlesKey" />
           </keep-alive>
       </div>
 </template>
 
 <script setup lang="ts">
 
-import {onMounted, provide, reactive, ref} from "vue";
+import {onBeforeMount, onMounted, provide, reactive, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import Articles from "@/components/article/Articles.vue";
 import {createDummies, getArticles} from "@/controller/api/article";
 import {useResponseStore} from "@/stores/Response";
 import {useAuthStore} from "@/stores/auth";
 import {useArticlesStore} from "@/stores/articles";
-import type {Article} from "@/components/custom-types/article";
-import Pagination from "@/components/pagination/Pagination.vue";
+import type {Article} from "@/custom-types/article";
 import CategoryIntro from "@/components/article/CategoryIntro.vue";
-import type {Intro} from "@/components/custom-types/intro";
-import {usePageStore} from "@/stores/articlePage";
+import type {Intro} from "@/custom-types/intro";
+import {usePageStore} from "@/stores/page";
 
 const route = useRoute();
 const router = useRouter();
 const resStore = useResponseStore();
 const articlesStore = useArticlesStore();
 const pageStore = usePageStore();
-
 const isNotice = ref(false);
+const articlesKey = ref(0);
 
 const sort = ref({
     period:'ALL',
@@ -177,18 +174,19 @@ const onSort = function (){
 const onPeriod = function(){
     sort.value.isSetPeriod = true;
 }
-const onPaging = async function(page: number){
-    await pageStore.setCurrentPage(page);
-    isSetPage.value = true;
-    await onGetArticles();
+const onPaging = async function(page: number, componentName: string ){
+    if(componentName === 'Articles') {
+        await pageStore.setArticlesCurrentPage(page);
+        isSetPage.value = true;
+        await onGetArticles();
+    }
 }
-
 
 const isAdmin = function(){
     return useAuthStore().isAdmin;
 }
 
-onMounted(async ()=>{
+onBeforeMount(async ()=>{   // 하위 컴포넌트들이 실행되기 전에 설정 완료
     await setDefaultFromPath(route.fullPath);
     await onGetArticles();
     if(route.name === "notice"){
@@ -204,7 +202,7 @@ function setDefaultFromPath(path: string):void {
     const regex = /[?&]([^=]+)=([^&]*)/g;
     let match: RegExpExecArray | null;
 
-    pageStore.setCurrentPage(1);
+    pageStore.setArticlesCurrentPage(1);
 
     while ((match = regex.exec(path)) !== null) {
         const paramName = match[1];
@@ -212,7 +210,7 @@ function setDefaultFromPath(path: string):void {
 
         switch (paramName) {
             case "page":
-                pageStore.setCurrentPage(parseInt(paramValue, 10));
+                pageStore.setArticlesCurrentPage(parseInt(paramValue, 10));
                 isSetPage.value = true;
                 break;
             case "period":
@@ -282,7 +280,7 @@ const getPath = function(){
     }
 
     if(isSetPage.value) {
-        checkChanges.value.push('page='+pageStore.getCurrentPage)
+        checkChanges.value.push('page='+pageStore.getArticlesCurrentPage)
     }
     if(sort.value.isSetPeriod) {
         checkChanges.value.push('period='+sort.value.period)
@@ -313,22 +311,13 @@ const onGetArticles = async function() {
             if(resStore.isOK){
                 articlesStore.clean();
                 response.articleList.forEach((r: any) => {
-                    const article: Article = {
-                        id: r.id,
-                        title: r.title,
-                        createdAt: r.createdAt,
-                        viewNum: r.viewNum,
-                        commentNum: r.commentNum,
-                        likeNum: r.likeNum,
-                        authorId: r.authorId,
-                        nickname: r.nickname,
-                        imagePath: r.imagePath,
-                    }
+                    const article: Article = {...r}
                     articlesStore.addArticle(article);
                 });
-                pageStore.setMaxPage(response.maxPage);
+                pageStore.setArticlesMaxPage(response.maxPage);
                 setIntro(route.name);
                 router.replace(getPath());
+                articlesKey.value++;
                 scrollTo(0, 0);
             } else {
                 alert(resStore.getErrorMessage);

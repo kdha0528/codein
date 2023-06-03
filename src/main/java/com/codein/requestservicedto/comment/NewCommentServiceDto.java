@@ -16,18 +16,16 @@ public class NewCommentServiceDto {
 
     @Builder
     public NewCommentServiceDto(Long articleId, String content, Long targetId, String accessToken) {
-        this.articleId = articleId;
         this.content = content;
+        this.articleId = articleId;
         this.targetId = targetId;
         this.accessToken = accessToken;
     }
 
-    public Comment toEntity(Member member, Article article, Comment target) {
-        return Comment.builder()
-                .member(member)
-                .article(article)
-                .target(target)
-                .content(this.content)
-                .build();
+    public String hasTarget(){
+        int index = this.content.indexOf("@");
+        if (index == 0) return this.content.substring(index).split(" ")[0];
+        else return null;
     }
+
 }

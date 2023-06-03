@@ -2,7 +2,9 @@ package com.codein.repository.article;
 
 import com.codein.domain.article.Article;
 import com.codein.domain.article.ArticleLike;
+import com.codein.domain.comment.Comment;
 import com.codein.domain.member.Member;
+import com.codein.requestdto.article.Activity;
 import com.codein.requestservicedto.article.GetActivitiesServiceDto;
 import com.codein.requestservicedto.article.GetArticlesServiceDto;
 import com.codein.responsedto.article.ActivityListItem;
@@ -14,6 +16,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.management.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -101,34 +104,73 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     @Override
     public ActivityListResponseDto getActivityListResponseDto(GetActivitiesServiceDto getActivitiesServiceDto, Member member) {
 
-        JPAQuery<Article> query = switch (getActivitiesServiceDto.getActivity()) {
-            case COMMENTS -> jpaQueryFactory.selectFrom(article)
-                    .innerJoin(comment)
-                    .where(comment.member.id.eq(getActivitiesServiceDto.getId())
-                            ,article.deleted.isFalse());
-            case LIKED_ARTICLES -> jpaQueryFactory.selectFrom(article)
-                    .innerJoin(articleLike)
-                    .where(articleLike.member.id.eq(getActivitiesServiceDto.getId())
-                            ,article.deleted.isFalse());
-            default -> jpaQueryFactory.selectFrom(article)
-                    .where(article.member.id.eq(getActivitiesServiceDto.getId())
-                            ,article.deleted.isFalse());
+        List<Article> listArticle;
+        int maxPage = 1;
+
+        switch (getActivitiesServiceDto.getActivity()) {
+            case COMMENTS -> {
+                JPAQuery<Comment> subQuery = jpaQueryFactory.selectFrom(comment)
+                        .where(comment.member.eq(member))
+                        .orderBy(comment.id.desc());
+
+                int size = subQuery.fetch().size();
+                maxPage = Math.floorDiv(size, getActivitiesServiceDto.getSize());
+                if (size % getActivitiesServiceDto.getSize() != 0) {
+                    maxPage++;
+                }
+
+                List<Comment> subFetch= subQuery
+                        .limit(getActivitiesServiceDto.getSize())
+                        .offset(getActivitiesServiceDto.getOffset())
+                        .fetch();
+
+                listArticle = subFetch
+                        .stream()
+                        .map(Comment::getArticle)
+                        .collect(Collectors.toList());
+            }
+
+            case LIKED_ARTICLES -> {
+                JPAQuery<ArticleLike> subQuery = jpaQueryFactory.selectFrom(articleLike)
+                        .where(articleLike.member.eq(member))
+                        .orderBy(articleLike.id.desc());
+
+                int size = subQuery.fetch().size();
+                maxPage = Math.floorDiv(size, getActivitiesServiceDto.getSize());
+                if (size % getActivitiesServiceDto.getSize() != 0) {
+                    maxPage++;
+                }
+
+                List<ArticleLike> subFetch = subQuery
+                        .limit(getActivitiesServiceDto.getSize())
+                        .offset(getActivitiesServiceDto.getOffset())
+                        .fetch();
+                listArticle = subFetch
+                        .stream()
+                        .map(ArticleLike::getArticle)
+                        .collect(Collectors.toList());
+            }
+            default -> {
+                JPAQuery<Article> subQuery = jpaQueryFactory.selectFrom(article)
+                        .where(article.member.eq(member))
+                        .orderBy(article.id.desc());
+                int size = subQuery.fetch().size();
+                maxPage = Math.floorDiv(size, getActivitiesServiceDto.getSize());
+                if (size % getActivitiesServiceDto.getSize() != 0) {
+                    maxPage++;
+                }
+
+                listArticle = subQuery
+                        .limit(getActivitiesServiceDto.getSize())
+                        .offset(getActivitiesServiceDto.getOffset())
+                        .fetch();
+            }
         };
 
-        long count = query.fetch().size();
-        int maxPage = (int) Math.floorDiv(count, getActivitiesServiceDto.getSize());
-
-        List<Article> fetchResult = query
-                .orderBy(article.id.desc())
-                .limit(getActivitiesServiceDto.getSize())
-                .offset(getActivitiesServiceDto.getOffset())
-                .fetch();
-
-        List<ActivityListItem> activityList = fetchResult
+        List<ActivityListItem> activityList = listArticle
                 .stream()
                 .map(Article::toActivityListItem)
-                .toList();
-
+                .collect(Collectors.toList());
 
         return ActivityListResponseDto.builder()
                 .id(member.getId())
@@ -138,6 +180,5 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .maxPage(maxPage)
                 .build();
     }
-
 
 }

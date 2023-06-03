@@ -35,10 +35,7 @@
             </el-menu>
         </div>
         <keep-alive>
-            <Activities />
-        </keep-alive>
-        <keep-alive>
-            <Pagination :key="route.fullPath"/>
+            <Activities :key="activitiesKey" />
         </keep-alive>
     </div>
 </template>
@@ -47,19 +44,19 @@ import {onMounted, provide, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useResponseStore} from "@/stores/Response";
 import {getActivities} from "@/controller/api/member";
-import type {Activity} from "@/components/custom-types/activity";
+import type {Activity} from "@/custom-types/activity";
 import {Avatar} from "@element-plus/icons-vue";
 import {useActivitiesStore} from "@/stores/activities";
 import Activities from "@/components/member/Activities.vue";
 import Pagination from "@/components/pagination/Pagination.vue";
-import {usePageStore} from "@/stores/articlePage";
+import {usePageStore} from "@/stores/page";
 
 const router = useRouter();
 const route = useRoute();
 const resStore = useResponseStore();
 const activitiesStore = useActivitiesStore();
 const pageStore = usePageStore();
-
+const activitiesKey = ref(0);
 const memberInfo = ref({
     id: 0,
     nickname: '',
@@ -74,7 +71,7 @@ onMounted(async ()=> {
 })
 
 const onPaging = async function(page: number){
-    await pageStore.setCurrentPage(page);
+    await pageStore.setArticlesCurrentPage(page);
     isSetPage.value = true;
     await onGetActivities();
 }
@@ -87,10 +84,10 @@ function setDefaultFromPath(path: string):void {
         const paramName = match[1];
         const paramValue = match[2];
         if(paramName === "page"){
-            pageStore.setCurrentPage(parseInt(paramValue, 10));
+            pageStore.setArticlesCurrentPage(parseInt(paramValue, 10));
             isSetPage.value = true;
         } else {
-            pageStore.setCurrentPage(1);
+            pageStore.setArticlesCurrentPage(1);
         }
     }
 }
@@ -99,7 +96,7 @@ const getPath = function(){
     let path = route.path;
 
     if(isSetPage.value) {
-        path = path + '?' + 'page='+pageStore.getCurrentPage;
+        path = path + '?' + 'page='+pageStore.getArticlesCurrentPage;
     }
 
     return path;
@@ -114,28 +111,22 @@ const onGetActivities = async function () {
                 memberInfo.value.imageUrl = response.imagePath;
 
                 response.activityList.forEach((r: any) => {
-                    const activity: Activity = {
-                        id: r.id,
-                        category: r.category,
-                        title: r.title,
-                        createdAt: r.createdAt,
-                        authorId: r.authorId,
-                        nickname: r.nickname
-                    }
+                    const activity: Activity = {...r}
                     activitiesStore.addActivities(activity);
                 });
-                pageStore.setMaxPage(response.maxPage);
+                pageStore.setArticlesMaxPage(response.maxPage);
                 router.replace(getPath());
+                activitiesKey.value++;
                 scrollTo(0, 0);
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
-                router.go(-1);
+                router.back();
             }
         }).catch(error => {
             alert(error);
             console.log(error);
-            router.go(-1);
+            router.back();
         })
 }
 

@@ -19,6 +19,7 @@ public class GetArticlesDto {
     private final Condition condition;
     private final String keyword;
 
+
     @Builder
     public GetArticlesDto(String category, Integer page, String period, String sort, String condition, String keyword) {
         if(category == null){

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.codein.domain.comment.QComment.comment;
 
@@ -23,8 +24,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
     @Override
     public Comment findTargetById(Long id) {
         return jpaQueryFactory.selectFrom(comment)
-                .where(comment.id.eq(id)
-                        , comment.deleted.isFalse())
+                .where(comment.id.eq(id))
                 .fetchOne();
     }
 
@@ -32,13 +32,16 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
     public CommentListResponseDto getCommentList(GetCommentListServiceDto getCommentListServiceDto) {
 
         JPAQuery<Comment> query = jpaQueryFactory.selectFrom(comment)
-                .where(comment.article.eq(getCommentListServiceDto.getArticle()));
+                .where(comment.article.eq(getCommentListServiceDto.getArticle()))
+                .orderBy(comment.id.asc());
 
         long count = query.fetch().size();
         int maxPage = (int) Math.floorDiv(count, getCommentListServiceDto.getSize());
+        if (count % getCommentListServiceDto.getSize() != 0) {
+            maxPage++;
+        }
 
         List<Comment> fetchResult = query
-                .orderBy(comment.parentId.desc(), comment.id.desc())
                 .limit(getCommentListServiceDto.getSize())
                 .offset(getCommentListServiceDto.getOffset())
                 .fetch();
@@ -46,7 +49,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
         List<CommentListItem> commentList = fetchResult
                 .stream()
                 .map(Comment::toCommentListItem)
-                .toList();
+                .collect(Collectors.toList());
 
         return CommentListResponseDto.builder()
                 .commentList(commentList)

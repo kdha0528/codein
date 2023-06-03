@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { Profile } from "@/components/custom-types/profile";
+import type { Profile } from "@/custom-types/profile";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -16,7 +16,11 @@ export const useAuthStore = defineStore("auth", {
             return state.member;
         },
         getProfileImage: (state) => {
-            return state.member.imagePath;
+            if(state.member.imagePath === null) {
+                return null;
+            } else {
+                return state.member.imagePath;
+            }
         },
         isAdmin: (state)=>{
             if(state.member != null){

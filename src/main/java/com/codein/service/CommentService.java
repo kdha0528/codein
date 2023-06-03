@@ -3,7 +3,7 @@ package com.codein.service;
 import com.codein.domain.article.Article;
 import com.codein.domain.comment.CommentLike;
 import com.codein.repository.comment.like.CommentLikeRepository;
-import com.codein.domain.utils.LikeChanges;
+import com.codein.utils.LikeChanges;
 import com.codein.domain.comment.Comment;
 import com.codein.domain.comment.CommentEditor;
 import com.codein.domain.member.Member;
@@ -45,19 +45,37 @@ public class CommentService {
 
     @Transactional
     public Comment newComment(NewCommentServiceDto newCommentServiceDto) {
-
         Article article = articleRepository.findById(newCommentServiceDto.getArticleId())
                 .orElseThrow(ArticleNotExistsException::new);
-
         Member member = memberRepository.findByAccessToken(newCommentServiceDto.getAccessToken());
 
         if(member != null){
             Comment target = null;
-            if(newCommentServiceDto.getTargetId() != null){
-                target = commentRepository.findTargetById(newCommentServiceDto.getTargetId());
+            String content = newCommentServiceDto.getContent();
+            String targetNickname = null;
+            if(newCommentServiceDto.getTargetId() != null) {    // target이 있는지 확인
+                target = commentRepository.findTargetById(newCommentServiceDto.getTargetId());  // target id 유효하면 target 추가
+                String targetMentionNickname = newCommentServiceDto.hasTarget(); // null or @+targetNickname
+                if(targetMentionNickname != null) {
+                    targetNickname = targetMentionNickname.replace("@","");
+                    if(targetNickname.equals(target.getMember().getNickname())){ // @를 제외한 진짜 nickname이 target id로 찾은 target의 nickname과 같다면
+                        content = newCommentServiceDto.getContent().replace(targetMentionNickname,"");  // content에서 metion nickname을 제거하고 저장하고 target nickname 저자
+                    } else {
+                        targetNickname = null; // 일치하지 않는다면 target nickname을 null로 변환
+                    }
+                }
             }
-            Comment newComment = newCommentServiceDto.toEntity(member,article, target);
+
+            Comment newComment = Comment.builder()
+                    .member(member)
+                    .article(article)
+                    .target(target)
+                    .targetNickname(targetNickname)
+                    .content(content)
+                    .build();
+
             commentRepository.save(newComment);
+            article.increaseCommentNum();
             newComment.setParentId();
             return newComment;
         } else {

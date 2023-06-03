@@ -14,5 +14,7 @@ public interface MemberRepositoryCustom {
 
     Member findByRefreshToken(String refreshToken);
 
+    boolean existsByNickname(String nickname);
+
 
 }

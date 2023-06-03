@@ -49,4 +49,13 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         member.deleted.isFalse())
                 .fetchOne();
     }
+
+    @Override
+    public boolean existsByNickname(String nickname) {
+        Member result = jpaQueryFactory.selectFrom(member)
+                .where(member.nickname.eq(nickname),
+                        member.deleted.isFalse())
+                .fetchFirst();
+        return result != null;
+    }
 }

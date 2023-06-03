@@ -30,13 +30,12 @@ public class AuthController {
         } else {
             ArrayList<String> tokens = authService.validateRefreshToken(cookie.getValue());
             if(tokens == null){ // refresh token이 정상적이지 않은 경우
-
-                response.addCookie(authService.deleteCookie("refreshtoken"));
-
+                response.addHeader(HttpHeaders.SET_COOKIE,authService.deleteCookie("refreshtoken").toString());
                 return;
             }
-            ResponseCookie accessCookie = authService.RefreshTokenToCookie(tokens.get(0));
-            ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(1));
+
+            ResponseCookie refreshCookie = authService.RefreshTokenToCookie(tokens.get(0));
+            ResponseCookie accessCookie = authService.AccessTokenToCookie(tokens.get(1));
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
             response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         }

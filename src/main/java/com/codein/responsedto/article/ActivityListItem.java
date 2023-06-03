@@ -7,6 +7,8 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.codein.utils.DateTimeUtils.toNormalFormat;
+
 @ToString
 @Getter
 public class ActivityListItem {
@@ -23,11 +25,11 @@ public class ActivityListItem {
 
     @Builder
     public ActivityListItem(Long id, String category, String title, LocalDateTime createdAt, Long authorId, String nickname, Integer viewNum,Integer commentNum,Integer likeNum,boolean deleted) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
+
         this.id = id;
         this.category = category;
         this.title = title;
-        this.createdAt = createdAt.format(formatter);
+        this.createdAt = toNormalFormat(createdAt);
         this.authorId = authorId;
         this.nickname = nickname;
         this.viewNum = viewNum;

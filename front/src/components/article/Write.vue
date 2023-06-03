@@ -15,7 +15,7 @@
               <el-input v-model="form.title"
                         size="large"
                         maxlength="30"
-                        placeholder="Please input"
+                        placeholder="제목을 입력해주세요."
                         show-word-limit
                         style="font-size:1rem;"/>
           </el-form-item>
@@ -23,11 +23,11 @@
               <el-input v-model="form.content"
                         size="large"
                         :autosize="{ minRows: 16 }"
-                        placeholder="Please input"
+                        placeholder="내용을 입력해주세요."
                         show-word-limit
-                        maxlength="5000"
+                        maxlength="10000"
                         type="textarea"
-                        style="font-size:1rem;"/>
+                        input-style="font-size: 1rem; line-height: 2rem; letter-spacing:0.05rem;"/>
           </el-form-item>
           <el-form-item >
               <el-button type="info" @click="onCancel()" style="margin: auto 0 auto auto;">취소</el-button>

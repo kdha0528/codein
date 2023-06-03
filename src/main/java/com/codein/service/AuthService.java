@@ -33,16 +33,16 @@ public class AuthService {
         if(member == null){
             return null;
         }
+        else {
+            Tokens newTokens = Tokens.builder()
+                    .member(member)
+                    .build();
 
-        Tokens newTokens = Tokens.builder()
-                .member(member)
-                .build();
-
-        ArrayList<String> tokens = new ArrayList<>();
-        tokens.add(newTokens.getRefreshToken());
-        tokens.add(newTokens.getAccessToken());
-        return tokens;
-
+            ArrayList<String> tokens = new ArrayList<>();
+            tokens.add(newTokens.getRefreshToken());
+            tokens.add(newTokens.getAccessToken());
+            return tokens;
+        }
     }
 
     @Transactional
@@ -51,7 +51,7 @@ public class AuthService {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .maxAge(Duration.ofDays(14L))
+                .maxAge(Duration.ofDays(1L))
                 .sameSite("Strict")
                 .domain(".loca.lt")
                 .build();
@@ -63,17 +63,22 @@ public class AuthService {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .maxAge(Duration.ofMinutes(1))
+                .maxAge(Duration.ofMinutes(1L))
                 .sameSite("Strict")
                 .domain(".loca.lt")
                 .build();
     }
 
     @Transactional
-    public Cookie deleteCookie(String tokenName) {
-        Cookie cookie = new Cookie(tokenName,null);
-        cookie.setMaxAge(0);
-        return cookie;
+    public ResponseCookie deleteCookie(String tokenName) {
+        return ResponseCookie.from(tokenName, "")
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(0)
+                .sameSite("Strict")
+                .domain(".loca.lt")
+                .build();
     }
 
     @Transactional

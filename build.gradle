@@ -36,6 +36,7 @@ dependencies {
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+    implementation 'org.projectlombok:lombok:1.18.26'
 
     asciidoctorExt "org.springframework.restdocs:spring-restdocs-asciidoctor:${asciidocVersion}"
     testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc:${asciidocVersion}"

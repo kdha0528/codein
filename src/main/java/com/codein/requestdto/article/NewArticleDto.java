@@ -15,11 +15,11 @@ public class NewArticleDto {
     private final String category;
 
     @NotBlank(message = "제목을 입력해주세요.")
-    @Size(min = 5, max = 50, message = "제목을 5~50글자로 맞춰주세요.")
+    @Size(max = 50, message = "제목은 50글자 이하로 작성해주세요.")
     private final String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
-    @Size(min = 5, max = 5000, message = "내용을 5글자 이상 입력해주세요.")
+    @Size(max = 10000, message = "최대 글자수를 초과하였습니다.")
     private final String content;
 
     @Builder

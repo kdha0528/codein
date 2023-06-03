@@ -13,7 +13,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,35 +35,40 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment target;
+    private String targetNickname;
 
     @NotNull
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @NotNull
     private LocalDateTime createdAt;
+    private LocalDateTime changedAt;
 
     private Integer likeNum;
     private Integer dislikeNum;
 
     private boolean deleted;
+    private boolean changed;
 
     @Builder
-    public Comment(Article article, Comment target, Member member, String content) {
-        this.parentId = 0L; //  초기화
+    public Comment(Article article, Comment target, String targetNickname, Member member, String content) {
+        this.parentId = null; //  초기화
         this.article = article;
         this.target = target;
+        this.targetNickname = targetNickname;
         this.member = member;
         this.content = content;
         this.createdAt = LocalDateTime.now();
+        this.changedAt = null;
         this.likeNum = 0;
         this.dislikeNum = 0;
         this.deleted = false;
+        this.changed = false;
     }
 
     public void setParentId() {
-        if(this.target == null){
-            this.parentId = this.id;
-        } else {
+        if(target != null) {
             if (this.target.getParentId() == null) {     // terget이 parentId가 없다면(최상위 댓글이라면) parent id는 최상위 댓글의 id
                 this.parentId = this.target.getId();
             } else {    // target이 parentId가 있다면(최상위 댓글이 아니라면) 최상위 댓글을 parent id로 설정
@@ -74,22 +78,25 @@ public class Comment {
     }
 
     public CommentListItem toCommentListItem() {
-        Long targetId = null;
+        Long targetMemberId = null;
         String targetNickname = null;
         if(this.target != null) {
-            targetNickname = this.target.getMember().getNickname();
-            targetId = this.target.getId();
+            targetNickname = this.targetNickname;
+            targetMemberId = this.target.member.getId();
         }
         return  CommentListItem.builder()
                 .id(this.id)
                 .content(this.content)
                 .createdAt(this.createdAt)
-                .articleId(this.article.getId())
+                .parentId(this.parentId)
+                .likeNum(this.likeNum)
+                .dislikeNum(this.dislikeNum)
                 .commenterId(this.member.getId())
                 .commenterNickname(this.member.getNickname())
                 .commenterProfileImage(this.member.getProfileImage())
-                .targetId(targetId)
+                .targetMemberId(targetMemberId)
                 .targetNickname(targetNickname)
+                .deleted(isDeleted())
                 .build();
     }
 

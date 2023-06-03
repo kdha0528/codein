@@ -45,10 +45,8 @@ public class MemberController {
     @PostMapping("/login")
     public LoginResponseDto login(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
         ArrayList<String> tokens = memberService.login(loginDto.toMemberServiceDto());
-        ResponseCookie accessCookie = authService.RefreshTokenToCookie(tokens.get(0));
-        ResponseCookie refreshCookie = authService.AccessTokenToCookie(tokens.get(1));
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, authService.RefreshTokenToCookie(tokens.get(0)).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, authService.AccessTokenToCookie(tokens.get(1)).toString());
         return memberRepository.findByAccessToken(tokens.get(1)).toLoginResponseDto();
     }
 
@@ -56,8 +54,8 @@ public class MemberController {
     @PostMapping("/logout")
     public String logout(@CookieValue(value = "accesstoken") Cookie cookie, HttpServletResponse response) {
         memberService.logout(cookie);
-        response.addCookie(authService.deleteCookie("accesstoken"));
-        response.addCookie(authService.deleteCookie("refreshtoken"));
+        response.addHeader(HttpHeaders.SET_COOKIE, authService.deleteCookie("accesstoken").toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, authService.deleteCookie("refreshtoken").toString());
         return "redirect:/home";
     }
 
@@ -73,7 +71,7 @@ public class MemberController {
 
     @MySecured(role = Role.MEMBER)
     @GetMapping(value = "/settings/profile")
-    public SettingsProfileResponseDto getSettingsProfile(@CookieValue(value = "accesstoken") Cookie cookie) throws IOException {
+    public SettingsProfileResponseDto getSettingsProfile(@CookieValue(value = "accesstoken") Cookie cookie) {
         Member member = memberRepository.findByAccessToken(cookie.getValue());
         if (member != null) {
             return member.toSettingsProfileResponseDto();
@@ -90,7 +88,7 @@ public class MemberController {
 
     @MySecured(role = Role.MEMBER)
     @GetMapping(value = "/settings/account")
-    public SettingsAccountResponseDto getSettingsAccount(@CookieValue(value = "accesstoken") Cookie cookie) throws IOException {
+    public SettingsAccountResponseDto getSettingsAccount(@CookieValue(value = "accesstoken") Cookie cookie) {
         Member member = memberRepository.findByAccessToken(cookie.getValue());
         if (member != null) {
             return member.toSettingsAccountResponseDto();

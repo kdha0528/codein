@@ -1,43 +1,35 @@
 import { defineStore } from 'pinia';
-import type {Article} from "@/components/custom-types/article";
-import type {Intro} from "@/components/custom-types/intro";
+import type {Article} from "@/custom-types/article";
+import type {Intro} from "@/custom-types/intro";
 
-export const useArticlesStore = defineStore("article", {
+export const useArticlesStore = defineStore("articles", {
     state: () => ({
         articles: [] as Article[],
         intro: {
           category: ' ',
           message: ' ',
         } as Intro,
-        maxPage: 1,
     }),
     getters: {
         getArticles: (state) => {
             return state.articles;
-        },
-        getMaxPage: (state)=>{
-            return state.maxPage;
         },
         getIntro: (state)=>{
             return state.intro;
         },
         introIsNull: (state) =>{
             return state.intro == null;
-        }
+        },
     },
     actions: {
         addArticle(a: Article){
             this.articles.push(a);
-        },
-        setMaxPage(m: number){
-            this.maxPage = m;
         },
         setIntro(intro: Intro){
             this.intro = intro;
         },
         clean(){
             this.articles = [];
-            this.maxPage = 1;
         },
     },
     persist: {

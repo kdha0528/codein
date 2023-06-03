@@ -10,6 +10,7 @@ import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.article.viewlog.ViewLogRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.EditArticleDto;
+import com.codein.requestdto.article.GetArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
@@ -19,6 +20,7 @@ import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -89,13 +91,17 @@ class ArticleControllerTest {
         return new Cookie("accesstoken", token);
     }
 
+
     Article newArticle() {
-        NewArticleDto newArticleDto = NewArticleDto.builder()
-                .category("NOTICE")
+        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Article article = Article.builder()
+                .member(member)
+                .category(Category.COMMUNITY)
                 .title("제목입니다.")
                 .content("내용입니다.")
                 .build();
-        return articleService.newArticle(newArticleDto.toNewArticleServiceDto(), getCookie().getValue());
+        articleRepository.save(article);
+        return article;
     }
 
     void createDummies(){
@@ -131,7 +137,10 @@ class ArticleControllerTest {
         List<Article> articleList = articleRepository.findAll();
         for (Article article : articleList) {
             for (int j = 0; j < random.nextInt(20); j++) {
-                articleService.getArticle(new GetArticleServiceDto(article.getId(),UUID.randomUUID().toString()));
+                articleService.getArticle(GetArticleServiceDto.builder()
+                                .articleId(article.getId())
+                                .clientIp(UUID.randomUUID().toString())
+                        .build());
             }
         }
     }
@@ -364,16 +373,10 @@ class ArticleControllerTest {
     @DisplayName("게시글 가져오기 성공")
     void test4_1() throws Exception {
         // given
-        newArticle();
-
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
-        List<Article> articles = articleRepository.findByMember(member);
-        Article article = articles.get(0);
-
-        Long id = article.getId();
+        Article article = newArticle();
 
         // expected
-        mockMvc.perform(get("/articles/{id}",id))
+        mockMvc.perform(get("/articles/{id}",article.getId()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -384,19 +387,27 @@ class ArticleControllerTest {
         // given
         Long id = 3213523521L;
 
+        GetArticleDto getArticleDto = GetArticleDto.builder()
+                .id(id)
+                .build();
+
         // expected
-        mockMvc.perform(get("/articles/{id}",id))
+        mockMvc.perform(get("/articles/{id}",id)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(getArticleDto)))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 
     @Test
-    @DisplayName("게시글 가져오기 실패: id를 입력하지 않은 경우")
+    @DisplayName("게시글 가져오기 성공: id를 입력하지 않은 경우")
     void test4_3() throws Exception {
 
+        Article article = newArticle();
+
         // expected
-        mockMvc.perform(get("/articles/"))
-                .andExpect(status().is4xxClientError())
+        mockMvc.perform(get("/articles/{id}",article.getId()))
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 
@@ -404,18 +415,23 @@ class ArticleControllerTest {
     @DisplayName("게시글 가져오기 실패: 삭제된 게시글")
     void test4_4() throws Exception {
         Article article = newArticle();
-        Long id = article.getId();
 
         DeleteArticleServiceDto deleteArticleServiceDto = DeleteArticleServiceDto.builder()
                 .accessToken(getCookie().getValue())
-                .id(id)
+                .id(article.getId())
                 .build();
 
         articleService.deleteArticle(deleteArticleServiceDto);
 
+        GetArticleDto getArticleDto = GetArticleDto.builder()
+                .id(article.getId())
+                .build();
+
         // expected
-        mockMvc.perform(get("/articles/{id}",id))
-                .andExpect(status().is4xxClientError())
+        mockMvc.perform(get("/articles/{id}",article.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(getArticleDto)))
+                .andExpect(status().isBadRequest())
                 .andDo(print());
     }
 

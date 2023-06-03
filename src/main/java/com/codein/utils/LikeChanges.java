@@ -1,4 +1,4 @@
-package com.codein.domain.utils;
+package com.codein.utils;
 
 import lombok.Getter;
 

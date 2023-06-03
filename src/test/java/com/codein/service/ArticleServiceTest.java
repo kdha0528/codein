@@ -177,12 +177,15 @@ class ArticleServiceTest {
         Article article = newArticle();
 
         // when
-        GetArticleResponseDto getArticleResponseDto = articleService.getArticle(new GetArticleServiceDto(article.getId(), "client ip"));
+        GetArticleResponseDto getArticleResponseDto = articleService.getArticle(GetArticleServiceDto.builder()
+                        .articleId(article.getId())
+                        .clientIp("client ip")
+                .build());
 
         //then
-        Assertions.assertEquals(getArticleResponseDto.getCategory(), article.getCategory().getName());
-        Assertions.assertEquals(getArticleResponseDto.getTitle(), article.getTitle());
-        Assertions.assertEquals(getArticleResponseDto.getContent(), article.getContent());
+        Assertions.assertEquals(getArticleResponseDto.getArticleData().getCategory(), article.getCategory().getName());
+        Assertions.assertEquals(getArticleResponseDto.getArticleData().getTitle(), article.getTitle());
+        Assertions.assertEquals(getArticleResponseDto.getArticleData().getContent(), article.getContent());
     }
 
     @Test

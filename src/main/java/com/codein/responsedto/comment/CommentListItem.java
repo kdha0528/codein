@@ -6,29 +6,37 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
+import static com.codein.utils.DateTimeUtils.toSimpleFormat;
 
 @ToString
 @Getter
 public class CommentListItem {
 
     private final Long id;
+    private final Long parentId;
     private final String content;
     private final String createdAt;
-    private final Long articleId;
+    private final Integer likeNum;
+    private final Integer dislikeNum;
+
     private final Long commenterId;
     private final String commenterNickname;
     private final String commenterImagePath;
-    private final Long targetId;
+
+    private final Long targetMemberId;
     private final String targetNickname;
 
+    private final boolean deleted;
+
     @Builder
-    public CommentListItem(Long id, String content, LocalDateTime createdAt, Long articleId, Long commenterId, String commenterNickname, ProfileImage commenterProfileImage, Long targetId, String targetNickname) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
+    public CommentListItem(Long id, Long parentId, String content, LocalDateTime createdAt, Integer likeNum, Integer dislikeNum, Long commenterId, String commenterNickname, ProfileImage commenterProfileImage, Long targetMemberId, String targetNickname, boolean deleted) {
         this.id = id;
+        this.parentId = parentId;
         this.content = content;
-        this.createdAt = createdAt.format(formatter);
-        this.articleId = articleId;
+        this.createdAt = toSimpleFormat(createdAt);
+        this.likeNum = likeNum;
+        this.dislikeNum = dislikeNum;
         this.commenterId = commenterId;
         this.commenterNickname = commenterNickname;
         if (commenterProfileImage != null) {
@@ -36,7 +44,8 @@ public class CommentListItem {
         } else {
             this.commenterImagePath = null;
         }
-        this.targetId = targetId;
+        this.targetMemberId = targetMemberId;
         this.targetNickname = targetNickname;
+        this.deleted = deleted;
     }
 }

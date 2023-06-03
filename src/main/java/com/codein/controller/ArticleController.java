@@ -6,6 +6,7 @@ import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
+import com.codein.requestdto.article.GetArticleDto;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
@@ -72,9 +73,12 @@ public class ArticleController {
     public void newArticle(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid NewArticleDto newArticleDto) {
         articleService.newArticle(newArticleDto.toNewArticleServiceDto(), cookie.getValue());
     }
-    @GetMapping("/articles/{id}")
-    public GetArticleResponseDto getArticle(@PathVariable(value = "id") Long id, HttpServletRequest request) {
-        return articleService.getArticle(new GetArticleServiceDto(id, request.getRemoteAddr()));
+    @GetMapping({"/articles/{id}"})
+    public GetArticleResponseDto getArticle(@PathVariable(value = "id") Long id,
+                                            @ModelAttribute GetArticleDto getArticleDto,
+                                            HttpServletRequest request) {
+
+        return articleService.getArticle(getArticleDto.toGetArticleServiceDto(request.getRemoteAddr()));
     }
 
     @MySecured(role = Role.MEMBER)

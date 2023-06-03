@@ -39,7 +39,7 @@ export async function createDummies() {
 export async function write(data:any) {
     try {
         await apiController({
-            url:  '/article/new',
+            url:  '/articles/new',
             method: 'post',
             data: data,
         })
@@ -73,6 +73,16 @@ export async function likeArticle(id:any) {
     try {
         await apiController({
             url: '/articles/'+id+'/like',
+            method: 'post'
+        })
+    } catch (error) {
+        return error;
+    }
+}
+export async function dislikeArticle(id:any) {
+    try {
+        await apiController({
+            url: '/articles/'+id+'/dislike',
             method: 'post'
         })
     } catch (error) {

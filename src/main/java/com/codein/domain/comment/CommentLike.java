@@ -1,6 +1,6 @@
 package com.codein.domain.comment;
 
-import com.codein.domain.utils.LikeChanges;
+import com.codein.utils.LikeChanges;
 import com.codein.domain.member.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

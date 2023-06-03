@@ -1,7 +1,7 @@
 package com.codein.domain.article;
 
 import com.codein.domain.member.Member;
-import com.codein.domain.utils.LikeChanges;
+import com.codein.utils.LikeChanges;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;

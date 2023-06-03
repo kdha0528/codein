@@ -4,12 +4,9 @@ import com.codein.config.SecurityConfig.MySecured;
 import com.codein.domain.member.Role;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
-import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.comment.EditCommentDto;
-import com.codein.requestdto.comment.GetCommentListServiceDto;
 import com.codein.requestdto.comment.NewCommentDto;
 import com.codein.requestservicedto.comment.CommentLikeServiceDto;
-import com.codein.responsedto.comment.CommentListItem;
 import com.codein.responsedto.comment.DeleteCommentServiceDto;
 import com.codein.service.ArticleService;
 import com.codein.service.CommentService;
@@ -20,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 
 @Slf4j

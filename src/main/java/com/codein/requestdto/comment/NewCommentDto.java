@@ -11,8 +11,8 @@ import lombok.ToString;
 @ToString
 public class NewCommentDto {
 
-    @NotBlank(message = "댓글을 1자 이상 적어주세요.")
-    @Size(min = 1, max = 500, message = "댓글은 최대 500글자까지 입력가능합니다.")
+    @NotBlank(message = "댓글을 입력해주세요.")
+    @Size(min = 1, max = 3000, message = "댓글은 최대 3000글자까지 입력가능합니다.")
     private final String content;
 
     private final Long targetId;

@@ -7,7 +7,7 @@ import ArticleView from "@/views/ArticleView.vue";
 export default [
     {
         path: '/',
-        alias: ['','/'],
+        alias: ['','/','/home'],
         name: 'index',
         component: CategoryView,
         children: [{

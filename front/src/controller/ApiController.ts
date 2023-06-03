@@ -35,17 +35,15 @@ apiController.interceptors.response.use(
         } else if (error.response.data.code === 'A001' && errorAPI.retry === undefined) {
             errorAPI.retry = true;
             await useResponseStore().setRetry(true);
-            await refreshToken();
             await console.log("refresh token")
+            await refreshToken();
+            if(error.response.data.code !== 'A001'){
+                await useResponseStore().setError(error.response.data.code, error.response.data.message);
+            }
             return axios(errorAPI);
         } else {
-            if(error.response.data.errors.size === 0) {
-                await useResponseStore().setError(error.response.data.code, error.response.data.message);
-                return await Promise.reject(error);
-            } else {
-                await useResponseStore().setError(error.response.data.code, error.response.data.message);
-                return await Promise.reject(error);
-            }
+            await useResponseStore().setError(error.response.data.code, error.response.data.message);
+            return await Promise.reject(error);
         }
     }
 );

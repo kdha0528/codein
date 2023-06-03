@@ -112,7 +112,6 @@ public class CommentServiceTest {
         Member member = memberRepository.findByAccessToken(accessToken);
 
         Assertions.assertEquals(newCommentDto.getContent(), comment.getContent());
-        Assertions.assertEquals(comment.getId(),comment.getParentId());
         Assertions.assertEquals(member.getId(), comment.getMember().getId());
     }
 
