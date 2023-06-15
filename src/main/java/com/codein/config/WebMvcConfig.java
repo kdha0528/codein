@@ -40,7 +40,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .setCachePeriod(3600)
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());
-        System.out.println("실행됨");
     }
 
     @Override

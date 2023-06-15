@@ -2,6 +2,7 @@ package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
 import com.codein.domain.auth.Tokens;
+import com.codein.domain.member.follow.Follow;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.ProfileEditor;
 import com.codein.error.exception.auth.InvalidTokensCookieException;
@@ -10,6 +11,7 @@ import com.codein.error.exception.profileimage.ImageTooLargeException;
 import com.codein.error.exception.profileimage.InvalidImageException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.repository.member.follow.FollowRepository;
 import com.codein.requestdto.member.SignupDto;
 import com.codein.requestservicedto.member.*;
 import jakarta.servlet.http.Cookie;
@@ -34,6 +36,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokensRepository tokensRepository;
+    private final FollowRepository followRepository;
 
     @Value("${spring.servlet.multipart.location}")
     private String uploadPath;
@@ -229,5 +232,30 @@ public class MemberService {
             memberList.add(member);
         }
         return memberList;
+    }
+
+    @Transactional
+    public Follow followMember(FollowServiceDto followServiceDto){
+        Member follower = memberRepository.findByAccessToken(followServiceDto.getAccessToken());
+        Member following = memberRepository.findById(followServiceDto.getFollowingId())
+                .orElseThrow(MemberNotExistsException::new);
+
+        if (follower != null) {
+            Follow exists = followRepository.findByMembers(follower,following);
+
+            if(exists == null){
+                Follow follow = Follow.builder()
+                        .follower(follower)
+                        .following(following)
+                        .build();
+                followRepository.save(follow);
+                return follow;
+            } else {
+                followRepository.delete(exists);
+                return null;
+            }
+        } else {
+            throw new MemberNotExistsException();
+        }
     }
 }

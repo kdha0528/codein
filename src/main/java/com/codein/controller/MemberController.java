@@ -8,6 +8,7 @@ import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.GetActivitiesDto;
 import com.codein.requestdto.member.*;
+import com.codein.requestservicedto.member.FollowServiceDto;
 import com.codein.responsedto.article.ActivityListResponseDto;
 import com.codein.responsedto.member.LoginResponseDto;
 import com.codein.responsedto.member.SettingsAccountResponseDto;
@@ -125,4 +126,19 @@ public class MemberController {
         memberService.deleteMember(cookie.getValue());
         return "redirect:/logout";
     }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping(value = {"/members/{id}/follow","/members/{id}/{activity}/follow"})
+    public void followMember(
+            @PathVariable(value = "id") Long id,
+            @PathVariable(value = "activity", required = false) String activity,
+            @CookieValue(value = "accesstoken") Cookie cookie) {
+
+        FollowServiceDto followServiceDto = FollowServiceDto.builder()
+                .accessToken(cookie.getValue())
+                .followingId(id)
+                .build();
+        memberService.followMember(followServiceDto);
+    }
+
 }

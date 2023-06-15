@@ -703,4 +703,81 @@ class MemberControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
+
+
+    @Test
+    @DisplayName("팔로우 성공")
+    void test13_1() throws Exception {
+        // given
+        signup();
+        login();
+
+        SignupDto signupDto = SignupDto.builder()
+                .name("김동하")
+                .nickname("데일이2")
+                .email("kdha0528@gmail.com")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("0101234457")
+                .build();
+        Member following = memberService.signup(signupDto.toSignupServiceDto());
+
+        // expected
+        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("팔로우 성공: activity 있을 때")
+    void test13_2() throws Exception {
+        // given
+        signup();
+        login();
+
+        SignupDto signupDto = SignupDto.builder()
+                .name("김동하")
+                .nickname("데일이2")
+                .email("kdha0528@gmail.com")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("0101234457")
+                .build();
+        Member following = memberService.signup(signupDto.toSignupServiceDto());
+
+        // expected
+        mockMvc.perform(post("/members/{id}/{activity}/follow", following.getId(), "comments").cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("팔로우 취소 성공")
+    void test13_3() throws Exception {
+        // given
+        signup();
+        login();
+
+        SignupDto signupDto = SignupDto.builder()
+                .name("김동하")
+                .nickname("데일이2")
+                .email("kdha0528@gmail.com")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("0101234457")
+                .build();
+        Member following = memberService.signup(signupDto.toSignupServiceDto());
+
+        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        // expected
+        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getCookie()))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
 }

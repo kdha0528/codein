@@ -1,17 +1,19 @@
 package com.codein.service;
 
 import com.codein.crypto.PasswordEncoder;
+import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
+import com.codein.domain.member.follow.Follow;
+import com.codein.error.exception.member.MemberNotExistsException;
+import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.member.EditProfileDto;
 import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
+import com.codein.requestservicedto.member.FollowServiceDto;
 import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ResourceLoader;
@@ -41,11 +43,40 @@ class MemberServiceTest {
     private ProfileImageRepository profileImageRepository;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private TokensRepository tokensRepository;
 
 
     @AfterEach
     void clean() {
         memberRepository.deleteAll();
+    }
+
+    Member signupLogin() {
+        SignupDto signupDto = SignupDto.builder()
+                .name("김동하")
+                .email("kdha4585@gmail.com")
+                .nickname("데일이")
+                .password("12341234")
+                .phone("01075444357")
+                .birth("1996-05-28")
+                .sex("male")
+                .build();
+        Member member = memberService.signup(signupDto.toSignupServiceDto());
+
+        LoginDto loginDto = LoginDto.builder()
+                .email("kdha4585@gmail.com")
+                .password("12341234")
+                .build();
+        memberService.login(loginDto.toMemberServiceDto());
+
+        return member;
+    }
+    String getToken() {
+        Member member = memberRepository.findByEmail("kdha4585@gmail.com");
+        Tokens tokens = tokensRepository.findByMember(member)
+                .orElseThrow(MemberNotExistsException::new);
+        return tokens.getAccessToken();
     }
 
     @Test
@@ -205,6 +236,36 @@ class MemberServiceTest {
         Member editedMember = memberRepository.findByEmail("kdha4585@gmail.com");
         Assertions.assertEquals(editProfileDto.getName(), editedMember.getName());
         Assertions.assertEquals(editProfileDto.getNickname(), editedMember.getNickname());
+    }
+
+    @Test
+    @DisplayName("팔로우 성공")
+    void test7() throws IOException {
+        // given
+        Member follower = signupLogin();
+        SignupDto signupDto = SignupDto.builder()
+                .name("김동하")
+                .nickname("데일이2")
+                .email("kdha0528@gmail.com")
+                .password("12341234")
+                .birth("2000-01-01")
+                .sex("male")
+                .phone("0101234457")
+                .build();
+        Member following = memberService.signup(signupDto.toSignupServiceDto());
+
+        FollowServiceDto followServiceDto = FollowServiceDto.builder()
+                .accessToken(getToken())
+                .followingId(following.getId())
+                .build();
+
+        // when
+        Follow follow = memberService.followMember(followServiceDto);
+
+        // then
+        Assertions.assertEquals(follower.getNickname(), follow.getFollower().getNickname());
+        Assertions.assertEquals(signupDto.getNickname(), follow.getFollowing().getNickname());
+
     }
 
 

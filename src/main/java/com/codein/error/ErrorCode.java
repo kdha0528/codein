@@ -44,7 +44,7 @@ public enum ErrorCode {
     FREQUENT_LIKE_EXCEPTION(400, "A006", "추천/비추천은 10초에 1번씩 할 수 있습니다. 담시후 다시 시도해주세요."),
 
     // Comment
-    COMMENT_NOT_EXISTS(400,"COMMENT001","존재하지 않는 댓글입니다."),
+    COMMENT_NOT_EXISTS(400,"CMT001","존재하지 않는 댓글입니다."),
     ;
     private final String code;
     private final String message;
