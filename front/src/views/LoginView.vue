@@ -78,7 +78,7 @@ const onLogin = async function () {
                 if(route.meta.previousRouteName === 'signup' || route.meta.previousRouteName === 'login'){
                     router.push({name: "community"})
                 } else {
-                    router.go(-1);
+                    router.back();
                 }
 
             } else {

@@ -102,7 +102,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
     }
 
     @Override
-    public ActivityListResponseDto getActivityListResponseDto(GetActivitiesServiceDto getActivitiesServiceDto, Member member) {
+    public ActivityListResponseDto getActivityListResponseDto(GetActivitiesServiceDto getActivitiesServiceDto, Member member, Boolean isFollow) {
 
         List<Article> listArticle;
         int maxPage = 1;
@@ -178,6 +178,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom {
                 .profileImage(member.getProfileImage())
                 .activityList(activityList)
                 .maxPage(maxPage)
+                .isFollow(isFollow)
                 .build();
     }
 

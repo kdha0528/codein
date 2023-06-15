@@ -1,6 +1,7 @@
 package com.codein.requestdto.article;
 
 import com.codein.requestservicedto.article.GetActivitiesServiceDto;
+import jakarta.servlet.http.Cookie;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -29,11 +30,12 @@ public class GetActivitiesDto {
         }
     }
 
-    public GetActivitiesServiceDto toGetActivitiesServiceDto(){
+    public GetActivitiesServiceDto toGetActivitiesServiceDto(Cookie cookie){
         return GetActivitiesServiceDto.builder()
                 .activity(this.activity)
                 .page(this.page)
                 .id(this.id)
+                .cookie(cookie)
                 .build();
     }
 }

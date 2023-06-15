@@ -163,7 +163,7 @@ class ArticleServiceTest {
                 .build();
 
         // when
-        ActivityListResponseDto activityList = articleService.getActivityList(getActivitiesDto.toGetActivitiesServiceDto());
+        ActivityListResponseDto activityList = articleService.getActivityList(getActivitiesDto.toGetActivitiesServiceDto(null));
 
         //then
         Assertions.assertEquals(20L,activityList.getActivityList().size()) ;

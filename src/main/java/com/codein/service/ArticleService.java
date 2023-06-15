@@ -1,6 +1,8 @@
 package com.codein.service;
 import com.codein.domain.article.*;
 import com.codein.domain.member.Member;
+import com.codein.domain.member.follow.Follow;
+import com.codein.repository.member.follow.FollowRepositoryCustom;
 import com.codein.utils.LikeChanges;
 import com.codein.error.exception.article.*;
 import com.codein.error.exception.member.MemberNotExistsException;
@@ -36,6 +38,7 @@ public class ArticleService {
     private final ViewLogRepository viewLogRepository;
     private final ArticleLikeRepository articleLikeRepository;
     private final CommentService commentService;
+    private final FollowRepositoryCustom followRepository;
 
     @Transactional
     public Article newArticle(NewArticleServiceDto newArticleServiceDto, String accesstoken) {
@@ -155,7 +158,19 @@ public class ArticleService {
     public ActivityListResponseDto getActivityList(GetActivitiesServiceDto getActivitiesServiceDto) {
         Member member = memberRepository.findById(getActivitiesServiceDto.getId())
                 .orElseThrow(MemberNotExistsException::new);
-        return articleRepository.getActivityListResponseDto(getActivitiesServiceDto, member);
+        Boolean isFollow = null;
+        if(getActivitiesServiceDto.getAccessToken() != null){
+            Member visitor = memberRepository.findByAccessToken(getActivitiesServiceDto.getAccessToken());
+            if(visitor != null){
+                Follow follow = followRepository.findByMembers(visitor,member);
+                if(visitor != member) {
+                    isFollow = follow != null;
+                }
+            } else {
+                throw new MemberNotExistsException();
+            }
+        }
+        return articleRepository.getActivityListResponseDto(getActivitiesServiceDto, member, isFollow);
     }
 
     @Transactional

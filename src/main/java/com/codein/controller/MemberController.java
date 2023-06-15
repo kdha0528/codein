@@ -65,9 +65,11 @@ public class MemberController {
             @PathVariable(value = "id") Long id,
             @PathVariable(value = "activity", required = false) String activity,
             @RequestParam(value = "page", required = false) Integer page,
-            @ModelAttribute GetActivitiesDto getActivitiesDto
+            @ModelAttribute GetActivitiesDto getActivitiesDto,
+            @CookieValue(value = "accesstoken", required = false) Cookie cookie
+
     ) {
-        return articleService.getActivityList(getActivitiesDto.toGetActivitiesServiceDto());
+        return articleService.getActivityList(getActivitiesDto.toGetActivitiesServiceDto(cookie));
     }
 
     @MySecured(role = Role.MEMBER)

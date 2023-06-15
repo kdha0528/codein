@@ -1,7 +1,7 @@
 <template>
     <div class="content">
         <div class="d-flex flex-column mb-4" style="border: thin solid #dcdfe6; border-radius: 10px;">
-            <div class="d-flex flex-row align-items-center">
+            <div class="d-flex align-items-center">
                 <div class="ms-3 mt-4 mb-4">
                     <img v-if="memberInfo.imageUrl" :src="memberInfo.imageUrl"
                          style="width: 4.5rem; height: 4.5rem; border-radius: 100%;"
@@ -11,11 +11,23 @@
                         <Avatar/>
                     </el-icon>
                 </div>
-                <div class="simple-profile ms-3">
-                    <ul>
-                        <li style="font-size: 1.5rem; font-weight: bold;">{{ memberInfo.nickname }}</li>
-                        <li style="font-size: 0.9rem;">팔로우 팔로워</li>
-                    </ul>
+                <div class="simple-profile ms-3 d-flex flex-column">
+                    <div style="font-size: 1.5rem; font-weight: bold;">{{ memberInfo.nickname }}</div>
+                    <div class="d-flex align-items-center">
+                        <div style="font-size: 0.9rem;">팔로우 팔로워</div>
+                        <div v-if="memberInfo.isFollow === false" class="ms-3">
+                            <el-button type="primary" @click="onFollow()">
+                                팔로우
+                            </el-button>
+                        </div>
+                        <div v-else-if="memberInfo.isFollow === true"  class="ms-3">
+                            <el-button type="danger" @click="onFollow()">
+                                팔로잉
+                            </el-button>
+                        </div>
+                        <div v-else class="ms-3">
+                        </div>
+                    </div>
                 </div>
             </div>
             <el-divider style="margin: 0"/>
@@ -43,7 +55,7 @@
 import {onMounted, provide, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useResponseStore} from "@/stores/Response";
-import {getActivities} from "@/controller/api/member";
+import {follow, getActivities} from "@/controller/api/member";
 import type {Activity} from "@/custom-types/activity";
 import {Avatar} from "@element-plus/icons-vue";
 import {useActivitiesStore} from "@/stores/activities";
@@ -61,6 +73,7 @@ const memberInfo = ref({
     id: 0,
     nickname: '',
     imageUrl:'',
+    isFollow: Boolean,
 })
 
 const isSetPage = ref(false);
@@ -109,6 +122,7 @@ const onGetActivities = async function () {
                 memberInfo.value.id = response.id;
                 memberInfo.value.nickname = response.nickname;
                 memberInfo.value.imageUrl = response.imagePath;
+                memberInfo.value.isFollow = response.isFollow;
 
                 response.activityList.forEach((r: any) => {
                     const activity: Activity = {...r}
@@ -131,6 +145,23 @@ const onGetActivities = async function () {
 }
 
 provide('onPaging', onPaging);
+
+const onFollow = async function () {
+    await follow(getPath()+"/follow")
+        .then((response: any) => {
+            if (resStore.isOK) {
+                onGetActivities();
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
+                onGetActivities();
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error);
+            onGetActivities();
+        })
+}
 </script>
 
 <style scoped lang="scss">

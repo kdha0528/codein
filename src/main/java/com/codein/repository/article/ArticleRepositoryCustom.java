@@ -14,6 +14,6 @@ public interface ArticleRepositoryCustom {
     List<Article> findByMember(Member member);
     Article findByMemberLatest(Member member);
     ArticleListResponseDto getArticleList(GetArticlesServiceDto getArticlesServiceDto);
-    ActivityListResponseDto getActivityListResponseDto(GetActivitiesServiceDto getActivitiesServiceDto, Member member);
+    ActivityListResponseDto getActivityListResponseDto(GetActivitiesServiceDto getActivitiesServiceDto, Member member, Boolean isFollow);
 
 }

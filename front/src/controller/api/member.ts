@@ -135,6 +135,18 @@ export async function getActivities(path: string) {
     }
 }
 
+export async function follow(path: string) {
+    try {
+        const response = await apiController({
+            url: path,
+            method: 'post',
+        })
+        return response.data;
+    } catch (error) {
+        return error;
+    }
+}
+
 export async function refreshToken() {
     try {
         await apiController.post('/refreshtoken');
@@ -142,3 +154,4 @@ export async function refreshToken() {
         return error;
     }
 }
+
