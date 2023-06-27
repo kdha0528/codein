@@ -28,6 +28,6 @@ public class NewArticleServiceDto {
                 .title(this.title)
                 .content(this.content)
                 .build();
-
     }
+
 }

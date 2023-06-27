@@ -33,12 +33,6 @@ public class AuthInterceptor implements HandlerInterceptor {
         String refreshToken = null;
         String accessToken = null;
 
-        // 형 변환하기
-        if (handler instanceof ResourceHttpRequestHandler) {
-            return true;
-        }
-        HandlerMethod handlerMethod = (HandlerMethod) handler;
-
         // refresh token이 있고, access token이 없는 경우 access token 재발급
         if(cookies != null) {
             for (Cookie cookie : cookies) {
@@ -51,6 +45,11 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
         if(refreshToken != null && accessToken == null) throw new AccessTokenNullException();
 
+        // 형 변환하기
+        if (handler instanceof ResourceHttpRequestHandler) {
+            return true;
+        }
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
 
         // @MySecured 받아오기
         MySecured mySecured = handlerMethod.getMethodAnnotation(MySecured.class);
@@ -59,7 +58,6 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (mySecured == null) {
             return true;
         }
-
 
         // accessToken이 존재하면 유효한 세션인지 확인
         Tokens tokens = tokensRepository.findByAccessToken(accessToken)

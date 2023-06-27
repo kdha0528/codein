@@ -32,12 +32,19 @@ public class Article {
     private String content;
     @NotNull
     private LocalDateTime createdAt;
+
     private LocalDateTime changedAt;
+    @NotNull
     private Integer viewNum;
+    @NotNull
     private Integer commentNum;
+    @NotNull
     private Integer likeNum;
+    @NotNull
     private Integer dislikeNum;
+    @NotNull
     private boolean deleted;
+    @NotNull
     private boolean changed;
 
 

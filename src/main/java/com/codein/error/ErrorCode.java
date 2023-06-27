@@ -45,6 +45,9 @@ public enum ErrorCode {
 
     // Comment
     COMMENT_NOT_EXISTS(400,"CMT001","존재하지 않는 댓글입니다."),
+
+    // Notification
+    NOTIFICATION_NOT_EXISTS(400, "N001", "존재하지 않는 알림입니다."),
     ;
     private final String code;
     private final String message;

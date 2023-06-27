@@ -47,6 +47,7 @@ public class Member {
     @NotNull
     private LocalDateTime createdAt;
 
+    @NotNull
     private Integer point;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "member", fetch = FetchType.LAZY)
@@ -58,6 +59,7 @@ public class Member {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private ProfileImage profileImage;
 
+    @NotNull
     private boolean deleted;
 
     @Builder

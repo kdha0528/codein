@@ -45,10 +45,14 @@ public class Comment {
     private LocalDateTime createdAt;
     private LocalDateTime changedAt;
 
+    @NotNull
     private Integer likeNum;
+    @NotNull
     private Integer dislikeNum;
 
+    @NotNull
     private boolean deleted;
+    @NotNull
     private boolean changed;
 
     @Builder
