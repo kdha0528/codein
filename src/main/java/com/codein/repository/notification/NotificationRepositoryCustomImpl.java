@@ -32,7 +32,7 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
     @Override
     public NotificationListResponseDto getNotificationList(GetNotificationsServiceDto getNotificationsServiceDto, Member member) {
          JPAQuery<Notification> query = jpaQueryFactory.selectFrom(notification)
-                .where(notification.receiver.eq(member), notification.id.gt(getNotificationsServiceDto.getLastNotificationId()))
+                .where(notification.receiver.eq(member), notification.id.lt(getNotificationsServiceDto.getLastNotificationId()))
                 .orderBy(notification.id.desc());
 
          int notChecked = query

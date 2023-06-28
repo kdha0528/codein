@@ -2,7 +2,9 @@ package com.codein.service;
 import com.codein.domain.article.*;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.follow.Follow;
+import com.codein.domain.notification.NotificationContent;
 import com.codein.repository.member.follow.FollowRepositoryCustom;
+import com.codein.requestservicedto.notification.NewNotificationServiceDto;
 import com.codein.utils.LikeChanges;
 import com.codein.error.exception.article.*;
 import com.codein.error.exception.member.MemberNotExistsException;
@@ -37,7 +39,6 @@ public class ArticleService {
     private final MemberRepository memberRepository;
     private final ViewLogRepository viewLogRepository;
     private final ArticleLikeRepository articleLikeRepository;
-    private final CommentService commentService;
     private final FollowRepositoryCustom followRepository;
 
     @Transactional
@@ -74,7 +75,7 @@ public class ArticleService {
         }
     }
     @Transactional
-    public GetArticleResponseDto getArticle(GetArticleServiceDto getArticleServiceDto) {
+    public ArticleResponseData getArticle(GetArticleServiceDto getArticleServiceDto) {
         Article article = articleRepository.findById(getArticleServiceDto.getArticleId())
                 .orElseThrow(ArticleNotExistsException::new);
 
@@ -91,19 +92,7 @@ public class ArticleService {
         } else {
             throw new DeletedArticleException();
         }
-
-        GetCommentListServiceDto getCommentListServiceDto = GetCommentListServiceDto.builder()
-                .article(article)
-                .page(getArticleServiceDto.getCommentPage())
-                .build();
-
-        CommentListResponseDto commentListResponseDto= commentService.getCommentList(getCommentListServiceDto);
-        ArticleResponseData articleResponseData = article.toArticleResponseData(isNewView);
-
-        return GetArticleResponseDto.builder()
-                .articleData(articleResponseData)
-                .commentsData(commentListResponseDto)
-                .build();
+        return article.toArticleResponseData(isNewView);
     }
 
 

@@ -1,10 +1,12 @@
 package com.codein.service;
 
+import com.codein.domain.comment.Comment;
 import com.codein.domain.member.Member;
 import com.codein.domain.notification.Notification;
+import com.codein.domain.notification.NotificationContent;
+import com.codein.error.exception.comment.CommentNotExistsException;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.error.exception.notification.NotificationNotExistsException;
-import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.comment.CommentRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.notification.NotificationRepository;
@@ -24,46 +26,71 @@ import java.util.List;
 public class NotificationService {
 
     private final MemberRepository memberRepository;
-    private final ArticleRepository articleRepository;
-    private final CommentRepository commentRepository;
     private final NotificationRepository notificationRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
-    public List<Notification> newNotifications(NewNotificationServiceDto newNotificationServiceDto) {
-        if(newNotificationServiceDto.getReceivers().isEmpty()) {
-            return null;
-        } else {
+    public void newNotifications(NewNotificationServiceDto newNotificationServiceDto) {
+        if(newNotificationServiceDto.getComment() == null) {    // 글 생성인 경우
+            List<Member> receivers = memberRepository.findByFollowing(newNotificationServiceDto.getSender());
+            if(!receivers.isEmpty()){
+                List<Notification> notifications = new ArrayList<>();
+                receivers.forEach(receiver -> {
+                            notifications.add(newNotificationServiceDto.toEntity(receiver, NotificationContent.FOLLOWING_POST_NEW_ARTICLE));
+                        });
+                notificationRepository.saveAll(notifications);
+            }
+        } else {    // 댓글 생성인 경우
             List<Notification> notifications = new ArrayList<>();
-            newNotificationServiceDto.getReceivers().forEach(receiver ->
-                    notifications.add(newNotificationServiceDto.toEntity(receiver))
-            );
+
+            // 댓글을 단 원글 작성자에게 알림
+            notifications.add(newNotificationServiceDto.toEntity(newNotificationServiceDto.getArticle().getMember(), NotificationContent.COMMENT_ON_MY_ARTICLE));
+
+            // 대댓글인 경우 부모댓글 작성자에게 알림
+            if(newNotificationServiceDto.getComment().getParentId() != null){
+
+                Comment parent = commentRepository.findById(newNotificationServiceDto.getComment().getParentId())
+                        .orElseThrow(CommentNotExistsException::new);
+                Member parentMember = parent.getMember();
+
+                // 타겟이 있는 경우 타겟에게 알림
+                if(newNotificationServiceDto.getComment().getTarget() != null){
+                    Member targetMember = newNotificationServiceDto.getComment().getTarget().getMember();
+                    if(targetMember != parentMember) {
+                        notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                        notifications.add(newNotificationServiceDto.toEntity(targetMember, NotificationContent.REPLY_TO_ME));
+                    } else {
+                        // 단 타겟과 부모가 일치할 경우 타겟 알림만 알림
+                        notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_TO_ME));
+                    }
+                } else {
+                    notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                }
+            }
             notificationRepository.saveAll(notifications);
-            return notifications;
         }
     }
-
 
     @Transactional
     public NotificationListResponseDto getNotifications(GetNotificationsServiceDto getNotificationsServiceDto) {
-
         Member member = memberRepository.findByAccessToken(getNotificationsServiceDto.getAccessToken());
         if(member != null) {
+            if(getNotificationsServiceDto.getLastNotificationId() == null) {    // 알림버튼을 클릭하여 처음 열람한 경우
+                checkNotifications(member);     // checked가 false인 모든 알림을 true로 변경
+            }
             return notificationRepository.getNotificationList(getNotificationsServiceDto, member);
-        }else{
+        } else {
             throw new MemberNotExistsException();
         }
     }
 
     @Transactional
-    public void checkNotifications(String accessToken){
-        Member member = memberRepository.findByAccessToken(accessToken);
-        if(member != null){
-            List<Notification> notifications = notificationRepository.findNotCheckedBySender(member);
+    public void checkNotifications(Member member){
+        List<Notification> notifications = notificationRepository.findNotCheckedBySender(member);
+        if(!notifications.isEmpty()) {
             notifications.forEach(notification ->
                     notification.setChecked(true)
             );
-        }else{
-            throw new MemberNotExistsException();
         }
     }
 

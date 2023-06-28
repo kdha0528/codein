@@ -2,21 +2,26 @@ package com.codein.controller;
 
 import com.codein.config.SecurityConfig.MySecured;
 import com.codein.crypto.PasswordEncoder;
+import com.codein.domain.article.Article;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
-import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.GetArticleDto;
 import com.codein.requestdto.article.GetArticlesDto;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.NewArticleDto;
+import com.codein.requestdto.comment.GetCommentListServiceDto;
 import com.codein.requestservicedto.article.ArticleLikeServiceDto;
 import com.codein.requestservicedto.article.DeleteArticleServiceDto;
-import com.codein.requestservicedto.article.GetArticleServiceDto;
+import com.codein.requestservicedto.notification.NewNotificationServiceDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
+import com.codein.responsedto.article.ArticleResponseData;
 import com.codein.responsedto.article.GetArticleResponseDto;
+import com.codein.responsedto.comment.CommentListResponseDto;
 import com.codein.service.ArticleService;
+import com.codein.service.CommentService;
 import com.codein.service.MemberService;
+import com.codein.service.NotificationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -34,6 +39,8 @@ public class ArticleController {
     private final MemberRepository memberRepository;
     private final ArticleService articleService;
     private final MemberService memberService;
+    private final CommentService commentService;
+    private final NotificationService notificationService;
 
     @GetMapping(value = {"/","/{category}"})
     public ArticleListResponseDto getArticleList(
@@ -71,14 +78,30 @@ public class ArticleController {
     @MySecured(role = Role.MEMBER)
     @PostMapping( "/articles/new")
     public void newArticle(@CookieValue(value = "accesstoken") Cookie cookie, @RequestBody @Valid NewArticleDto newArticleDto) {
-        articleService.newArticle(newArticleDto.toNewArticleServiceDto(), cookie.getValue());
+        Article article = articleService.newArticle(newArticleDto.toNewArticleServiceDto(), cookie.getValue());
+        NewNotificationServiceDto newNotificationServiceDto = NewNotificationServiceDto.builder()
+                .article(article)
+                .sender(article.getMember())
+                .build();
+        notificationService.newNotifications(newNotificationServiceDto);
     }
     @GetMapping({"/articles/{id}"})
     public GetArticleResponseDto getArticle(@PathVariable(value = "id") Long id,
                                             @ModelAttribute GetArticleDto getArticleDto,
                                             HttpServletRequest request) {
 
-        return articleService.getArticle(getArticleDto.toGetArticleServiceDto(request.getRemoteAddr()));
+        ArticleResponseData articleResponseData = articleService.getArticle(getArticleDto.toGetArticleServiceDto(request.getRemoteAddr()));
+
+        GetCommentListServiceDto getCommentListServiceDto = GetCommentListServiceDto.builder()
+                .articleId(articleResponseData.getId())
+                .page(getArticleDto.getCpage())
+                .build();
+        CommentListResponseDto commentListResponseDto= commentService.getCommentList(getCommentListServiceDto);
+
+        return GetArticleResponseDto.builder()
+                .articleData(articleResponseData)
+                .commentsData(commentListResponseDto)
+                .build();
     }
 
     @MySecured(role = Role.MEMBER)

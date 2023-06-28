@@ -1,11 +1,15 @@
 package com.codein.repository.member;
 
 import com.codein.domain.member.Member;
+import com.codein.domain.member.QMember;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.codein.domain.member.QMember.member;
+import static com.codein.domain.member.follow.QFollow.follow;
 
 @Repository
 @RequiredArgsConstructor
@@ -57,5 +61,12 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
                         member.deleted.isFalse())
                 .fetchFirst();
         return result != null;
+    }
+
+    public List<Member> findByFollowing(Member sender) {
+        return jpaQueryFactory.select(follow.follower)
+                .from(follow)
+                .where(follow.following.eq(sender))
+                .fetch();
     }
 }

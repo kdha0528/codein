@@ -1,6 +1,7 @@
 package com.codein.requestservicedto.notification;
 
 import com.codein.domain.article.Article;
+import com.codein.domain.comment.Comment;
 import com.codein.domain.member.Member;
 import com.codein.domain.notification.Notification;
 import com.codein.domain.notification.NotificationContent;
@@ -14,24 +15,22 @@ import java.util.List;
 @ToString
 public class NewNotificationServiceDto {
 
-    private final NotificationContent content;
     private final Member sender;
-    private final List<Member> receivers;
     private final Article article;
+    private final Comment comment;
 
     @Builder
-    public NewNotificationServiceDto(NotificationContent content, Member sender, List<Member> receivers, Article article) {
-        this.content = content;
+    public NewNotificationServiceDto(Member sender, Article article, Comment comment) {
         this.sender = sender;
-        this.receivers = receivers;
         this.article = article;
+        this.comment = comment;
     }
 
-    public Notification toEntity(Member receiver) {
+    public Notification toEntity(Member receiver, NotificationContent content) {
         return Notification.builder()
                 .sender(this.sender)
                 .receiver(receiver)
-                .content(this.content)
+                .content(content)
                 .build();
     }
 

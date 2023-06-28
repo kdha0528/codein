@@ -14,12 +14,12 @@ import static java.lang.Math.max;
 public class GetCommentListServiceDto {
 
     private static final int SIZE = 50;
-    private final Article article;
+    private final Long articleId;
     private final Integer page;
 
     @Builder
-    public GetCommentListServiceDto(Article article, Integer page) {
-        this.article = article;
+    public GetCommentListServiceDto(Long articleId, Integer page) {
+        this.articleId = articleId;
         this.page = Objects.requireNonNullElse(page, 1);
     }
 

@@ -145,7 +145,7 @@ public class CommentServiceTest {
 
         // when
         CommentListResponseDto commentListResponseDto = commentService.getCommentList(GetCommentListServiceDto.builder()
-                        .article(article)
+                        .articleId(article.getId())
                         .build());
 
         // then

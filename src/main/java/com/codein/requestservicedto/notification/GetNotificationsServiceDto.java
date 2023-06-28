@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.Objects;
+
 @Getter
 @ToString
 public class GetNotificationsServiceDto {
@@ -15,7 +17,7 @@ public class GetNotificationsServiceDto {
     @Builder
     public GetNotificationsServiceDto(String accessToken, Long lastNotificationId) {
         this.accessToken = accessToken;
-        this.lastNotificationId = lastNotificationId;
+        this.lastNotificationId = Objects.requireNonNullElse(lastNotificationId, Long.MAX_VALUE);
     }
 
     public int getSize() {

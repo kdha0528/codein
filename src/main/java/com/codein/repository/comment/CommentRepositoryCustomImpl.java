@@ -32,7 +32,7 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
     public CommentListResponseDto getCommentList(GetCommentListServiceDto getCommentListServiceDto) {
 
         JPAQuery<Comment> query = jpaQueryFactory.selectFrom(comment)
-                .where(comment.article.eq(getCommentListServiceDto.getArticle()))
+                .where(comment.article.id.eq(getCommentListServiceDto.getArticleId()))
                 .orderBy(comment.id.asc());
 
         long count = query.fetch().size();

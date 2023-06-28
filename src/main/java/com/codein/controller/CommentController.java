@@ -1,16 +1,15 @@
 package com.codein.controller;
 
 import com.codein.config.SecurityConfig.MySecured;
+import com.codein.domain.comment.Comment;
 import com.codein.domain.member.Role;
-import com.codein.repository.article.ArticleRepository;
-import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.comment.EditCommentDto;
 import com.codein.requestdto.comment.NewCommentDto;
 import com.codein.requestservicedto.comment.CommentLikeServiceDto;
+import com.codein.requestservicedto.notification.NewNotificationServiceDto;
 import com.codein.responsedto.comment.DeleteCommentServiceDto;
-import com.codein.service.ArticleService;
 import com.codein.service.CommentService;
-import com.codein.service.MemberService;
+import com.codein.service.NotificationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,18 +22,22 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class CommentController {
-    private final MemberRepository memberRepository;
-    private final MemberService memberService;
-    private final ArticleRepository articleRepository;
-    private final ArticleService articleService;
     private final CommentService commentService;
+    private final NotificationService notificationService;
 
     @MySecured(role = Role.MEMBER)
     @PostMapping( "/articles/{id}/comments")
     public void newComment(@CookieValue(value = "accesstoken") Cookie cookie,
                            @PathVariable(value = "id") Long id,
                            @Valid @RequestBody NewCommentDto newCommentDto) {
-        commentService.newComment(newCommentDto.toNewCommentServiceDto(cookie.getValue(), id));
+        Comment comment = commentService.newComment(newCommentDto.toNewCommentServiceDto(cookie.getValue(), id));
+
+        NewNotificationServiceDto newNotificationServiceDto = NewNotificationServiceDto.builder()
+                .article(comment.getArticle())
+                .comment(comment)
+                .sender(comment.getMember())
+                .build();
+        notificationService.newNotifications(newNotificationServiceDto);
     }
 
     @MySecured(role = Role.MEMBER)

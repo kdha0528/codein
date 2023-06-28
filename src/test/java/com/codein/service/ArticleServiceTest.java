@@ -15,6 +15,7 @@ import com.codein.requestservicedto.article.DeleteArticleServiceDto;
 import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.article.ActivityListResponseDto;
 import com.codein.responsedto.article.ArticleListResponseDto;
+import com.codein.responsedto.article.ArticleResponseData;
 import com.codein.responsedto.article.GetArticleResponseDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,15 +178,15 @@ class ArticleServiceTest {
         Article article = newArticle();
 
         // when
-        GetArticleResponseDto getArticleResponseDto = articleService.getArticle(GetArticleServiceDto.builder()
+        ArticleResponseData articleResponseData = articleService.getArticle(GetArticleServiceDto.builder()
                         .articleId(article.getId())
                         .clientIp("client ip")
-                .build());
+                        .build());
 
         //then
-        Assertions.assertEquals(getArticleResponseDto.getArticleData().getCategory(), article.getCategory().getName());
-        Assertions.assertEquals(getArticleResponseDto.getArticleData().getTitle(), article.getTitle());
-        Assertions.assertEquals(getArticleResponseDto.getArticleData().getContent(), article.getContent());
+        Assertions.assertEquals(articleResponseData.getCategory(), article.getCategory().getName());
+        Assertions.assertEquals(articleResponseData.getTitle(), article.getTitle());
+        Assertions.assertEquals(articleResponseData.getContent(), article.getContent());
     }
 
     @Test
