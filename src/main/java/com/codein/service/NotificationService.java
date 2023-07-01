@@ -16,10 +16,11 @@ import com.codein.requestservicedto.notification.NewNotificationServiceDto;
 import com.codein.responsedto.notification.NotificationListResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Duration;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,37 +41,71 @@ public class NotificationService {
                         });
                 notificationRepository.saveAll(notifications);
             }
-        } else {    // 댓글 생성인 경우
+        }
+        else {    // 댓글 생성인 경우
             List<Notification> notifications = new ArrayList<>();
 
+            Member author = newNotificationServiceDto.getArticle().getMember();
+
             // 댓글을 단 원글 작성자에게 알림
-            notifications.add(newNotificationServiceDto.toEntity(newNotificationServiceDto.getArticle().getMember(), NotificationContent.COMMENT_ON_MY_ARTICLE));
+            if(!newNotificationServiceDto.getSender().equals(newNotificationServiceDto.getArticle().getMember())) {
+                notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
+            }
 
-            // 대댓글인 경우 부모댓글 작성자에게 알림
-            if(newNotificationServiceDto.getComment().getParentId() != null){
-
+            // 대댓글인 경우 부모댓글 작성자에게 알림 단 부모댓글이 본인인 경우 제외
+            if(newNotificationServiceDto.getComment().getParentId() != null) {
                 Comment parent = commentRepository.findById(newNotificationServiceDto.getComment().getParentId())
                         .orElseThrow(CommentNotExistsException::new);
                 Member parentMember = parent.getMember();
 
-                // 타겟이 있는 경우 타겟에게 알림
-                if(newNotificationServiceDto.getComment().getTarget() != null){
-                    Member targetMember = newNotificationServiceDto.getComment().getTarget().getMember();
-                    if(targetMember != parentMember) {
-                        notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
-                        notifications.add(newNotificationServiceDto.toEntity(targetMember, NotificationContent.REPLY_TO_ME));
-                    } else {
-                        // 단 타겟과 부모가 일치할 경우 타겟 알림만 알림
-                        notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_TO_ME));
-                    }
-                } else {
+                if(!parentMember.equals(newNotificationServiceDto.getSender())) {
                     notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                    // 타겟이 있는 경우 타겟에게 알림 단 타겟이 본인인 경우 제외
+                    if (newNotificationServiceDto.getComment().getTarget() != null) {
+                        Member targetMember = newNotificationServiceDto.getComment().getTarget().getMember();
+
+                        if (!targetMember.equals(newNotificationServiceDto.getSender())) {
+                            notifications.add(newNotificationServiceDto.toEntity(targetMember, NotificationContent.REPLY_TO_ME));
+                        }
+                    }
                 }
             }
-            notificationRepository.saveAll(notifications);
+            Collections.reverse(notifications);
+            notificationRepository.saveAll( removeDuplicateReceivers(notifications));
         }
     }
 
+    private List<Notification> removeDuplicateReceivers(List<Notification> notifications) {
+        Set<Long> uniqueReceivers = new HashSet<>();
+        List<Notification> uniqueNotifications = new ArrayList<>();
+        notifications.forEach(notification -> {
+            if (!uniqueReceivers.contains(notification.getReceiver().getId())) {
+                uniqueReceivers.add(notification.getReceiver().getId());
+                uniqueNotifications.add(notification);
+            }
+        });
+        return uniqueNotifications;
+    }
+
+    @Transactional
+    public ResponseCookie countNewNotifications(String accessToken) {
+        Member member = memberRepository.findByAccessToken(accessToken);
+        if(member != null) {
+            Integer count = notificationRepository.countNewNotification(member);
+            if(count > 0) {
+                return ResponseCookie.from("count_new_notifications", count.toString())
+                        .path("/")
+                        .maxAge(0)
+                        .domain(".loca.lt")
+                        .build();
+            } else {
+                return null;
+            }
+        } else {
+            throw new MemberNotExistsException();
+        }
+    }
+    
     @Transactional
     public NotificationListResponseDto getNotifications(GetNotificationsServiceDto getNotificationsServiceDto) {
         Member member = memberRepository.findByAccessToken(getNotificationsServiceDto.getAccessToken());
@@ -86,7 +121,7 @@ public class NotificationService {
 
     @Transactional
     public void checkNotifications(Member member){
-        List<Notification> notifications = notificationRepository.findNotCheckedBySender(member);
+        List<Notification> notifications = notificationRepository.findNotCheckedByReceiver(member);
         if(!notifications.isEmpty()) {
             notifications.forEach(notification ->
                     notification.setChecked(true)

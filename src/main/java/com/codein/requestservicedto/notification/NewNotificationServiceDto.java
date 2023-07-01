@@ -31,6 +31,8 @@ public class NewNotificationServiceDto {
                 .sender(this.sender)
                 .receiver(receiver)
                 .content(content)
+                .article(this.article)
+                .comment(this.comment)
                 .build();
     }
 

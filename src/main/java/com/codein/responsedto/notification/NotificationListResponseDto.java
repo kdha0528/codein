@@ -11,11 +11,9 @@ import java.util.List;
 public class NotificationListResponseDto {
 
     private final List<NotificationListItem> notificationListItemList;
-    private final int notChecked;
 
     @Builder
-    public NotificationListResponseDto(List<NotificationListItem> notificationListItemList, int notChecked) {
+    public NotificationListResponseDto(List<NotificationListItem> notificationListItemList) {
         this.notificationListItemList = notificationListItemList;
-        this.notChecked = notChecked;
     }
 }

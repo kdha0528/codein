@@ -8,6 +8,7 @@ import com.codein.responsedto.notification.NotificationListResponseDto;
 import java.util.List;
 
 public interface NotificationRepositoryCustom {
-    List<Notification> findNotCheckedBySender(Member member);
+    List<Notification> findNotCheckedByReceiver(Member member);
     NotificationListResponseDto getNotificationList(GetNotificationsServiceDto getNotificationsServiceDto, Member member);
+    Integer countNewNotification(Member member);
 }

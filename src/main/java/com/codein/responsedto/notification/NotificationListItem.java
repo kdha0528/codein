@@ -16,6 +16,7 @@ public class NotificationListItem {
     private final Long senderId;
     private final Long receiverId;
     private final Long articleId;
+    private final Long commentId;
     private final Integer content;
 
     private final boolean checked;
@@ -24,11 +25,12 @@ public class NotificationListItem {
     private final String notifiedAt;
 
     @Builder
-    public NotificationListItem(Long id, Long senderId, Long receiverId, Long articleId, Integer content, boolean checked, boolean clicked, LocalDateTime notifiedAt) {
+    public NotificationListItem(Long id, Long senderId, Long receiverId, Long articleId, Long commentId, Integer content, boolean checked, boolean clicked, LocalDateTime notifiedAt) {
         this.id = id;
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.articleId = articleId;
+        this.commentId = commentId;
         this.content = content;
         this.checked = checked;
         this.clicked = clicked;

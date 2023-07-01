@@ -1,6 +1,7 @@
 package com.codein.domain.notification;
 
 import com.codein.domain.article.Article;
+import com.codein.domain.comment.Comment;
 import com.codein.domain.member.Member;
 import com.codein.responsedto.notification.NotificationListItem;
 import jakarta.persistence.*;
@@ -35,6 +36,10 @@ public class Notification {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Article article;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Comment comment;
+
     @NotNull
     private NotificationContent content;
 
@@ -47,10 +52,11 @@ public class Notification {
     private LocalDateTime notifiedAt;
 
     @Builder
-    public Notification(Member sender, Member receiver, Article article, NotificationContent content) {
+    public Notification(Member sender, Member receiver, Article article, Comment comment, NotificationContent content) {
         this.sender = sender;
         this.receiver = receiver;
         this.article = article;
+        this.comment = comment;
         this.content = content;
         this.checked = false;
         this.clicked = false;
@@ -71,6 +77,7 @@ public class Notification {
                 .receiverId(this.receiver.getId())
                 .senderId(this.sender.getId())
                 .articleId(this.article.getId())
+                .commentId(this.comment.getId())
                 .content(this.content.ordinal())
                 .checked(isChecked())
                 .clicked(isClicked())

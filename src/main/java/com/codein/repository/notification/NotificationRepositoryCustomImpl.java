@@ -2,6 +2,7 @@ package com.codein.repository.notification;
 
 import com.codein.domain.member.Member;
 import com.codein.domain.notification.Notification;
+import com.codein.domain.notification.QNotification;
 import com.codein.requestservicedto.notification.GetNotificationsServiceDto;
 import com.codein.responsedto.notification.NotificationListItem;
 import com.codein.responsedto.notification.NotificationListResponseDto;
@@ -22,10 +23,10 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Notification> findNotCheckedBySender(Member member) {
+    public List<Notification> findNotCheckedByReceiver(Member member) {
 
         return jpaQueryFactory.selectFrom(notification)
-                .where(notification.sender.eq(member), notification.checked.isFalse())
+                .where(notification.receiver.eq(member), notification.checked.isFalse())
                 .fetch();
     }
 
@@ -34,11 +35,6 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
          JPAQuery<Notification> query = jpaQueryFactory.selectFrom(notification)
                 .where(notification.receiver.eq(member), notification.id.lt(getNotificationsServiceDto.getLastNotificationId()))
                 .orderBy(notification.id.desc());
-
-         int notChecked = query
-                 .where(notification.checked.isFalse())
-                 .fetch()
-                 .size();
 
         List<Notification> fetchResult = query
                 .limit(getNotificationsServiceDto.getSize())
@@ -51,8 +47,15 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
 
         return NotificationListResponseDto.builder()
                 .notificationListItemList(notificationList)
-                .notChecked(notChecked)
                 .build();
+    }
+
+    @Override
+    public Integer countNewNotification(Member member) {
+        return jpaQueryFactory.selectFrom(notification)
+                .where(notification.receiver.eq(member), notification.checked.isFalse())
+                .fetch()
+                .size();
     }
 }
 
