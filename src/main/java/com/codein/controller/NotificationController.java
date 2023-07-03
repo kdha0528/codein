@@ -7,7 +7,9 @@ import com.codein.requestservicedto.notification.GetNotificationsServiceDto;
 import com.codein.responsedto.notification.NotificationListResponseDto;
 import com.codein.service.NotificationService;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -20,11 +22,13 @@ public class NotificationController {
     @MySecured(role = Role.MEMBER)
     @GetMapping({"/notifications"})
     public NotificationListResponseDto getNotifications(@CookieValue(value = "accesstoken") Cookie cookie,
-                                                        @RequestParam(value = "lastId", required = false) Long lastId) {
+                                                        @RequestParam(value = "lastId", required = false) Long lastId,
+                                                        HttpServletResponse response) {
         GetNotificationsServiceDto getNotificationsServiceDto = GetNotificationsServiceDto.builder()
                 .lastNotificationId(lastId)
                 .accessToken(cookie.getValue())
                 .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, notificationService.removeNewNotificationsCountCookie().toString());
         return notificationService.getNotifications(getNotificationsServiceDto);
     }
 

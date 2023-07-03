@@ -28,6 +28,8 @@ apiController.interceptors.response.use(
     }, async function (error) {
         const errorAPI = error.config;
         await console.log("error = ", error)
+        await console.log("retry = ", errorAPI.retry)
+
         if(error.response === undefined){
             await console.log("ERROR RESPONSE IS UNDEFINED : "+error.message)
             await useResponseStore().setError(error.code, error.message);

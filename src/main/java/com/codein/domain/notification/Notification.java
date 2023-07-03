@@ -72,16 +72,37 @@ public class Notification {
     }
 
     public NotificationListItem toNotificationListItem(){
+
         return NotificationListItem.builder()
                 .id(this.id)
-                .receiverId(this.receiver.getId())
-                .senderId(this.sender.getId())
+                .sender(this.sender)
                 .articleId(this.article.getId())
                 .commentId(this.comment.getId())
-                .content(this.content.ordinal())
+                .subCotent(getNotificationSubContent())
+                .content(getNotificationContent())
                 .checked(isChecked())
                 .clicked(isClicked())
                 .notifiedAt(this.notifiedAt)
                 .build();
+    }
+
+    public String getNotificationContent() {
+        String content;
+        if(this.content.ordinal() == 0) {
+            content = this.getArticle().getTitle().substring(0,30);
+        } else {
+            content = this.getComment().getContent().substring(0,30);
+        }
+        return content;
+    }
+
+    public String getNotificationSubContent() {
+        return switch (this.content.ordinal()) {
+            case 0 -> "새 글 작성";
+            case 1 -> "내 글의 댓글";
+            case 2 -> "내 댓글에 답글";
+            case 3 -> "나에게 멘션";
+            default -> throw new RuntimeException();
+        };
     }
 }

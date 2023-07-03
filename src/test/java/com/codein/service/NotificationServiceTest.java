@@ -361,7 +361,8 @@ public class NotificationServiceTest {
             notificationService.newNotifications(newNotificationServiceDto);
         });
 
-        ResponseCookie responseCookie = notificationService.countNewNotifications(getToken());
+        Integer count = notificationService.countNewNotifications(receiver);
+        ResponseCookie responseCookie = notificationService.newNotificationsCountCookie(count);
 
         // then
         Assertions.assertEquals("6",responseCookie.getValue());
@@ -503,7 +504,10 @@ public class NotificationServiceTest {
         notificationService.checkNotifications(receiver);
 
         //then
-        ResponseCookie responseCookie = notificationService.countNewNotifications(getToken());
+
+        Integer count = notificationService.countNewNotifications(receiver);
+        ResponseCookie responseCookie = notificationService.newNotificationsCountCookie(count);
+
         Assertions.assertNull(responseCookie);
     }
 

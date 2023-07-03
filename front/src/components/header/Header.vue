@@ -21,59 +21,119 @@
                     공지사항
                 </el-menu-item>
             </div>
-            <div v-if="isUserLogin" class="d-flex justify-content-center align-items-center me-4" style="cursor: pointer;">
-                <el-dropdown  trigger="click">
-                    <span class="el-dropdown-link">
-                    <img v-if="auth.getProfileImage" :src="auth.getProfileImage"
-                         style="width: 2.8rem; height: 2.8rem; border-radius: 100%;"
-                         alt=""/>
-                    <el-icon v-else size="40"
-                             style="width: 2.8rem;  height:2.8rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
-                        <Avatar/>
-                    </el-icon>
-                    </span>
-                    <template #dropdown>
-                      <el-dropdown-menu class="dropdown_menu d-flex flex-column"
-                                        style="
-                                        --el-dropdown-menuItem-hover-fill: white;
-                                        --el-menu-hover-bg-color: white;
-                                        --el-menu-hover-text-color: #409eff;
-                                        --el-menu-active-color: #409eff">
-                          <el-dropdown-item class="d-flex" style="padding-right: 5rem;" >
-                              <el-menu-item class="dropdown" index="/settings/profile">
-                                  <el-icon>
-                                      <User />
-                                  </el-icon>
-                                  내 프로필
-                              </el-menu-item>
-                          </el-dropdown-item>
-                          <el-dropdown-item class="d-flex">
-                              <el-menu-item index="/settings/account">
-                                  <el-icon>
-                                      <Setting />
-                                  </el-icon>
-                                  내 계정
-                              </el-menu-item>
-                          </el-dropdown-item>
-                          <el-dropdown-item class="d-flex">
-                              <el-menu-item :index="toActivity()" >
-                                  <el-icon>
-                                      <Clock />
-                                  </el-icon>
-                                  내 활동
-                              </el-menu-item>
-                          </el-dropdown-item>
-                          <el-dropdown-item divided class="d-flex">
-                              <el-menu-item index="logout" @click="onLogout">
-                                  <el-icon>
-                                      <CloseBold/>
-                                  </el-icon>
-                                  로그아웃
-                              </el-menu-item>
-                          </el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
+            <div v-if="isUserLogin" class="d-flex justify-content-center align-items-center me-4">
+                <keep-alive :key="auth.notificationCount">
+                    <div class="position-relative me-3" style="cursor: pointer;">
+                        <div class="newNotificationCount" v-if="auth.notificationCount > 0">
+                            {{ auth.notificationCount }}
+                        </div>
+                        <el-dropdown  trigger="click">
+                            <el-icon size="30" style="width: 3rem;  height:3rem; color:#A6A6A6;">
+                                <Bell/>
+                            </el-icon>
+                            <template #dropdown>
+                                <el-dropdown-menu class="dropdown_menu d-flex flex-column"
+                                                  v-infinite-scroll="onLoadNotifications"
+                                                  style="
+                                                --el-dropdown-menuItem-hover-fill: white;
+                                                --el-menu-hover-bg-color: white;
+                                                --el-menu-hover-text-color: #409eff;
+                                                --el-menu-active-color: #409eff;
+                                                overflow: auto">
+                                    <el-dropdown-item v-for="notification in notifications" :key="notification.id" style="padding-right: 5rem;" >
+                                        <div class="d-flex">
+                                            <div>
+                                                <img v-if="notification.senderImageUrl" :src="notification.senderImageUrl"
+                                                     style="width: 2rem; height: 2rem; border-radius: 100%;"
+                                                     alt=""/>
+                                                <el-icon v-else size="28"
+                                                         style="width: 2rem;  height:2rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+                                                    <Avatar/>
+                                                </el-icon>
+                                            </div>
+                                            <div class="d-flex flex-column">
+                                                <div class="d-flex justify-content-between">
+                                                    <div style="font-size: 1rem">
+                                                        {{ notification.senderNickname }}
+                                                    </div>
+                                                    <div style="font-size: 0.9rem">
+                                                        {{ notification.notifiedAt }}
+                                                    </div>
+                                                </div>
+                                                <div style="font-size: 0.9rem;">
+                                                    <div v-if="notification.content === 0">
+                                                        {{ notification.senderNickname }}님이 새 글을 작성하였습니다.
+                                                    </div>
+                                                    <div v-else-if="notification.content === 1">
+                                                        {{ notification.senderNickname }}님이 댓글을 달았습니다.
+                                                    </div>
+                                                    <div v-else>
+                                                        {{ notification.senderNickname }}님이 답글을 달았습니다.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <el-divider/>
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
+                    </div>
+                </keep-alive>
+                <div  class="d-flex justify-content-center align-items-center" style="cursor: pointer;">
+                    <el-dropdown  trigger="click">
+                        <span class="el-dropdown-link">
+                        <img v-if="auth.getProfileImage" :src="auth.getProfileImage"
+                             style="width: 2.8rem; height: 2.8rem; border-radius: 100%;"
+                             alt=""/>
+                        <el-icon v-else size="40"
+                                 style="width: 2.8rem;  height:2.8rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+                            <Avatar/>
+                        </el-icon>
+                        </span>
+                        <template #dropdown>
+                          <el-dropdown-menu class="dropdown_menu d-flex flex-column"
+                                            style="
+                                            --el-dropdown-menuItem-hover-fill: white;
+                                            --el-menu-hover-bg-color: white;
+                                            --el-menu-hover-text-color: #409eff;
+                                            --el-menu-active-color: #409eff">
+                              <el-dropdown-item class="d-flex" style="padding-right: 5rem;" >
+                                  <el-menu-item class="dropdown" index="/settings/profile">
+                                      <el-icon>
+                                          <User />
+                                      </el-icon>
+                                      내 프로필
+                                  </el-menu-item>
+                              </el-dropdown-item>
+                              <el-dropdown-item class="d-flex">
+                                  <el-menu-item index="/settings/account">
+                                      <el-icon>
+                                          <Setting />
+                                      </el-icon>
+                                      내 계정
+                                  </el-menu-item>
+                              </el-dropdown-item>
+                              <el-dropdown-item class="d-flex">
+                                  <el-menu-item :index="toActivity()" >
+                                      <el-icon>
+                                          <Clock />
+                                      </el-icon>
+                                      내 활동
+                                  </el-menu-item>
+                              </el-dropdown-item>
+                              <el-dropdown-item divided class="d-flex">
+                                  <el-menu-item index="logout" @click="onLogout">
+                                      <el-icon>
+                                          <CloseBold/>
+                                      </el-icon>
+                                      로그아웃
+                                  </el-menu-item>
+                              </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </div>
             </div>
             <div v-else class="d-flex justify-content-center align-items-center me-4">
                 <el-menu-item index="/signup">회원가입</el-menu-item>
@@ -83,12 +143,14 @@
     </el-header>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import {onMounted, ref} from "vue";
+import type {Notification} from "@/custom-types/notification";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
 import { logout } from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
 import {Loading, Avatar, CloseBold, Setting} from "@element-plus/icons-vue";
+import {loadNotifications} from "@/controller/api/notificaion";
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -96,6 +158,8 @@ const route = useRoute();
 const resStore = useResponseStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
+
+const notifications = ref<Notification[]>([]);
 
 const replacePath = function (path: string) {
     router.replace(path);
@@ -128,6 +192,33 @@ const onLogout = async function () {
             router.push({name:"community"});
         })
 }
+
+const getNotificationPath = function() {
+    let path = "/notifications";
+    if(notifications.value.length > 19) {
+        return path+"?lastId="+ notifications.value[notifications.value.length - 1].id;
+    } else {
+        return path;
+    }
+}
+
+const onLoadNotifications = async function () {
+    await loadNotifications(getNotificationPath())
+        .then((response: any)=>{
+            if(resStore.isOK){
+                response.notificationListItemList.forEach((r: any)=>{
+                    const notification: Notification = {...r}
+                    notifications.value.push(notification);
+                });
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(response)
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error)
+        })
+}
 </script>
 <style scoped lang="scss">
 .navbar{
@@ -156,4 +247,18 @@ const onLogout = async function () {
         }
     }
 }
+.newNotificationCount{
+    position: absolute;
+    z-index: 99;
+    width:1.4rem;
+    height:1.4rem;
+    border-radius: 50%;
+    color: white;
+    background-color: red;
+    font-size: 0.8rem;
+    text-align: center;
+    line-height: 1.5rem;
+    right:0;
+}
+
 </style>

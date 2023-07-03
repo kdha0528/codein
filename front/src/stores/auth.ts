@@ -3,7 +3,8 @@ import type { Profile } from "@/custom-types/profile";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
-        member: null as Profile | any
+        member: null as Profile | any,
+        notificationCount: 0
     }),
     getters: {
         getId: (state) => {
@@ -28,7 +29,10 @@ export const useAuthStore = defineStore("auth", {
             } else {
                 return false;
             }
-        }
+        },
+        getNotificationCount: (state) => {
+            return state.notificationCount;
+        },
     },
     actions: {
         login(m: Profile) {
@@ -36,6 +40,9 @@ export const useAuthStore = defineStore("auth", {
         },
         logout() {
             this.member = null;
+        },
+        setNotificationCount(count: number){
+            this.notificationCount = count;
         }
     },
     persist: {

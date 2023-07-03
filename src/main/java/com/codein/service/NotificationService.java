@@ -14,6 +14,7 @@ import com.codein.requestservicedto.notification.ClickNotificationServiceDto;
 import com.codein.requestservicedto.notification.GetNotificationsServiceDto;
 import com.codein.requestservicedto.notification.NewNotificationServiceDto;
 import com.codein.responsedto.notification.NotificationListResponseDto;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -88,21 +89,19 @@ public class NotificationService {
     }
 
     @Transactional
-    public ResponseCookie countNewNotifications(String accessToken) {
-        Member member = memberRepository.findByAccessToken(accessToken);
-        if(member != null) {
-            Integer count = notificationRepository.countNewNotification(member);
-            if(count > 0) {
-                return ResponseCookie.from("count_new_notifications", count.toString())
-                        .path("/")
-                        .maxAge(0)
-                        .domain(".loca.lt")
-                        .build();
-            } else {
-                return null;
-            }
+    public Integer countNewNotifications (Member member) {
+        return notificationRepository.countNewNotification(member);
+    }
+
+    @Transactional
+    public ResponseCookie newNotificationsCountCookie(Integer count) {
+        if(count > 0) {
+            return ResponseCookie.from("count_new_notifications", count.toString())
+                    .path("/")
+                    .domain(".loca.lt")
+                    .build();
         } else {
-            throw new MemberNotExistsException();
+            return null;
         }
     }
     
@@ -127,6 +126,15 @@ public class NotificationService {
                     notification.setChecked(true)
             );
         }
+    }
+
+    @Transactional
+    public ResponseCookie removeNewNotificationsCountCookie() {
+        return ResponseCookie.from("count_new_notifications", "0")
+                .path("/")
+                .maxAge(0)
+                .domain(".loca.lt")
+                .build();
     }
 
     @Transactional

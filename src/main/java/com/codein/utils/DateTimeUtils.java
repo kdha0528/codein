@@ -3,7 +3,9 @@ package com.codein.utils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
@@ -11,26 +13,29 @@ import java.time.temporal.ChronoUnit;
 public class DateTimeUtils {
     public static String toSimpleFormat(LocalDateTime createdAt) {
         LocalDateTime now = LocalDateTime.now();
-        if (now.getYear() == createdAt.getYear()) {
-            if (now.getMonth() == createdAt.getMonth()) {
-                if (now.getDayOfMonth() == createdAt.getDayOfMonth()) {
-                    if (now.getHour() == createdAt.getHour()) {
-                        if (now.getMinute() == createdAt.getMinute()) {
+        Period diffDate = Period.between(createdAt.toLocalDate(), now.toLocalDate());
+        Duration diffTime = Duration.between(createdAt.toLocalTime(), now.toLocalTime());
+
+        if (diffDate.getYears() == 0) {
+            if (diffDate.getMonths() == 0) {
+                if (diffDate.getDays() == 0) {
+                    if (diffTime.toHours() == 0L) {
+                        if (diffTime.toMinutes() == 0L) {
                             return "0분 전";
                         } else {
-                            return ChronoUnit.MINUTES.between(createdAt, now)+"분 전";
+                            return diffTime.toMinutes()+"분 전";
                         }
                     } else {
-                        return ChronoUnit.HOURS.between(createdAt, now)+"시간 전";
+                        return diffTime.toHours()+"시간 전";
                     }
                 } else {
-                    return ChronoUnit.DAYS.between(createdAt, now)+"일 전";
+                    return diffDate.getDays()+"일 전";
                 }
             } else {
-                return ChronoUnit.MONTHS.between(createdAt, now)+"달 전";
+                return diffDate.getMonths()+"달 전";
             }
         } else {
-            return ChronoUnit.YEARS.between(createdAt, now)+"년 전";
+            return diffDate.getYears()+"년 전";
         }
     }
 
