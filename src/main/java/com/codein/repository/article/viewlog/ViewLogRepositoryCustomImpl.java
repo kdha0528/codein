@@ -19,7 +19,7 @@ public class ViewLogRepositoryCustomImpl implements ViewLogRepositoryCustom {
 
         return jpaQueryFactory.selectFrom(viewLog)
                 .where(viewLog.article.id.eq(getArticleServiceDto.getArticleId())
-                        .and(viewLog.clientIp.eq(getArticleServiceDto.getClientIp())))
+                        ,viewLog.clientIp.eq(getArticleServiceDto.getClientIp()))
                 .orderBy(viewLog.id.desc())
                 .fetchFirst();
     }

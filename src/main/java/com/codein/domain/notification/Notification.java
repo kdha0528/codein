@@ -89,19 +89,24 @@ public class Notification {
     public String getNotificationContent() {
         String content;
         if(this.content.ordinal() == 0) {
-            content = this.getArticle().getTitle().substring(0,30);
+            content = this.getArticle().getTitle();
         } else {
-            content = this.getComment().getContent().substring(0,30);
+            content = this.getComment().getContent();
         }
-        return content;
+
+        if (content.length() > 60) {
+            return content.trim().substring(0, 60) + "...";
+        } else {
+            return content.trim();
+        }
     }
 
     public String getNotificationSubContent() {
         return switch (this.content.ordinal()) {
-            case 0 -> "새 글 작성";
-            case 1 -> "내 글의 댓글";
-            case 2 -> "내 댓글에 답글";
-            case 3 -> "나에게 멘션";
+            case 0 -> "님이 새 글 작성";
+            case 1 -> "님이 내 글의 댓글";
+            case 2 -> "님이 내 댓글에 답글";
+            case 3 -> "님이 나를 멘션";
             default -> throw new RuntimeException();
         };
     }

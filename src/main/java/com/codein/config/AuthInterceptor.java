@@ -5,6 +5,7 @@ import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
 import com.codein.error.exception.auth.AccessTokenNullException;
 import com.codein.error.exception.auth.InvalidAccessTokenException;
+import com.codein.error.exception.auth.RefreshTokenNullException;
 import com.codein.error.exception.auth.UnauthorizedException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
@@ -53,6 +54,8 @@ public class AuthInterceptor implements HandlerInterceptor {
                     beforeNotificationCount = Integer.parseInt(cookie.getValue());
                 }
             }
+            System.out.println("refresh token = " + refreshToken);
+            System.out.println("access token = " + accessToken);
             if(refreshToken != null && accessToken == null) {
                 throw new AccessTokenNullException();
             }
@@ -84,6 +87,11 @@ public class AuthInterceptor implements HandlerInterceptor {
         // method에 @MySecured가 없는 경우, 즉 인증이 필요 없는 요청
         if (mySecured == null) {
             return true;
+        }
+
+        // 로그인이 안되어 있을경우 에러
+        if(refreshToken == null){
+            throw new RefreshTokenNullException();
         }
 
         // 유효한 세션이라면 해당 유저 가져오기

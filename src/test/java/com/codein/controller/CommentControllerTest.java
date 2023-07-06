@@ -25,11 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -83,7 +81,7 @@ public class CommentControllerTest {
         memberRepository.deleteAll();
     }
 
-    Cookie getCookie() {
+    Cookie getAccessCookie() {
         Member member = memberRepository.findByEmail("kdha4585@gmail.com");
         Tokens tokens = tokensRepository.findByMember(member)
                 .orElseThrow(MemberNotExistsException::new);
@@ -92,20 +90,27 @@ public class CommentControllerTest {
         return new Cookie("accesstoken", token);
     }
 
+    Cookie getRefreshCookie(){
+        Member member = memberRepository.findByEmail("kdha4585@gmail.com");
+        Tokens tokens = tokensRepository.findByMember(member)
+                .orElseThrow(MemberNotExistsException::new);
+        return new Cookie("refreshtoken", tokens.getRefreshToken());
+    }
+
     Article newArticle() {
         NewArticleDto newArticleDto = NewArticleDto.builder()
                 .category("NOTICE")
                 .title("제목입니다.")
                 .content("내용입니다.")
                 .build();
-        return articleService.newArticle(newArticleDto.toNewArticleServiceDto(), getCookie().getValue());
+        return articleService.newArticle(newArticleDto.toNewArticleServiceDto(), getAccessCookie().getValue());
     }
 
     Comment newComment(Article article){
         NewCommentDto newCommentDto = NewCommentDto.builder()
                 .content("댓글입니다.")
                 .build();
-        return commentService.newComment(newCommentDto.toNewCommentServiceDto(getCookie().getValue(),article.getId()));
+        return commentService.newComment(newCommentDto.toNewCommentServiceDto(getAccessCookie().getValue(),article.getId()));
     }
 
     @Test
@@ -120,7 +125,7 @@ public class CommentControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{id}/comments",id).cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/comments",id).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCommentDto))
                 )
@@ -128,7 +133,7 @@ public class CommentControllerTest {
                 .andDo(print());
     }
     @Test
-    @DisplayName("댓글 등록 성공: target 있음")
+    @DisplayName("댓글 등록 성공: 대댓글")
     void test1_2() throws Exception {
         //given
         Article article = newArticle();
@@ -136,12 +141,12 @@ public class CommentControllerTest {
         Comment comment = newComment(article);
 
         NewCommentDto childCommentDto = NewCommentDto.builder()
-                .targetId(comment.getId())
+                .parentId(comment.getId())
                 .content("대댓글입니다.")
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{id}/comments",id).cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/comments",id).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(childCommentDto))
                 )
@@ -150,8 +155,38 @@ public class CommentControllerTest {
     }
 
     @Test
-    @DisplayName("댓글 등록 실패: 내용 없음")
+    @DisplayName("댓글 등록 성공: 타겟 있는 대댓글")
     void test1_3() throws Exception {
+        //given
+        Article article = newArticle();
+        Long id = article.getId();
+        Comment comment = newComment(article);
+
+        NewCommentDto childCommentDto = NewCommentDto.builder()
+                .parentId(comment.getId())
+                .content("대댓글입니다.")
+                .build();
+
+        Comment reply = commentService.newComment(childCommentDto.toNewCommentServiceDto(getAccessCookie().getValue(),article.getId()));
+
+        NewCommentDto targetCommentDto = NewCommentDto.builder()
+                .targetId(reply.getId())
+                .parentId(reply.getParentId())
+                .content("타겟 대댓글입니다.")
+                .build();
+
+        // expected
+        mockMvc.perform(post("/articles/{id}/comments",id).cookie(getAccessCookie(),getRefreshCookie())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(targetCommentDto))
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("댓글 등록 실패: 내용 없음")
+    void test1_4() throws Exception {
         //given
         Article article = newArticle();
         Long id = article.getId();
@@ -161,7 +196,7 @@ public class CommentControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{id}/comments",id).cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/comments",id).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentDto))
                 )
@@ -181,7 +216,7 @@ public class CommentControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}",article.getId(), comment.getId()).cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editCommentDto))
                 )
@@ -193,12 +228,12 @@ public class CommentControllerTest {
     @DisplayName("댓글 추천 누르기 성공")
     void test3_1() throws Exception {
         //given
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         Article article = newArticle();
         Comment comment = newComment(article);
         
         // expected
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -206,12 +241,12 @@ public class CommentControllerTest {
     @DisplayName("댓글 비추천 누르기 성공")
     void test3_2() throws Exception {
         //given
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         Article article = newArticle();
         Comment comment = newComment(article);
 
         // expected
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}/dislike",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}/dislike",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -219,16 +254,16 @@ public class CommentControllerTest {
     @DisplayName("댓글 추천 누르기 실패: 5초 이내 같은 계정으로 같은 댓글 추천")
     void test3_3() throws Exception {
         //given
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         Article article = newArticle();
         Comment comment = newComment(article);
 
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}/dislike",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}/dislike",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
         // expected
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
@@ -237,11 +272,11 @@ public class CommentControllerTest {
     @DisplayName("댓글 추천 누르기 성공: 비추천 후 추천")
     void test3_4() throws Exception {
         //given
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         Article article = newArticle();
         Comment comment = newComment(article);
 
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}/dislike",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}/dislike",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -253,7 +288,7 @@ public class CommentControllerTest {
         Thread.sleep(10000);
 
         // expected
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -270,7 +305,7 @@ public class CommentControllerTest {
         Article article = newArticle();
         Comment comment = newComment(article);
 
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -282,7 +317,7 @@ public class CommentControllerTest {
         Thread.sleep(10000);
 
         // expected
-        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/comments/{commentId}/like",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -300,7 +335,7 @@ public class CommentControllerTest {
         Comment comment = newComment(article);
 
         // expected
-        mockMvc.perform(delete("/articles/{id}/comments/{commentId}",article.getId(), comment.getId()).cookie(getCookie()))
+        mockMvc.perform(delete("/articles/{id}/comments/{commentId}",article.getId(), comment.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

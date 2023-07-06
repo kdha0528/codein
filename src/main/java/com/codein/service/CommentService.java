@@ -49,10 +49,11 @@ public class CommentService {
                 .orElseThrow(ArticleNotExistsException::new);
         Member member = memberRepository.findByAccessToken(newCommentServiceDto.getAccessToken());
 
-        if(member != null){
+        if(member != null) {
             Comment target = null;
             String content = newCommentServiceDto.getContent();
             String targetNickname = null;
+
             if(newCommentServiceDto.getTargetId() != null) {    // target이 있는지 확인
                 target = commentRepository.findTargetById(newCommentServiceDto.getTargetId());  // target id 유효하면 target 추가
                 String targetMentionNickname = newCommentServiceDto.hasTarget(); // null or @+targetNickname
@@ -67,6 +68,7 @@ public class CommentService {
             }
 
             Comment newComment = Comment.builder()
+                    .parentId(newCommentServiceDto.getParentId())
                     .member(member)
                     .article(article)
                     .target(target)
@@ -76,7 +78,6 @@ public class CommentService {
 
             commentRepository.save(newComment);
             article.increaseCommentNum();
-            newComment.setParentId();
             return newComment;
         } else {
             throw new MemberNotExistsException();
@@ -164,24 +165,22 @@ public class CommentService {
     @Transactional
     public void createCommentDummies(Article article, Member member) {
         Random random = new Random();
-        for(int i = 0; i < 50; i++){
+        for(int i = 0; i < 20; i++){
             Comment comment = Comment.builder()
                     .content("댓글 테스트 "+i)
                     .article(article)
                     .member(member)
                     .build();
             commentRepository.save(comment);
-            comment.setParentId();
 
-            for(int j = 0; j < random.nextInt(4);j++){
+            for(int j = 0; j < random.nextInt(8);j++){
                 Comment child = Comment.builder()
-                        .target(comment)
+                        .parentId(comment.getId())
                         .content(i+"의 "+j+"번 째 자식 댓글")
                         .article(article)
                         .member(member)
                         .build();
                 commentRepository.save(child);
-                child.setParentId();
             }
         }
     }

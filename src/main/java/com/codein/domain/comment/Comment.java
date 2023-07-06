@@ -56,8 +56,8 @@ public class Comment {
     private boolean changed;
 
     @Builder
-    public Comment(Article article, Comment target, String targetNickname, Member member, String content) {
-        this.parentId = null; //  초기화
+    public Comment(Article article, Long parentId, Comment target, String targetNickname, Member member, String content) {
+        this.parentId = parentId;
         this.article = article;
         this.target = target;
         this.targetNickname = targetNickname;
@@ -71,15 +71,6 @@ public class Comment {
         this.changed = false;
     }
 
-    public void setParentId() {
-        if(target != null) {
-            if (this.target.getParentId() == null) {     // terget이 parentId가 없다면(최상위 댓글이라면) parent id는 최상위 댓글의 id
-                this.parentId = this.target.getId();
-            } else {    // target이 parentId가 있다면(최상위 댓글이 아니라면) 최상위 댓글을 parent id로 설정
-                this.parentId = this.target.getParentId();
-            }
-        }
-    }
 
     public CommentListItem toCommentListItem() {
         Long targetMemberId = null;

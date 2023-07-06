@@ -111,6 +111,7 @@ public class NotificationServiceTest {
                 .orElseThrow(MemberNotExistsException::new);
         return tokens.getAccessToken();
     }
+
     String getToken2() {
         Member member = memberRepository.findByEmail("kdha0528@gmail.com");
         Tokens tokens = tokensRepository.findByMember(member)
@@ -137,8 +138,17 @@ public class NotificationServiceTest {
     }
     Comment newReply(Article article, Comment comment, String accessToken){
         NewCommentDto newCommentDto = NewCommentDto.builder()
-                .targetId(comment.getId())
+                .parentId(comment.getId())
                 .content("대댓글입니다.")
+                .build();
+        return commentService.newComment(newCommentDto.toNewCommentServiceDto(accessToken,article.getId()));
+    }
+
+    Comment newTargetReply(Article article, Comment target, String accessToken){
+        NewCommentDto newCommentDto = NewCommentDto.builder()
+                .parentId(target.getParentId())
+                .targetId(target.getId())
+                .content("타겟 대댓글입니다.")
                 .build();
         return commentService.newComment(newCommentDto.toNewCommentServiceDto(accessToken,article.getId()));
     }
@@ -161,7 +171,7 @@ public class NotificationServiceTest {
 
                 case 1 -> {
                     NewCommentDto newCommentDto = NewCommentDto.builder()
-                            .targetId(comment.getId())
+                            .parentId(comment.getId())
                             .content(i+"번째 알림입니다.")
                             .build();
                     comments.add(commentService.newComment(newCommentDto.toNewCommentServiceDto(accessToken,article.getId())));
@@ -169,10 +179,20 @@ public class NotificationServiceTest {
 
                 case 2 -> {
                     if (i > 4) {
-                        NewCommentDto newCommentDto = NewCommentDto.builder()
-                                .targetId(comments.get(random.nextInt(5)).getId())
-                                .content(i+"번째 알림입니다.")
-                                .build();
+                        Comment targetComment = comments.get(random.nextInt(5));
+                        NewCommentDto newCommentDto;
+                        if(targetComment.getParentId() != null){
+                            newCommentDto = NewCommentDto.builder()
+                                    .targetId(targetComment.getId())
+                                    .parentId(targetComment.getParentId())
+                                    .content(i + "번째 알림입니다.")
+                                    .build();
+                        } else {
+                            newCommentDto = NewCommentDto.builder()
+                                    .parentId(targetComment.getId())
+                                    .content(i + "번째 알림입니다.")
+                                    .build();
+                        }
                         comments.add(commentService.newComment(newCommentDto.toNewCommentServiceDto(accessToken,article.getId())));
                     } else {
                         NewCommentDto newCommentDto = NewCommentDto.builder()
@@ -268,41 +288,6 @@ public class NotificationServiceTest {
     @DisplayName("알림 생성 성공: 대댓글 생성시 부모댓글 작성자에게 알림")
     void test1_3() {
         // given
-        Member sender = memberRepository.findByAccessToken(getToken());
-        Article article = newArticle(getToken());
-
-        Member receiver = signup2();
-        login2();
-        Comment comment = newComment(article, getToken2());
-
-        Comment reply = newReply(article,comment, getToken());
-        Comment reply2 = newReply(article,reply, getToken());
-
-        NewNotificationServiceDto newNotificationServiceDto = NewNotificationServiceDto.builder()
-                .sender(sender)
-                .article(article)
-                .comment(reply2)
-                .build();
-
-        // when
-        notificationService.newNotifications(newNotificationServiceDto);
-
-        // then
-        List<Notification> notificationList = notificationRepository.findAllByReceiver(receiver);
-
-        notificationList.forEach(notification -> {
-            Assertions.assertEquals(article.getId(), notification.getArticle().getId());
-            Assertions.assertEquals(reply2.getId(), notification.getComment().getId());
-            Assertions.assertEquals(NotificationContent.REPLY_ON_MY_COMMENT, notification.getContent());
-            Assertions.assertEquals(sender.getId(), notification.getSender().getId());
-            Assertions.assertEquals(receiver.getId(), notification.getReceiver().getId());
-        });
-    }
-
-    @Test
-    @DisplayName("알림 생성 성공: 대댓글 생성시 부모댓글 작성자에게 알림")
-    void test1_4() {
-        // given
         Member receiver = memberRepository.findByAccessToken(getToken());
         Article article = newArticle(getToken());
         Comment comment = newComment(article, getToken());
@@ -325,7 +310,42 @@ public class NotificationServiceTest {
         notificationList.forEach(notification -> {
             Assertions.assertEquals(article.getId(), notification.getArticle().getId());
             Assertions.assertEquals(reply.getId(), notification.getComment().getId());
-            Assertions.assertEquals(NotificationContent.REPLY_TO_ME, notification.getContent());
+            Assertions.assertEquals(NotificationContent.REPLY_ON_MY_COMMENT, notification.getContent());
+            Assertions.assertEquals(sender.getId(), notification.getSender().getId());
+            Assertions.assertEquals(receiver.getId(), notification.getReceiver().getId());
+        });
+    }
+
+    @Test
+    @DisplayName("알림 생성 성공: 대댓글 생성시 타겟 작성자에게 알림")
+    void test1_4() {
+        // given
+        Member sender = memberRepository.findByAccessToken(getToken());
+        Article article = newArticle(getToken());
+
+        Member receiver = signup2();
+        login2();
+        Comment comment = newComment(article, getToken2());
+
+        Comment reply = newReply(article,comment, getToken());
+        Comment targetReply = newTargetReply(article, reply, getToken());
+
+        NewNotificationServiceDto newNotificationServiceDto = NewNotificationServiceDto.builder()
+                .sender(sender)
+                .article(article)
+                .comment(targetReply)
+                .build();
+
+        // when
+        notificationService.newNotifications(newNotificationServiceDto);
+
+        // then
+        List<Notification> notificationList = notificationRepository.findAllByReceiver(receiver);
+
+        notificationList.forEach(notification -> {
+            Assertions.assertEquals(article.getId(), notification.getArticle().getId());
+            Assertions.assertEquals(targetReply.getId(), notification.getComment().getId());
+            Assertions.assertEquals(NotificationContent.REPLY_ON_MY_COMMENT, notification.getContent());
             Assertions.assertEquals(sender.getId(), notification.getSender().getId());
             Assertions.assertEquals(receiver.getId(), notification.getReceiver().getId());
         });

@@ -5,7 +5,7 @@ export interface Notification {
     senderNickname: String,
     articleId: Number,
     commentId: Number,
-    contentType: Number,
+    subContent: String,
     content: String,
     checked: Boolean,
     clicked: Boolean,

@@ -3,10 +3,10 @@
         <el-menu mode="horizontal" router class="navbar d-flex justify-content-between">
             <div class="d-flex align-items-center justify-content-center" >
                 <div class="d-flex align-items-center justify-content-center ms-3" @click="replacePath('/')" style="cursor: pointer">
-                  <el-icon size="40">
-                      <Loading />
-                  </el-icon>
-                  <div class="d-flex ms-1 me-2" style="font-size: larger; font-weight: bold;">Code In</div>
+                    <el-icon size="40">
+                        <Loading />
+                    </el-icon>
+                    <div class="d-flex ms-1 me-2" style="font-size: larger; font-weight: bold;">Code In</div>
                 </div>
                 <el-menu-item index="/community" style="font-size: 1rem; font-weight: 500;">
                     커뮤니티
@@ -21,67 +21,65 @@
                     공지사항
                 </el-menu-item>
             </div>
-            <div v-if="isUserLogin" class="d-flex justify-content-center align-items-center me-4">
-                <keep-alive :key="auth.notificationCount">
-                    <div class="position-relative me-3" style="cursor: pointer;">
-                        <div class="newNotificationCount" v-if="auth.notificationCount > 0">
-                            {{ auth.notificationCount }}
-                        </div>
-                        <el-dropdown  trigger="click">
-                            <el-icon size="30" style="width: 3rem;  height:3rem; color:#A6A6A6;">
+            <div v-if="isUserLogin" class="position-relative d-flex justify-content-center align-items-center me-4">
+                    <div class="position-relative me-3" style="cursor: pointer;" @click="clickNotification">
+                        <keep-alive :key="auth.notificationCount">
+                            <div class="new_notification_count" v-if="auth.notificationCount > 0">
+                                {{ auth.notificationCount }}
+                            </div>
+                        </keep-alive>
+                        <div class="notification_button">
+                            <el-icon type="info" size="30" style="width: 3rem; height:3rem; color:#A6A6A6;">
                                 <Bell/>
                             </el-icon>
-                            <template #dropdown>
-                                <el-dropdown-menu class="dropdown_menu d-flex flex-column"
-                                                  v-infinite-scroll="onLoadNotifications"
-                                                  style="
-                                                --el-dropdown-menuItem-hover-fill: white;
-                                                --el-menu-hover-bg-color: white;
-                                                --el-menu-hover-text-color: #409eff;
-                                                --el-menu-active-color: #409eff;
-                                                overflow: auto">
-                                    <el-dropdown-item v-for="notification in notifications" :key="notification.id" style="padding-right: 5rem;" >
-                                        <div class="d-flex">
-                                            <div>
-                                                <img v-if="notification.senderImageUrl" :src="notification.senderImageUrl"
-                                                     style="width: 2rem; height: 2rem; border-radius: 100%;"
-                                                     alt=""/>
-                                                <el-icon v-else size="28"
-                                                         style="width: 2rem;  height:2rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
-                                                    <Avatar/>
-                                                </el-icon>
-                                            </div>
-                                            <div class="d-flex flex-column">
-                                                <div class="d-flex justify-content-between">
-                                                    <div style="font-size: 1rem">
+                        </div>
+                        <div v-if="clickedNotification" class="notification_window d-flex flex-column"
+                             v-infinite-scroll="onLoadNotifications">
+                                <div class="notification" style="cursor:default; pointer-events: none;">
+                                    <div style="width: 100%; text-align: center; color:black;">
+                                        알림
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column" v-for="notification in notifications" :key="notification.id" >
+                                    <el-divider class="mt-0 mb-0"/>
+                                    <div class="d-flex" style="width:100%;">
+                                        <div class="ms-0">
+                                            <img v-if="notification.senderImageUrl" :src="notification.senderImageUrl"
+                                                 @click="router.replace( '/members/'+notification.senderId)"
+                                                 style="width: 2rem; height: 2rem; border-radius: 100%; cursor: pointer;"
+                                                 alt=""/>
+                                            <el-icon v-else size="28"
+                                                     @click="router.replace( '/members/'+notification.senderId)"
+                                                     style="width: 2rem;  height:2rem; border-radius: 100%; color:white; background-color: #E2E2E2;  cursor: pointer;">
+                                                <Avatar/>
+                                            </el-icon>
+                                        </div>
+                                        <div class="d-flex flex-column ms-2" style="width:90%;">
+                                            <div class="d-flex justify-content-between">
+                                                <div class="d-flex">
+                                                    <div style="font-size: 1rem; cursor: pointer;"
+                                                         @click="router.replace( '/members/'+notification.senderId)">
                                                         {{ notification.senderNickname }}
                                                     </div>
-                                                    <div style="font-size: 0.9rem">
-                                                        {{ notification.notifiedAt }}
+                                                    <div class="ms-2" style="font-size: 0.9rem; color: #A6A6A6">
+                                                        {{ notification.subContent }}
                                                     </div>
                                                 </div>
-                                                <div style="font-size: 0.9rem;">
-                                                    <div v-if="notification.content === 0">
-                                                        {{ notification.senderNickname }}님이 새 글을 작성하였습니다.
-                                                    </div>
-                                                    <div v-else-if="notification.content === 1">
-                                                        {{ notification.senderNickname }}님이 댓글을 달았습니다.
-                                                    </div>
-                                                    <div v-else>
-                                                        {{ notification.senderNickname }}님이 답글을 달았습니다.
-                                                    </div>
+                                                <div style="font-size: 0.9rem; color: #A6A6A6">
+                                                    {{ notification.notifiedAt }}
                                                 </div>
                                             </div>
+                                            <div style="font-size: 0.9rem; cursor: pointer;"
+                                                 @click="router.replace( '/articles/'+notification.articleId)">
+                                                {{ notification.content }}
+                                            </div>
                                         </div>
-                                        <el-divider/>
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
+                                    </div>
+                                </div>
+                        </div>
                     </div>
-                </keep-alive>
-                <div  class="d-flex justify-content-center align-items-center" style="cursor: pointer;">
-                    <el-dropdown  trigger="click">
+                <div  class="d-flex justify-content-center align-items-center" style="cursor: pointer;" @click="clickedNotification = false">
+                    <el-dropdown trigger="click">
                         <span class="el-dropdown-link">
                         <img v-if="auth.getProfileImage" :src="auth.getProfileImage"
                              style="width: 2.8rem; height: 2.8rem; border-radius: 100%;"
@@ -92,45 +90,45 @@
                         </el-icon>
                         </span>
                         <template #dropdown>
-                          <el-dropdown-menu class="dropdown_menu d-flex flex-column"
-                                            style="
+                            <el-dropdown-menu class="dropdown_menu d-flex flex-column"
+                                              style="
                                             --el-dropdown-menuItem-hover-fill: white;
                                             --el-menu-hover-bg-color: white;
                                             --el-menu-hover-text-color: #409eff;
                                             --el-menu-active-color: #409eff">
-                              <el-dropdown-item class="d-flex" style="padding-right: 5rem;" >
-                                  <el-menu-item class="dropdown" index="/settings/profile">
-                                      <el-icon>
-                                          <User />
-                                      </el-icon>
-                                      내 프로필
-                                  </el-menu-item>
-                              </el-dropdown-item>
-                              <el-dropdown-item class="d-flex">
-                                  <el-menu-item index="/settings/account">
-                                      <el-icon>
-                                          <Setting />
-                                      </el-icon>
-                                      내 계정
-                                  </el-menu-item>
-                              </el-dropdown-item>
-                              <el-dropdown-item class="d-flex">
-                                  <el-menu-item :index="toActivity()" >
-                                      <el-icon>
-                                          <Clock />
-                                      </el-icon>
-                                      내 활동
-                                  </el-menu-item>
-                              </el-dropdown-item>
-                              <el-dropdown-item divided class="d-flex">
-                                  <el-menu-item index="logout" @click="onLogout">
-                                      <el-icon>
-                                          <CloseBold/>
-                                      </el-icon>
-                                      로그아웃
-                                  </el-menu-item>
-                              </el-dropdown-item>
-                          </el-dropdown-menu>
+                                <el-dropdown-item class="d-flex" style="padding-right: 5rem;" >
+                                    <el-menu-item class="dropdown" index="/settings/profile">
+                                        <el-icon>
+                                            <User />
+                                        </el-icon>
+                                        내 프로필
+                                    </el-menu-item>
+                                </el-dropdown-item>
+                                <el-dropdown-item class="d-flex">
+                                    <el-menu-item index="/settings/account">
+                                        <el-icon>
+                                            <Setting />
+                                        </el-icon>
+                                        내 계정
+                                    </el-menu-item>
+                                </el-dropdown-item>
+                                <el-dropdown-item class="d-flex">
+                                    <el-menu-item :index="toActivity()" >
+                                        <el-icon>
+                                            <Clock />
+                                        </el-icon>
+                                        내 활동
+                                    </el-menu-item>
+                                </el-dropdown-item>
+                                <el-dropdown-item divided class="d-flex">
+                                    <el-menu-item index="logout" @click="onLogout">
+                                        <el-icon>
+                                            <CloseBold/>
+                                        </el-icon>
+                                        로그아웃
+                                    </el-menu-item>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
                         </template>
                     </el-dropdown>
                 </div>
@@ -158,8 +156,17 @@ const route = useRoute();
 const resStore = useResponseStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
-
 const notifications = ref<Notification[]>([]);
+const noMoreNotification = ref<boolean>(false);
+
+const clickedNotification = ref<boolean>(false);
+const clickNotification = function () {
+    clickedNotification.value = !clickedNotification.value;
+    if(clickedNotification.value) {
+        notifications.value = [];
+        noMoreNotification.value = false;
+    }
+}
 
 const replacePath = function (path: string) {
     router.replace(path);
@@ -170,7 +177,7 @@ const toActivity = function(): string {
 }
 
 router.afterEach((to, from, next) => {
-  isUserLogin.value = auth.isLoggedIn;
+    isUserLogin.value = auth.isLoggedIn;
 });
 
 const onLogout = async function () {
@@ -195,7 +202,7 @@ const onLogout = async function () {
 
 const getNotificationPath = function() {
     let path = "/notifications";
-    if(notifications.value.length > 19) {
+    if(notifications.value.length > 0) {
         return path+"?lastId="+ notifications.value[notifications.value.length - 1].id;
     } else {
         return path;
@@ -206,10 +213,14 @@ const onLoadNotifications = async function () {
     await loadNotifications(getNotificationPath())
         .then((response: any)=>{
             if(resStore.isOK){
-                response.notificationListItemList.forEach((r: any)=>{
-                    const notification: Notification = {...r}
-                    notifications.value.push(notification);
-                });
+                if(response.notificationListItemList.length === 0){
+                    noMoreNotification.value = true;
+                } else {
+                    response.notificationListItemList.forEach((r: any) => {
+                        const notification: Notification = {...r}
+                        notifications.value.push(notification);
+                    })
+                }
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response)
@@ -219,16 +230,17 @@ const onLoadNotifications = async function () {
             console.log(error)
         })
 }
+
 </script>
 <style scoped lang="scss">
 .navbar{
-  width: 100vw;
-  height: 80px;
-  position: fixed;
-  top:0;
-  left:0;
-  right:0;
-  z-index: 99;
+    width: 100vw;
+    height: 80px;
+    position: fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index: 99;
 
     .el-menu-item {
         --el-menu-hover-bg-color: #ffffff;
@@ -247,7 +259,7 @@ const onLoadNotifications = async function () {
         }
     }
 }
-.newNotificationCount{
+.new_notification_count{
     position: absolute;
     z-index: 99;
     width:1.4rem;
@@ -259,6 +271,29 @@ const onLoadNotifications = async function () {
     text-align: center;
     line-height: 1.5rem;
     right:0;
+}
+
+.notification_window {
+    position: absolute;
+    right: -3rem;
+    top: 3.5rem;
+
+    width: 25rem;
+    min-height: 30rem;
+    max-height: 30rem;
+
+    border: solid thin #E2E2E2;
+    border-radius: 2px;
+
+    background-color: white;
+
+    transition: top 0.5s ease;
+
+    overflow: auto;
+}
+
+.notification_window::-webkit-scrollbar {
+    display: none;
 }
 
 </style>

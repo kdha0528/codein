@@ -1,6 +1,5 @@
 package com.codein.controller;
 
-import com.codein.domain.article.Article;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.Role;
@@ -10,7 +9,6 @@ import com.codein.repository.member.MemberRepository;
 import com.codein.repository.profileimage.ProfileImageRepository;
 import com.codein.requestdto.article.Activity;
 import com.codein.requestdto.member.*;
-import com.codein.requestservicedto.article.GetArticleServiceDto;
 import com.codein.responsedto.member.SettingsAccountResponseDto;
 import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
@@ -31,9 +29,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -104,7 +99,7 @@ class MemberControllerTest {
         memberService.login(loginDto.toMemberServiceDto());
     }
 
-    Cookie getCookie() {
+    Cookie getAccessCookie() {
         Member member = memberRepository.findByEmail("kdha4585@gmail.com");
         Tokens tokens = tokensRepository.findByMember(member)
                 .orElseThrow(MemberNotExistsException::new);
@@ -112,8 +107,16 @@ class MemberControllerTest {
 
         return new Cookie("accesstoken", token);
     }
+
+    Cookie getRefreshCookie(){
+        Member member = memberRepository.findByEmail("kdha4585@gmail.com");
+        Tokens tokens = tokensRepository.findByMember(member)
+                .orElseThrow(MemberNotExistsException::new);
+        return new Cookie("refreshtoken", tokens.getRefreshToken());
+    }
+
     void createDummies(){
-        articleService.createDummies(memberRepository.findByAccessToken(getCookie().getValue()));
+        articleService.createDummies(memberRepository.findByAccessToken(getAccessCookie().getValue()));
         ArrayList<Member> memberList = memberService.createMemberDummies();
         articleService.createViewDummies();
         articleService.createLikeDummies(memberList);
@@ -366,7 +369,7 @@ class MemberControllerTest {
         login();
 
         // expected
-        mockMvc.perform(post("/logout").cookie(getCookie()))
+        mockMvc.perform(post("/logout").cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("redirect:/home"))
                 .andDo(print());
@@ -383,7 +386,7 @@ class MemberControllerTest {
         memberRepository.save(member);
 
         // expected
-        mockMvc.perform(post("/logout").cookie(getCookie()))
+        mockMvc.perform(post("/logout").cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
@@ -396,7 +399,7 @@ class MemberControllerTest {
         login();
 
         // expected
-        mockMvc.perform(delete("/settings/account").cookie(getCookie()))
+        mockMvc.perform(delete("/settings/account").cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string("redirect:/logout"))
                 .andDo(print());
@@ -409,12 +412,12 @@ class MemberControllerTest {
         signup();
         login();
 
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         member.setRole(Role.NONE);
         memberRepository.save(member);
 
         // expected
-        mockMvc.perform(delete("/settings/account").cookie(getCookie()))
+        mockMvc.perform(delete("/settings/account").cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
@@ -425,11 +428,11 @@ class MemberControllerTest {
         // given
         signup();
         login();
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         Long memberId = member.getId();
 
         // expected
-        mockMvc.perform(get("/members/{memberId}", memberId).cookie(getCookie()))
+        mockMvc.perform(get("/members/{memberId}", memberId).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -445,7 +448,7 @@ class MemberControllerTest {
         mockMvc.perform(multipart("/settings/profile")
                         .param("name","김복자")
                         .param("nickname","데일이")
-                        .cookie(getCookie()))
+                        .cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -466,7 +469,7 @@ class MemberControllerTest {
                         .file(profileImage)
                         .param("name","김복자")
                         .param("nickname","데일이")
-                        .cookie(getCookie()))
+                        .cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -487,7 +490,7 @@ class MemberControllerTest {
                         .file(profileImage)
                         .param("name","김복자")
                         .param("nickname","데일이")
-                        .cookie(getCookie()))
+                        .cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
 
@@ -507,7 +510,7 @@ class MemberControllerTest {
                         .file(profileImage)
                         .param("name","김복자")
                         .param("nickname","데일이")
-                        .cookie(getCookie()))
+                        .cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -519,7 +522,7 @@ class MemberControllerTest {
                         .file(profileImage2)
                         .param("name","김복자")
                         .param("nickname","데일이")
-                        .cookie(getCookie()))
+                        .cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -539,7 +542,7 @@ class MemberControllerTest {
                         .file(profileImage)
                         .param("name","김복자")
                         .param("nickname","데일이")
-                        .cookie(getCookie()))
+                        .cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -560,13 +563,13 @@ class MemberControllerTest {
         mockMvc.perform(multipart("/settings/profile")
                         .param("name","김복자")
                         .param("nickname","데일이")
-                        .cookie(getCookie()))
+                        .cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
         // expected
         mockMvc.perform(get("/settings/profile")
-                        .cookie(getCookie()))
+                        .cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -583,9 +586,9 @@ class MemberControllerTest {
                 .newPassword("11112222")
                 .build();
 
-        System.out.println(memberRepository.findByAccessToken(getCookie().getValue()).getPassword());
+        System.out.println(memberRepository.findByAccessToken(getAccessCookie().getValue()).getPassword());
         // expected
-        mockMvc.perform(post("/settings/account/password").cookie(getCookie())
+        mockMvc.perform(post("/settings/account/password").cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(passwordDto))
                 )
@@ -605,7 +608,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/settings/account/email").cookie(getCookie())
+        mockMvc.perform(post("/settings/account/email").cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(emailDto))
                 )
@@ -625,7 +628,7 @@ class MemberControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/settings/account/phone").cookie(getCookie())
+        mockMvc.perform(post("/settings/account/phone").cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(phoneDto))
                 )
@@ -639,14 +642,14 @@ class MemberControllerTest {
         // given
         signup();
         login();
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         SettingsAccountResponseDto settingsAccountResponseDto = SettingsAccountResponseDto.builder()
                 .email(member.getEmail())
                 .phone(member.getPhone())
                 .build();
 
         // expected
-        mockMvc.perform(get("/settings/account").cookie(getCookie())
+        mockMvc.perform(get("/settings/account").cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(settingsAccountResponseDto)))
@@ -660,11 +663,11 @@ class MemberControllerTest {
         // given
         signup();
         login();
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         createDummies();
 
         // expected
-        mockMvc.perform(get("/members/{id}",member.getId()).cookie(getCookie())
+        mockMvc.perform(get("/members/{id}",member.getId()).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -677,11 +680,11 @@ class MemberControllerTest {
         // given
         signup();
         login();
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         createDummies();
 
         // expected
-        mockMvc.perform(get("/members/{id}/{activity}",member.getId(), Activity.ARTICLES).cookie(getCookie())
+        mockMvc.perform(get("/members/{id}/{activity}",member.getId(), Activity.ARTICLES).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -697,7 +700,7 @@ class MemberControllerTest {
         createDummies();
 
         // expected
-        mockMvc.perform(get("/members/{id}", 4321).cookie(getCookie())
+        mockMvc.perform(get("/members/{id}", 4321).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                 )
                 .andExpect(status().is4xxClientError())
@@ -724,7 +727,7 @@ class MemberControllerTest {
         Member following = memberService.signup(signupDto.toSignupServiceDto());
 
         // expected
-        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -748,7 +751,7 @@ class MemberControllerTest {
         Member following = memberService.signup(signupDto.toSignupServiceDto());
 
         // expected
-        mockMvc.perform(post("/members/{id}/{activity}/follow", following.getId(), "comments").cookie(getCookie()))
+        mockMvc.perform(post("/members/{id}/{activity}/follow", following.getId(), "comments").cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -771,12 +774,12 @@ class MemberControllerTest {
                 .build();
         Member following = memberService.signup(signupDto.toSignupServiceDto());
 
-        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
         // expected
-        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getCookie()))
+        mockMvc.perform(post("/members/{id}/follow", following.getId()).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

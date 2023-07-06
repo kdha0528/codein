@@ -11,13 +11,15 @@ public class NewCommentServiceDto {
 
     private final Long articleId;
     private final String content;
+    private final Long parentId;
     private final Long targetId;
     private final String accessToken;
 
     @Builder
-    public NewCommentServiceDto(Long articleId, String content, Long targetId, String accessToken) {
+    public NewCommentServiceDto(Long articleId, String content, Long parentId, Long targetId, String accessToken) {
         this.content = content;
         this.articleId = articleId;
+        this.parentId = parentId;
         this.targetId = targetId;
         this.accessToken = accessToken;
     }

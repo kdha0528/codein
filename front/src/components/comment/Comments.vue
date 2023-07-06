@@ -83,7 +83,7 @@
                 <div v-if="!parent.reply"
                      class="write_reply"
                      style="font-size:0.8rem; cursor:pointer"
-                     @click="parent.reply = true, reply.content = '@'+parent.commenterNickname+' ', reply.targetId = parent.id">
+                     @click="parent.reply = true">
                     답글 쓰기
                 </div>
                 <div v-else>
@@ -202,9 +202,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-flex mt-1 flex-shrink-0" style="white-space: pre-line; line-height: 2rem;">
-                                <p v-if="child.targetNickname !== null" class="target_nickname" @click="router.replace('/members/'+child.targetMemberId)">@{{child.targetNickname}}</p>
-                                <p>{{ child.content }}</p>
+                            <div class="mt-1" style="white-space: pre-line; line-height: 2rem;">
+                                <span v-if="child.targetNickname !== null" class="target_nickname d-inline" @click="router.replace('/members/'+child.targetMemberId)">@{{child.targetNickname}}</span><span style="display: inline;">{{ child.content }}</span>
                             </div>
                             <div v-if="!child.reply"
                                  class="write_reply"

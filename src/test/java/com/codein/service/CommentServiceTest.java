@@ -149,7 +149,7 @@ public class CommentServiceTest {
                         .build());
 
         // then
-        Assertions.assertEquals(50L,commentListResponseDto.getCommentList().size());
+        Assertions.assertEquals(commentListResponseDto.getCommentList().size(), 50);
     }
 
     @Test

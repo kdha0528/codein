@@ -2,6 +2,7 @@ package com.codein.config;
 
 import com.codein.repository.TokensRepository;
 import com.codein.repository.member.MemberRepository;
+import com.codein.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -19,6 +20,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final TokensRepository tokensRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -27,7 +29,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthInterceptor(tokensRepository, memberRepository))
+        registry.addInterceptor(new AuthInterceptor(tokensRepository, memberRepository, notificationService))
                 .addPathPatterns("/**")
                 .excludePathPatterns("/error", "/favicon.ico"); // 인증없이 접근 가능하게
     }

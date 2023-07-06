@@ -7,7 +7,6 @@ import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
 import com.codein.repository.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
-import com.codein.repository.article.viewlog.ViewLogRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.EditArticleDto;
 import com.codein.requestdto.article.GetArticleDto;
@@ -20,7 +19,6 @@ import com.codein.service.ArticleService;
 import com.codein.service.MemberService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -78,22 +76,28 @@ class ArticleControllerTest {
 
     @AfterEach
     void clean() {
+        System.out.println("실행됨?");
         memberRepository.deleteAll();
         articleRepository.deleteAll();
     }
 
-    Cookie getCookie() {
+    Cookie getAccessCookie() {
         Member member = memberRepository.findByEmail("kdha4585@gmail.com");
         Tokens tokens = tokensRepository.findByMember(member)
                 .orElseThrow(MemberNotExistsException::new);
-        String token = tokens.getAccessToken();
-
-        return new Cookie("accesstoken", token);
+        Cookie cookie = new Cookie("refreshtoken", tokens.getRefreshToken());
+        return new Cookie("accesstoken", tokens.getAccessToken());
     }
 
+    Cookie getRefreshCookie(){
+        Member member = memberRepository.findByEmail("kdha4585@gmail.com");
+        Tokens tokens = tokensRepository.findByMember(member)
+                .orElseThrow(MemberNotExistsException::new);
+        return new Cookie("refreshtoken", tokens.getRefreshToken());
+    }
 
     Article newArticle() {
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         Article article = Article.builder()
                 .member(member)
                 .category(Category.COMMUNITY)
@@ -105,7 +109,7 @@ class ArticleControllerTest {
     }
 
     void createDummies(){
-        Cookie cookie = getCookie();
+        Cookie cookie = getAccessCookie();
         Random random = new Random();
         Member member = memberRepository.findByAccessToken(cookie.getValue());
         for(int i = 0; i < 100; i ++) {
@@ -156,7 +160,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/new").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newArticleDto))
                 )
@@ -175,7 +179,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/new").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newArticleDto))
                 )
@@ -194,7 +198,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/new").cookie(getCookie())
+        mockMvc.perform(post("/articles/new").cookie(getAccessCookie(), getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(writePostDto))
                 )
@@ -208,7 +212,7 @@ class ArticleControllerTest {
         //given
         newArticle();
 
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         List<Article> articles = articleRepository.findByMember(member);
         Article article = articles.get(0);
         Long articleId = article.getId();
@@ -220,7 +224,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
@@ -234,7 +238,7 @@ class ArticleControllerTest {
         //given
         newArticle();
 
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         List<Article> articles = articleRepository.findByMember(member);
         Article article = articles.get(0);
         Long articleId = article.getId();
@@ -246,7 +250,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
@@ -260,7 +264,7 @@ class ArticleControllerTest {
         //given
         newArticle();
 
-        Member member = memberRepository.findByAccessToken(getCookie().getValue());
+        Member member = memberRepository.findByAccessToken(getAccessCookie().getValue());
         List<Article> articles = articleRepository.findByMember(member);
         Article article = articles.get(0);
         Long articleId = article.getId();
@@ -272,7 +276,7 @@ class ArticleControllerTest {
                 .build();
 
         // expected
-        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getCookie())
+        mockMvc.perform(post("/articles/{id}/edit",articleId).cookie(getAccessCookie(),getRefreshCookie())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(editArticleDto))
                 )
@@ -287,7 +291,7 @@ class ArticleControllerTest {
         createDummies();
         String category = "community";
         // expected
-        mockMvc.perform(get("/{category}", category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}", category).cookie(getAccessCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -300,7 +304,7 @@ class ArticleControllerTest {
         String category = "community";
 
         // expected
-        mockMvc.perform(get("/{category}?page=5&sort=LATEST&period=ALL",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=5&sort=LATEST&period=ALL",category).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -314,7 +318,7 @@ class ArticleControllerTest {
         String category = "community";
 
         // expected
-        mockMvc.perform(get("/{category}?page=1&sort=VIEW&period=ALL",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=1&sort=VIEW&period=ALL",category).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -327,7 +331,7 @@ class ArticleControllerTest {
         String category = "information";
 
         // expected
-        mockMvc.perform(get("/{category}?page=1&sort=LATEST&period=ALL",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=1&sort=LATEST&period=ALL",category).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -340,7 +344,7 @@ class ArticleControllerTest {
         String category = "community";
 
         // expected
-        mockMvc.perform(get("/{category}?page=1&sort=abc&period=abc",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=1&sort=abc&period=abc",category).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().is5xxServerError())
                 .andDo(print());
     }
@@ -352,7 +356,7 @@ class ArticleControllerTest {
         String category = "community";
 
         // expected
-        mockMvc.perform(get("/{category}?page=12345&sort=LATEST&period=ALL",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=12345&sort=LATEST&period=ALL",category).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -364,7 +368,7 @@ class ArticleControllerTest {
         String category = "abc";
 
         // expected
-        mockMvc.perform(get("/{category}?page=1&sort=latest&period=all",category).cookie(getCookie()))
+        mockMvc.perform(get("/{category}?page=1&sort=latest&period=all",category).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().is5xxServerError())
                 .andDo(print());
     }
@@ -417,7 +421,7 @@ class ArticleControllerTest {
         Article article = newArticle();
 
         DeleteArticleServiceDto deleteArticleServiceDto = DeleteArticleServiceDto.builder()
-                .accessToken(getCookie().getValue())
+                .accessToken(getAccessCookie().getValue())
                 .id(article.getId())
                 .build();
 
@@ -443,7 +447,7 @@ class ArticleControllerTest {
         Long id = article.getId();
 
         // expected
-        mockMvc.perform(post("/articles/{id}/like",id).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/like",id).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -454,12 +458,12 @@ class ArticleControllerTest {
         // given
         Article article = newArticle();
         Long id = article.getId();
-        mockMvc.perform(post("/articles/{id}/like",id).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/like",id).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
 
         // expected
-        mockMvc.perform(post("/articles/{id}/like",id).cookie(getCookie()))
+        mockMvc.perform(post("/articles/{id}/like",id).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
@@ -472,7 +476,7 @@ class ArticleControllerTest {
         Long id = article.getId();
 
         // expected
-        mockMvc.perform(delete("/articles/{id}",id).cookie(getCookie()))
+        mockMvc.perform(delete("/articles/{id}",id).cookie(getAccessCookie(),getRefreshCookie()))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

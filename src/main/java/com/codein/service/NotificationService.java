@@ -31,7 +31,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final CommentRepository commentRepository;
 
-    @Transactional
+/*    @Transactional
     public void newNotifications(NewNotificationServiceDto newNotificationServiceDto) {
         if(newNotificationServiceDto.getComment() == null) {    // 글 생성인 경우
             List<Member> receivers = memberRepository.findByFollowing(newNotificationServiceDto.getSender());
@@ -53,12 +53,12 @@ public class NotificationService {
                 notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
             }
 
-            // 대댓글인 경우 부모댓글 작성자에게 알림 단 부모댓글이 본인인 경우 제외
+            // 대댓글인 경우 부모댓글 작성자에게 알림
             if(newNotificationServiceDto.getComment().getParentId() != null) {
                 Comment parent = commentRepository.findById(newNotificationServiceDto.getComment().getParentId())
                         .orElseThrow(CommentNotExistsException::new);
                 Member parentMember = parent.getMember();
-
+                //  부모댓글이 본인인 경우 알림 제외, 타겟이 타인인 경우 타겟에게 알림
                 if(!parentMember.equals(newNotificationServiceDto.getSender())) {
                     notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
                     // 타겟이 있는 경우 타겟에게 알림 단 타겟이 본인인 경우 제외
@@ -71,8 +71,68 @@ public class NotificationService {
                     }
                 }
             }
+
             Collections.reverse(notifications);
             notificationRepository.saveAll( removeDuplicateReceivers(notifications));
+        }
+    }*/
+
+    @Transactional
+    public void newNotifications(NewNotificationServiceDto newNotificationServiceDto) {
+        if (newNotificationServiceDto.getComment() == null) {    // 글 생성인 경우
+            List<Member> receivers = memberRepository.findByFollowing(newNotificationServiceDto.getSender());
+            if (!receivers.isEmpty()) {
+                List<Notification> notifications = new ArrayList<>();
+                receivers.forEach(receiver -> {
+                    notifications.add(newNotificationServiceDto.toEntity(receiver, NotificationContent.FOLLOWING_POST_NEW_ARTICLE));
+                });
+                notificationRepository.saveAll(notifications);
+            }
+        } else {    // 댓글 생성인 경우
+            List<Notification> notifications = new ArrayList<>();
+
+            Member author = newNotificationServiceDto.getArticle().getMember();
+            Comment target = newNotificationServiceDto.getComment().getTarget();
+            Member parentMember = null;
+
+            if(newNotificationServiceDto.getComment().getParentId() != null) {
+                Comment parentComment = commentRepository.findById(newNotificationServiceDto.getComment().getParentId())
+                        .orElseThrow(CommentNotExistsException::new);
+                parentMember = parentComment.getMember();
+            }
+
+             // target member가 존재하면 target member에게 알림
+            if (target != null) {
+                Member targetMember = target.getMember();
+                notifications.add(newNotificationServiceDto.toEntity(targetMember, NotificationContent.REPLY_TO_ME));
+
+                // target member와 parent member가 일치하지 않는다면 parent member에게 알림
+                if (!parentMember.getId().equals(targetMember.getId())) {
+                    notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                }
+
+                // author가 target member, parent member와 일치하지 않는다면 author에게 알림
+                if (!author.getId().equals(targetMember.getId()) && !author.getId().equals(parentMember.getId())) {
+                    notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
+                }
+
+            } else {
+                // parent member가 존재한다면 parent member에게 알림
+                if(parentMember != null){
+                    notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+
+                    // parent member와 article author가 불일치한다면 article author에게도 알림
+                    if(!parentMember.getId().equals(author.getId())){
+                        notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
+                    }
+
+                }else{  // parent member도 존재하지 않는다면 article author에게만 알림
+                    notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
+                }
+            }
+
+            notificationRepository.saveAll(notifications);
+
         }
     }
 
