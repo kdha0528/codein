@@ -6,10 +6,11 @@ import com.codein.domain.member.follow.Follow;
 import com.codein.domain.member.Member;
 import com.codein.domain.member.ProfileEditor;
 import com.codein.error.exception.auth.InvalidTokensCookieException;
+import com.codein.error.exception.auth.RefreshTokenNullException;
 import com.codein.error.exception.member.*;
 import com.codein.error.exception.profileimage.ImageTooLargeException;
 import com.codein.error.exception.profileimage.InvalidImageException;
-import com.codein.repository.TokensRepository;
+import com.codein.repository.tokens.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.member.follow.FollowRepository;
 import com.codein.requestdto.member.SignupDto;
@@ -87,9 +88,12 @@ public class MemberService {
                     .orElseThrow(MemberNotLoginException::new);
             tokensRepository.delete(tokens);
         } else if (cookie.getName().equals("refreshtoken")) {
-            Tokens tokens = tokensRepository.findByRefreshToken(cookie.getValue())
-                    .orElseThrow(MemberNotLoginException::new);
-            tokensRepository.delete(tokens);
+            Tokens tokens = tokensRepository.findByRefreshToken(cookie.getValue());
+            if(tokens != null) {
+                tokensRepository.delete(tokens);
+            } else {
+                throw new RefreshTokenNullException();
+            }
         }else{
             throw new InvalidTokensCookieException();
         }

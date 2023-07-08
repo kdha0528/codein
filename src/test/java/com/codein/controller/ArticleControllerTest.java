@@ -5,7 +5,7 @@ import com.codein.domain.article.Category;
 import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.member.MemberNotExistsException;
-import com.codein.repository.TokensRepository;
+import com.codein.repository.tokens.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.requestdto.article.EditArticleDto;

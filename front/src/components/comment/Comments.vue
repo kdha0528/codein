@@ -83,13 +83,13 @@
                 <div v-if="!parent.reply"
                      class="write_reply"
                      style="font-size:0.8rem; cursor:pointer"
-                     @click="parent.reply = true">
+                     @click="parent.reply = true; setWriteReply(parent)">
                     답글 쓰기
                 </div>
                 <div v-else>
                     <div class="write_reply"
                          style="font-size:0.8rem; cursor:pointer"
-                         @click="parent.reply = false, reply.content = '', reply.targetId = null">
+                         @click="parent.reply = false, resetReply">
                         답글 취소
                     </div>
                     <div class="d-flex flex-column mb-5 p-4">
@@ -208,13 +208,13 @@
                             <div v-if="!child.reply"
                                  class="write_reply"
                                  style="font-size:0.8rem; cursor:pointer"
-                                 @click="child.reply = true, reply.content = '@'+child.commenterNickname+' ', reply.targetId = child.id">
+                                 @click="child.reply = true, reply.content = '@'+child.commenterNickname+' ', setWriteMentionReply(child, parent.id)">
                                 답글 쓰기
                             </div>
                             <div v-else>
                                 <div class="write_reply"
                                      style="font-size:0.8rem; cursor:pointer"
-                                     @click="child.reply = false, reply.content = '', reply.targetId = null">
+                                     @click="child.reply = false, resetReply">
                                     답글 취소
                                 </div>
                                 <div class="d-flex flex-column mb-5 p-4">
@@ -269,6 +269,7 @@ import {Avatar, CaretBottom, CaretTop, MoreFilled} from "@element-plus/icons-vue
 import {dislikeComment, likeComment} from "@/controller/api/comment";
 import {useResponseStore} from "@/stores/Response";
 import {inject, ref} from "vue";
+import {valueOf} from "cypress";
 
 const commentsStore = useCommentsStore();
 const pageStore = usePageStore();
@@ -286,15 +287,40 @@ const isCommenter = function (comment: Comment) {
         return false;
     }
 }
+
 const reply = ref({
     content: '',
+    parentId: null as null| number,
     targetId: null as null | number,
 })
 
-const seq = ref({
-    parent: 0,
-    child: 0,
+const writeReply = ref({
+    parent : null as null|Comment,
+    target : null as null|Comment,
 })
+
+const setWriteReply = function(parent: Comment) {
+    if(writeReply.value.parent !== null) writeReply.value.parent.reply = false;
+    else if(writeReply.value.target !== null) writeReply.value.target.reply = false;
+
+    writeReply.value.parent = parent;
+    reply.value.parentId = parent.id.valueOf();
+    reply.value.content = '';
+}
+const setWriteMentionReply = function(target: Comment, parentId: number) {
+    if(writeReply.value.parent !== null) writeReply.value.parent.reply = false;
+    else if(writeReply.value.target !== null) writeReply.value.target.reply = false;
+
+    writeReply.value.target = target;
+    reply.value.targetId = target.id.valueOf();
+    reply.value.parentId = parentId;
+}
+const resetReply = function(){
+    reply.value.content = '';
+    reply.value.parentId = null;
+    reply.value.targetId = null;
+}
+
 const onLikeComment = async function ( commentId: number) {
     await likeComment(route.path+'/comments/'+commentId+'/like')
         .then((response:any)=>{

@@ -58,7 +58,7 @@ export const useCommentsStore = defineStore("comments", {
             return this.getChildrenSize(child.parentId) === seq;
         },
         addComments(c: Comment){
-            if(c.parentId === null){
+            if(c.parentId === null) {
                 this.parents.push(c);
             } else {
                 this.children.push(c)

@@ -1,6 +1,6 @@
 package com.codein.config;
 
-import com.codein.repository.TokensRepository;
+import com.codein.repository.tokens.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.service.NotificationService;
 import lombok.RequiredArgsConstructor;

@@ -238,7 +238,7 @@ const onGetArticle = async function() {
         })
 }
 
-provide('onGetArticle',onGetArticle());
+provide('onGetArticle',onGetArticle);
 
 const getKoreanCategory = function (c: string){
     switch(c){

@@ -2,7 +2,7 @@
     <el-header height="80px">
         <el-menu mode="horizontal" router class="navbar d-flex justify-content-between">
             <div class="d-flex align-items-center justify-content-center" >
-                <div class="d-flex align-items-center justify-content-center ms-3" @click="replacePath('/')" style="cursor: pointer">
+                <div class="d-flex align-items-center justify-content-center ms-3" @click="router.replace('/community')" style="cursor: pointer">
                     <el-icon size="40">
                         <Loading />
                     </el-icon>

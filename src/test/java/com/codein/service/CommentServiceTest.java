@@ -6,7 +6,7 @@ import com.codein.domain.comment.Comment;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.comment.CommentNotExistsException;
 import com.codein.error.exception.member.MemberNotExistsException;
-import com.codein.repository.TokensRepository;
+import com.codein.repository.tokens.TokensRepository;
 import com.codein.repository.article.ArticleRepository;
 import com.codein.repository.comment.CommentRepository;
 import com.codein.repository.member.MemberRepository;
@@ -18,12 +18,9 @@ import com.codein.requestdto.member.LoginDto;
 import com.codein.requestdto.member.SignupDto;
 import com.codein.responsedto.comment.CommentListResponseDto;
 import com.codein.responsedto.comment.DeleteCommentServiceDto;
-import jakarta.validation.constraints.PastOrPresent;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
 
 @SpringBootTest
 public class CommentServiceTest {

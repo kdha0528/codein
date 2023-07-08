@@ -1,7 +1,8 @@
 package com.codein.controller;
 
+import com.codein.error.exception.auth.InvalidRefreshTokenException;
 import com.codein.error.exception.auth.RefreshTokenNullException;
-import com.codein.repository.TokensRepository;
+import com.codein.repository.tokens.TokensRepository;
 import com.codein.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,9 +30,9 @@ public class AuthController {
             throw new RefreshTokenNullException();
         } else {
             ArrayList<String> tokens = authService.validateRefreshToken(cookie.getValue());
-            if(tokens == null){ // refresh token이 정상적이지 않은 경우
+            if(tokens == null){ // refresh token이 정상적이지 않은 경우 refresh token 삭제
                 response.addHeader(HttpHeaders.SET_COOKIE,authService.deleteCookie("refreshtoken").toString());
-                return;
+                throw new InvalidRefreshTokenException();
             }
 
             ResponseCookie refreshCookie = authService.RefreshTokenToCookie(tokens.get(0));

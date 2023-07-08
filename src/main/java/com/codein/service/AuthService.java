@@ -4,9 +4,8 @@ import com.codein.domain.auth.Tokens;
 import com.codein.domain.member.Member;
 import com.codein.error.exception.auth.InvalidRefreshTokenException;
 import com.codein.error.exception.auth.RefreshTokenNullException;
-import com.codein.repository.TokensRepository;
+import com.codein.repository.tokens.TokensRepository;
 import com.codein.repository.member.MemberRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -23,25 +22,26 @@ public class AuthService {
 
     @Transactional
     public ArrayList<String> validateRefreshToken(String refreshToken) {
-        Tokens token = tokensRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(InvalidRefreshTokenException::new);
-
-        Member member = memberRepository.findByRefreshToken(token.getRefreshToken());
-
-        tokensRepository.delete(token);
-
-        if(member == null){
+        Tokens token = tokensRepository.findByRefreshToken(refreshToken);
+        if(token == null){  // db에 일치하는 refresh token이 없는 경우 쿠키를 삭제해야하기 때문에 null을 보내 쿠키를 삭제 후 예외처리
             return null;
-        }
-        else {
-            Tokens newTokens = Tokens.builder()
-                    .member(member)
-                    .build();
+        } else {
 
-            ArrayList<String> tokens = new ArrayList<>();
-            tokens.add(newTokens.getRefreshToken());
-            tokens.add(newTokens.getAccessToken());
-            return tokens;
+            Member member = memberRepository.findByRefreshToken(token.getRefreshToken());
+            tokensRepository.delete(token);
+            if (member == null) { // db에 refresh token을 소유하고 있는 member가 존재하지 않는 경우 null을 보내 refresh token 삭제
+                return null;
+            } else {
+
+                Tokens newTokens = Tokens.builder()
+                        .member(member)
+                        .build();
+
+                ArrayList<String> tokens = new ArrayList<>();
+                tokens.add(newTokens.getRefreshToken());
+                tokens.add(newTokens.getAccessToken());
+                return tokens;
+            }
         }
     }
 
@@ -82,11 +82,13 @@ public class AuthService {
     }
 
     @Transactional
-    public void deleteTokens(String refreshToken) {
-        Tokens tokens = tokensRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(RefreshTokenNullException::new);
-
-        tokensRepository.delete(tokens);
+    public void deleteTokensByRefreshToken(String refreshToken) {
+        Tokens tokens = tokensRepository.findByRefreshToken(refreshToken);
+        if(tokens != null){
+            tokensRepository.delete(tokens);
+        } else {
+            throw new InvalidRefreshTokenException();
+        }
     }
 
 }

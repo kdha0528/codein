@@ -3,7 +3,7 @@ package com.codein.config;
 import com.codein.config.data.MemberSession;
 import com.codein.domain.auth.Tokens;
 import com.codein.error.exception.auth.UnauthorizedException;
-import com.codein.repository.TokensRepository;
+import com.codein.repository.tokens.TokensRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

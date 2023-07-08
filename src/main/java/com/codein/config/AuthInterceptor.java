@@ -7,7 +7,7 @@ import com.codein.error.exception.auth.AccessTokenNullException;
 import com.codein.error.exception.auth.InvalidAccessTokenException;
 import com.codein.error.exception.auth.RefreshTokenNullException;
 import com.codein.error.exception.auth.UnauthorizedException;
-import com.codein.repository.TokensRepository;
+import com.codein.repository.tokens.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.service.NotificationService;
 import jakarta.servlet.http.Cookie;
@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
@@ -89,7 +90,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        // 로그인이 안되어 있을경우 에러
+        // 로그인이 안되어 있을 경우 에러
         if(refreshToken == null){
             throw new RefreshTokenNullException();
         }
