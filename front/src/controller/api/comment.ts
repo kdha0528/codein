@@ -32,3 +32,14 @@ export async function dislikeComment(path: string) {
         return error;
     }
 }
+
+export async function createCommentDummies(path: string){
+    try {
+        await apiController({
+            url: path,
+            method: 'post'
+        })
+    } catch (error) {
+        return error;
+    }
+}

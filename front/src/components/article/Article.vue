@@ -100,13 +100,20 @@
         </div>
 
         <el-divider/>
-        <div class="d-flex mt-3 mb-3">
+        <div class="d-flex mt-3 mb-3 align-items-center">
             <el-icon size="25">
                 <ChatDotSquare/>
             </el-icon>
             <span style="font-size: 1.2rem; padding-left: 3px;">
                 {{ article.commentNum }}개의 댓글
             </span>
+            <div v-if="!isAuthor()" class="create-dummies-button">
+                <el-button plain @click="onCreateCommentDummies()" style="border: none; padding-left: 3px; color: black;">
+                    <el-icon style="vertical-align: middle">
+                        <Plus />
+                    </el-icon>
+                </el-button>
+            </div>
         </div>
         <div
             class="d-flex flex-column mb-5 p-4"
@@ -157,7 +164,7 @@ import {useCommentsStore} from "@/stores/comments";
 import {usePageStore} from "@/stores/page";
 import type {Comment} from "@/custom-types/comment";
 import Comments from "@/components/comment/Comments.vue";
-import {write} from "@/controller/api/comment";
+import {createCommentDummies, write} from "@/controller/api/comment";
 
 const route = useRoute();
 const router = useRouter();
@@ -198,6 +205,7 @@ const isAuthor = function () {
     }
 }
 
+
 const onPaging = async function(page: number, componentName: string) {
     if(componentName === 'Articles'){
         await pageStore.setArticlesCurrentPage(page);
@@ -224,7 +232,7 @@ const onGetArticle = async function() {
                     const comment: Comment = {...r}
                     commentsStore.addComments(comment);
                 })
-                pageStore.setArticlesMaxPage(response.commentsData.maxPage);
+                pageStore.setCommentsMaxPage(response.commentsData.maxPage)
                 getKoreanCategory(article.value.category);
             } else {
                 alert(resStore.getErrorMessage);
@@ -335,6 +343,21 @@ const onDeleteArticle = async function () {
         })
 }
 
+const onCreateCommentDummies = async function() {
+    await createCommentDummies(route.path+'/dummies')
+        .then(()=>{
+            if(resStore.isOK){
+                alert("생성이 완료되었습니다.");
+                router.replace(route.path);
+            } else {
+                alert(resStore.getErrorMessage);
+                console.log(resStore.getErrorMessage);
+            }
+        }).catch(error => {
+            alert(error);
+            console.log(error)
+        })
+}
 </script>
 <style scoped>
 @import "../css/contentBase.css";

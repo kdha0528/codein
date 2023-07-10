@@ -305,6 +305,7 @@ const setWriteReply = function(parent: Comment) {
 
     writeReply.value.parent = parent;
     reply.value.parentId = parent.id.valueOf();
+    reply.value.targetId = null;
     reply.value.content = '';
 }
 const setWriteMentionReply = function(target: Comment, parentId: number) {
@@ -312,8 +313,8 @@ const setWriteMentionReply = function(target: Comment, parentId: number) {
     else if(writeReply.value.target !== null) writeReply.value.target.reply = false;
 
     writeReply.value.target = target;
-    reply.value.targetId = target.id.valueOf();
     reply.value.parentId = parentId;
+    reply.value.targetId = target.id.valueOf();
 }
 const resetReply = function(){
     reply.value.content = '';

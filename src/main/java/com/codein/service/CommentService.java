@@ -2,7 +2,10 @@ package com.codein.service;
 
 import com.codein.domain.article.Article;
 import com.codein.domain.comment.CommentLike;
+import com.codein.domain.notification.Notification;
+import com.codein.domain.notification.NotificationContent;
 import com.codein.repository.comment.like.CommentLikeRepository;
+import com.codein.repository.notification.NotificationRepository;
 import com.codein.utils.LikeChanges;
 import com.codein.domain.comment.Comment;
 import com.codein.domain.comment.CommentEditor;
@@ -27,6 +30,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -37,6 +42,7 @@ public class CommentService {
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public CommentListResponseDto getCommentList(GetCommentListServiceDto getCommentListServiceDto) {
@@ -163,25 +169,60 @@ public class CommentService {
     }
 
     @Transactional
-    public void createCommentDummies(Article article, Member member) {
-        Random random = new Random();
-        for(int i = 0; i < 20; i++){
-            Comment comment = Comment.builder()
-                    .content("댓글 테스트 "+i)
-                    .article(article)
-                    .member(member)
-                    .build();
-            commentRepository.save(comment);
+    public void createCommentDummies(Long articleId, String accessToken) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(ArticleNotExistsException::new);
 
-            for(int j = 0; j < random.nextInt(8);j++){
-                Comment child = Comment.builder()
-                        .parentId(comment.getId())
-                        .content(i+"의 "+j+"번 째 자식 댓글")
+        Member member = memberRepository.findByAccessToken(accessToken);
+        if(member == null) throw new MemberNotExistsException();
+
+        if(article.getCommentNum() == 0) {  // article에 댓글이 0개일때만 더미생성 가능
+            Random random = new Random();
+            List<Comment> commentList = new ArrayList<>();
+            List<Notification> notificationList = new ArrayList<>();
+
+            for (int i = 0; i < 20; i++) {
+                Comment comment = Comment.builder()
+                        .content("댓글 테스트 " + i)
                         .article(article)
                         .member(member)
                         .build();
-                commentRepository.save(child);
+
+                Notification notification1 = Notification.builder()
+                        .sender(member)
+                        .receiver(article.getMember())
+                        .comment(comment)
+                        .content(NotificationContent.COMMENT_ON_MY_ARTICLE)
+                        .article(article)
+                        .build();
+
+                article.increaseCommentNum();
+                commentList.add(comment);
+                notificationList.add(notification1);
+
+                for (int j = 0; j < random.nextInt(8); j++) {
+                    Comment reply = Comment.builder()
+                            .parentId(comment.getId())
+                            .content(i + "의 " + j + "번 째 자식 댓글")
+                            .article(article)
+                            .member(member)
+                            .build();
+
+                    Notification notification2 = Notification.builder()
+                            .sender(member)
+                            .receiver(article.getMember())
+                            .comment(reply)
+                            .content(NotificationContent.REPLY_ON_MY_COMMENT)
+                            .article(article)
+                            .build();
+
+                    article.increaseCommentNum();
+                    commentList.add(reply);
+                    notificationList.add(notification2);
+                }
             }
+            commentRepository.saveAll(commentList);
+            notificationRepository.saveAll(notificationList);
         }
     }
 }

@@ -137,8 +137,8 @@ public class CommentServiceTest {
         // given
         String accessToken = getToken();
         Article article = newArticle();
-        Member member = memberRepository.findByAccessToken(accessToken);
-        commentService.createCommentDummies(article,member);
+
+        commentService.createCommentDummies(article.getId(),accessToken);
 
         // when
         CommentListResponseDto commentListResponseDto = commentService.getCommentList(GetCommentListServiceDto.builder()

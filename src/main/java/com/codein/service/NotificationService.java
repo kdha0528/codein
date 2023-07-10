@@ -79,8 +79,9 @@ public class NotificationService {
 
     @Transactional
     public void newNotifications(NewNotificationServiceDto newNotificationServiceDto) {
+        Member sender = newNotificationServiceDto.getSender();
         if (newNotificationServiceDto.getComment() == null) {    // 글 생성인 경우
-            List<Member> receivers = memberRepository.findByFollowing(newNotificationServiceDto.getSender());
+            List<Member> receivers = memberRepository.findByFollowing(sender);
             if (!receivers.isEmpty()) {
                 List<Notification> notifications = new ArrayList<>();
                 receivers.forEach(receiver -> {
@@ -91,31 +92,34 @@ public class NotificationService {
         } else {    // 댓글 생성인 경우
             List<Notification> notifications = new ArrayList<>();
 
-            Member author = newNotificationServiceDto.getArticle().getMember();
+            Member author = null;
+            if(isNotSender(sender, newNotificationServiceDto.getArticle().getMember())) author = newNotificationServiceDto.getArticle().getMember();; // sender와 receiver가 동일하면 알림 x
+
             Comment target = newNotificationServiceDto.getComment().getTarget();
             Member parentMember = null;
 
             if(newNotificationServiceDto.getComment().getParentId() != null) {
                 Comment parentComment = commentRepository.findById(newNotificationServiceDto.getComment().getParentId())
                         .orElseThrow(CommentNotExistsException::new);
-                parentMember = parentComment.getMember();
+                if(isNotSender(sender, parentComment.getMember())) parentMember = parentComment.getMember();  // sender와 receiver가 동일하면 알림 x
             }
 
              // target member가 존재하면 target member에게 알림
             if (target != null) {
                 Member targetMember = target.getMember();
-                notifications.add(newNotificationServiceDto.toEntity(targetMember, NotificationContent.REPLY_TO_ME));
+                if(isNotSender(sender, targetMember)) { // sender와 receiver가 동일하면 알림 x
+                    notifications.add(newNotificationServiceDto.toEntity(targetMember, NotificationContent.REPLY_TO_ME));
 
-                // target member와 parent member가 일치하지 않는다면 parent member에게 알림
-                if (!parentMember.getId().equals(targetMember.getId())) {
-                    notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                    // target member와 parent member가 일치하지 않는다면 parent member에게 알림
+                    if (!parentMember.getId().equals(targetMember.getId())) {
+                        notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                    }
+
+                    // author가 target member, parent member와 일치하지 않는다면 author에게 알림
+                    if (!author.getId().equals(targetMember.getId()) && !author.getId().equals(parentMember.getId())) {
+                        notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
+                    }
                 }
-
-                // author가 target member, parent member와 일치하지 않는다면 author에게 알림
-                if (!author.getId().equals(targetMember.getId()) && !author.getId().equals(parentMember.getId())) {
-                    notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
-                }
-
             } else {
                 // parent member가 존재한다면 parent member에게 알림
                 if(parentMember != null){
@@ -132,20 +136,11 @@ public class NotificationService {
             }
 
             notificationRepository.saveAll(notifications);
-
         }
     }
 
-    private List<Notification> removeDuplicateReceivers(List<Notification> notifications) {
-        Set<Long> uniqueReceivers = new HashSet<>();
-        List<Notification> uniqueNotifications = new ArrayList<>();
-        notifications.forEach(notification -> {
-            if (!uniqueReceivers.contains(notification.getReceiver().getId())) {
-                uniqueReceivers.add(notification.getReceiver().getId());
-                uniqueNotifications.add(notification);
-            }
-        });
-        return uniqueNotifications;
+    public boolean isNotSender(Member sender, Member receiver){
+        return sender != receiver;
     }
 
     @Transactional

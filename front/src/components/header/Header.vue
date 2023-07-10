@@ -33,8 +33,10 @@
                                 <Bell/>
                             </el-icon>
                         </div>
-                        <div v-if="clickedNotification" class="notification_window d-flex flex-column"
-                             v-infinite-scroll="onLoadNotifications">
+                        <div v-if="clickedNotification" style="overflow: auto; border: none;">
+                            <div class="notification_window d-flex flex-column"
+                                 v-infinite-scroll="onLoadNotifications"
+                                 infinite-scroll-distance="70%">
                                 <div class="notification" style="cursor:default; pointer-events: none;">
                                     <div style="width: 100%; text-align: center; color:black;">
                                         알림
@@ -76,6 +78,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <p v-if="loading">Loading...</p>
+                                <p v-if="noMoreNotification">No More</p>
+                            </div>
                         </div>
                     </div>
                 <div  class="d-flex justify-content-center align-items-center" style="cursor: pointer;" @click="clickedNotification = false">
@@ -139,6 +144,9 @@
             </div>
         </el-menu>
     </el-header>
+  <InfiniteLoading>
+
+  </InfiniteLoading>
 </template>
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
@@ -149,6 +157,8 @@ import { logout } from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
 import {Loading, Avatar, CloseBold, Setting} from "@element-plus/icons-vue";
 import {loadNotifications} from "@/controller/api/notificaion";
+import InfiniteLoading from "v3-infinite-loading";
+import "v3-infinite-loading/lib/style.css";
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -157,19 +167,16 @@ const resStore = useResponseStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
 const notifications = ref<Notification[]>([]);
-const noMoreNotification = ref<boolean>(false);
+const noMoreNotification = ref(false);
+const clickedNotification = ref(false);
+const loading = ref(false);
 
-const clickedNotification = ref<boolean>(false);
 const clickNotification = function () {
     clickedNotification.value = !clickedNotification.value;
     if(clickedNotification.value) {
         notifications.value = [];
         noMoreNotification.value = false;
     }
-}
-
-const replacePath = function (path: string) {
-    router.replace(path);
 }
 
 const toActivity = function(): string {
@@ -209,7 +216,34 @@ const getNotificationPath = function() {
     }
 }
 
-const onLoadNotifications = async function () {
+const onFirstLoadNotifications = async function () {
+    loading.value = true;
+    await loadNotifications('/notifications')
+        .then((response: any)=>{
+            if(resStore.isOK){
+                if(response.notificationListItemList.length === 0){
+                    noMoreNotification.value = true;
+                } else {
+                    response.notificationListItemList.forEach((r: any) => {
+                        const notification: Notification = {...r}
+                        notifications.value.push(notification);
+                    })
+                }
+                loading.value = false;
+            } else {
+                loading.value = false;
+                alert(resStore.getErrorMessage);
+                console.log(response)
+            }
+        }).catch(error => {
+            loading.value = false;
+            alert(error);
+            console.log(error)
+        })
+}
+
+const onScrollLoadNotifications = async function () {
+    loading.value = true;
     await loadNotifications(getNotificationPath())
         .then((response: any)=>{
             if(resStore.isOK){
@@ -221,16 +255,18 @@ const onLoadNotifications = async function () {
                         notifications.value.push(notification);
                     })
                 }
+                loading.value = false;
             } else {
+                loading.value = false;
                 alert(resStore.getErrorMessage);
                 console.log(response)
             }
         }).catch(error => {
+            loading.value = false;
             alert(error);
             console.log(error)
         })
 }
-
 </script>
 <style scoped lang="scss">
 .navbar{

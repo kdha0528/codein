@@ -86,4 +86,11 @@ public class CommentController {
                 .build();
         commentService.deleteComment(deleteCommentServiceDto);
     }
+
+    @MySecured(role = Role.MEMBER)
+    @PostMapping( "/articles/{id}/dummies")
+    public void createCommentDummies(@CookieValue(value = "accesstoken") Cookie cookie,
+                           @PathVariable(value = "id") Long articleId) {
+        commentService.createCommentDummies(articleId, cookie.getValue());
+    }
 }

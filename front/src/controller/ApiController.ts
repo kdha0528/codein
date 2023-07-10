@@ -45,9 +45,6 @@ apiController.interceptors.response.use(
                 }
                 return axios(errorAPI);
             } else {
-                if(error.response.data.code === 'A002') {
-                    useAuthStore().logout();
-                }
                 useResponseStore().setError(error.response.data.code, error.response.data.message);
                 return await Promise.reject(error);
             }

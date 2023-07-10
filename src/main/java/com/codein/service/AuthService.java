@@ -24,12 +24,14 @@ public class AuthService {
     public ArrayList<String> validateRefreshToken(String refreshToken) {
         Tokens token = tokensRepository.findByRefreshToken(refreshToken);
         if(token == null){  // db에 일치하는 refresh token이 없는 경우 쿠키를 삭제해야하기 때문에 null을 보내 쿠키를 삭제 후 예외처리
+            System.out.println("refresh token으로 token을 찾지 못함");
             return null;
         } else {
 
             Member member = memberRepository.findByRefreshToken(token.getRefreshToken());
             tokensRepository.delete(token);
             if (member == null) { // db에 refresh token을 소유하고 있는 member가 존재하지 않는 경우 null을 보내 refresh token 삭제
+                System.out.println("token으로 member를 찾지 못함");
                 return null;
             } else {
 
