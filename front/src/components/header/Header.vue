@@ -34,53 +34,7 @@
                             </el-icon>
                         </div>
                         <div v-if="clickedNotification" style="overflow: auto; border: none;">
-                            <div class="notification_window d-flex flex-column"
-                                 v-infinite-scroll="onLoadNotifications"
-                                 infinite-scroll-distance="70%">
-                                <div class="notification" style="cursor:default; pointer-events: none;">
-                                    <div style="width: 100%; text-align: center; color:black;">
-                                        알림
-                                    </div>
-                                </div>
-                                <div class="d-flex flex-column" v-for="notification in notifications" :key="notification.id" >
-                                    <el-divider class="mt-0 mb-0"/>
-                                    <div class="d-flex" style="width:100%;">
-                                        <div class="ms-0">
-                                            <img v-if="notification.senderImageUrl" :src="notification.senderImageUrl"
-                                                 @click="router.replace( '/members/'+notification.senderId)"
-                                                 style="width: 2rem; height: 2rem; border-radius: 100%; cursor: pointer;"
-                                                 alt=""/>
-                                            <el-icon v-else size="28"
-                                                     @click="router.replace( '/members/'+notification.senderId)"
-                                                     style="width: 2rem;  height:2rem; border-radius: 100%; color:white; background-color: #E2E2E2;  cursor: pointer;">
-                                                <Avatar/>
-                                            </el-icon>
-                                        </div>
-                                        <div class="d-flex flex-column ms-2" style="width:90%;">
-                                            <div class="d-flex justify-content-between">
-                                                <div class="d-flex">
-                                                    <div style="font-size: 1rem; cursor: pointer;"
-                                                         @click="router.replace( '/members/'+notification.senderId)">
-                                                        {{ notification.senderNickname }}
-                                                    </div>
-                                                    <div class="ms-2" style="font-size: 0.9rem; color: #A6A6A6">
-                                                        {{ notification.subContent }}
-                                                    </div>
-                                                </div>
-                                                <div style="font-size: 0.9rem; color: #A6A6A6">
-                                                    {{ notification.notifiedAt }}
-                                                </div>
-                                            </div>
-                                            <div style="font-size: 0.9rem; cursor: pointer;"
-                                                 @click="router.replace( '/articles/'+notification.articleId)">
-                                                {{ notification.content }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p v-if="loading">Loading...</p>
-                                <p v-if="noMoreNotification">No More</p>
-                            </div>
+                            <Notifications/>
                         </div>
                     </div>
                 <div  class="d-flex justify-content-center align-items-center" style="cursor: pointer;" @click="clickedNotification = false">
@@ -144,12 +98,9 @@
             </div>
         </el-menu>
     </el-header>
-  <InfiniteLoading>
-
-  </InfiniteLoading>
 </template>
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import {onMounted, provide, ref} from "vue";
 import type {Notification} from "@/custom-types/notification";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter, useRoute } from "vue-router";
@@ -157,26 +108,23 @@ import { logout } from "@/controller/api/member";
 import {useResponseStore} from "@/stores/Response";
 import {Loading, Avatar, CloseBold, Setting} from "@element-plus/icons-vue";
 import {loadNotifications} from "@/controller/api/notificaion";
+import Notifications from "@/components/header/Notifications.vue";
 import InfiniteLoading from "v3-infinite-loading";
 import "v3-infinite-loading/lib/style.css";
+import {useNotificationStore} from "@/stores/notifications";
 
 const auth = useAuthStore();
 const router = useRouter();
 const route = useRoute();
 const resStore = useResponseStore();
+const notificationStore = useNotificationStore();
 
 const isUserLogin = ref(auth.isLoggedIn);
-const notifications = ref<Notification[]>([]);
-const noMoreNotification = ref(false);
 const clickedNotification = ref(false);
-const loading = ref(false);
 
 const clickNotification = function () {
     clickedNotification.value = !clickedNotification.value;
-    if(clickedNotification.value) {
-        notifications.value = [];
-        noMoreNotification.value = false;
-    }
+    notificationStore.clean();
 }
 
 const toActivity = function(): string {
@@ -209,64 +157,44 @@ const onLogout = async function () {
 
 const getNotificationPath = function() {
     let path = "/notifications";
-    if(notifications.value.length > 0) {
-        return path+"?lastId="+ notifications.value[notifications.value.length - 1].id;
+    if(notificationStore.getSize > 0) {
+        return path+"?lastId="+ notificationStore.getLastId;
     } else {
         return path;
     }
 }
 
-const onFirstLoadNotifications = async function () {
-    loading.value = true;
-    await loadNotifications('/notifications')
-        .then((response: any)=>{
-            if(resStore.isOK){
-                if(response.notificationListItemList.length === 0){
-                    noMoreNotification.value = true;
-                } else {
+const onLoadNotifications = async function () {
+    notificationStore.startLoading();
+    if(notificationStore.isNoMore){
+        notificationStore.finishLoading();
+    } else {
+        await loadNotifications(getNotificationPath())
+            .then((response: any) => {
+                if (resStore.isOK) {
+                    if (response.notificationListItemList.length < 20) {
+                        notificationStore.noMoreNotification();
+                    }
                     response.notificationListItemList.forEach((r: any) => {
                         const notification: Notification = {...r}
-                        notifications.value.push(notification);
+                        notificationStore.addNotification(notification);
                     })
+                    notificationStore.finishLoading();
+                } else {
+                    notificationStore.finishLoading();
+                    alert(resStore.getErrorMessage);
+                    console.log(response)
                 }
-                loading.value = false;
-            } else {
-                loading.value = false;
-                alert(resStore.getErrorMessage);
-                console.log(response)
-            }
-        }).catch(error => {
-            loading.value = false;
-            alert(error);
-            console.log(error)
-        })
+            }).catch(error => {
+                notificationStore.finishLoading();
+                alert(error);
+                console.log(error)
+            })
+    }
 }
 
-const onScrollLoadNotifications = async function () {
-    loading.value = true;
-    await loadNotifications(getNotificationPath())
-        .then((response: any)=>{
-            if(resStore.isOK){
-                if(response.notificationListItemList.length === 0){
-                    noMoreNotification.value = true;
-                } else {
-                    response.notificationListItemList.forEach((r: any) => {
-                        const notification: Notification = {...r}
-                        notifications.value.push(notification);
-                    })
-                }
-                loading.value = false;
-            } else {
-                loading.value = false;
-                alert(resStore.getErrorMessage);
-                console.log(response)
-            }
-        }).catch(error => {
-            loading.value = false;
-            alert(error);
-            console.log(error)
-        })
-}
+provide('onLoadNotifications', onLoadNotifications);
+
 </script>
 <style scoped lang="scss">
 .navbar{
@@ -295,6 +223,7 @@ const onScrollLoadNotifications = async function () {
         }
     }
 }
+
 .new_notification_count{
     position: absolute;
     z-index: 99;
@@ -309,27 +238,5 @@ const onScrollLoadNotifications = async function () {
     right:0;
 }
 
-.notification_window {
-    position: absolute;
-    right: -3rem;
-    top: 3.5rem;
-
-    width: 25rem;
-    min-height: 30rem;
-    max-height: 30rem;
-
-    border: solid thin #E2E2E2;
-    border-radius: 2px;
-
-    background-color: white;
-
-    transition: top 0.5s ease;
-
-    overflow: auto;
-}
-
-.notification_window::-webkit-scrollbar {
-    display: none;
-}
 
 </style>

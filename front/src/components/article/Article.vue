@@ -348,7 +348,7 @@ const onCreateCommentDummies = async function() {
         .then(()=>{
             if(resStore.isOK){
                 alert("생성이 완료되었습니다.");
-                router.replace(route.path);
+                onGetArticle();
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(resStore.getErrorMessage);

@@ -92,7 +92,7 @@
                          @click="parent.reply = false, resetReply">
                         답글 취소
                     </div>
-                    <div class="d-flex flex-column mb-5 p-4">
+                    <div class="d-flex flex-column p-4">
                         <div class="d-flex justify-content-between" style="width:95%; margin:auto 0 auto auto;">
                             <img v-if="parent.commenterImagePath" :src="parent.commenterImagePath"
                                  style="width: 3rem; height: 3rem; border-radius: 100%;"
@@ -124,9 +124,9 @@
                     </div>
                 </div>
             </div>
-            <div>
+            <div v-if="commentsStore.hasChild(parent.id)">
                 <ul class="d-flex flex-column" style="width:95%; margin: 1rem 0 auto auto;">
-                    <li  v-for="child in commentsStore.getChildren(parent.id)"
+                    <li v-for="child in commentsStore.getChildren(parent.id)"
                          :key="child.id">
                         <div class="d-flex flex-column ">
                             <div class="d-flex justify-content-between align-items-center">
@@ -217,7 +217,7 @@
                                      @click="child.reply = false, resetReply">
                                     답글 취소
                                 </div>
-                                <div class="d-flex flex-column mb-5 p-4">
+                                <div class="d-flex flex-column p-4">
                                     <div class="d-flex justify-content-between" style="width:95%; margin: auto 0 auto auto;">
                                         <img v-if="child.commenterImagePath" :src="child.commenterImagePath"
                                              style="width: 3rem; height: 3rem; border-radius: 100%;"
@@ -249,11 +249,11 @@
                                 </div>
                             </div>
                         </div>
-                        <el-divider v-if="!commentsStore.isLastChild(child)" border-style="dashed"/>
+                        <el-divider v-if="!commentsStore.isLastChild(child)" border-style="dashed" class="mt-3 mb-3"/>
                     </li>
                 </ul>
-                <el-divider v-if="!commentsStore.isLastParent(parent.id)" class="mt-3 mb-3"/>
             </div>
+            <el-divider v-if="!commentsStore.isLastParent(parent.id)" class="mt-3 mb-3"/>
         </li>
     </ul>
     <Pagination v-if="pageStore.getCommentsMaxPage > 1" :key="route.fullPath" />
