@@ -42,7 +42,7 @@
             <el-divider class="mt-3 mb-3"/>
         </li>
     </ul>
-    <Pagination :key="paginationKey" />
+    <Pagination :key="paginationKey"/>
 </template>
 <script setup lang="ts">
 import {ChatDotSquare, Star} from "@element-plus/icons-vue";

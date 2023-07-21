@@ -1,8 +1,9 @@
 <template>
-    <Pagination v-if="pageStore.getCommentsMaxPage > 1" :key="route.fullPath" />
+    <Pagination v-if="pageStore.getCommentsMaxPage > 1"
+                :key="paginationKey"/>
     <ul class=" d-flex flex-column" style="width:100%; margin-block:0; padding-inline-start: 0">
         <li v-for="parent in commentsStore.getParents"
-            :key="parent.id">
+            :key="parent.id" :id="'comment-' + parent.id">
             <div class="d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
@@ -124,11 +125,11 @@
                     </div>
                 </div>
             </div>
-            <div v-if="commentsStore.hasChild(parent.id)">
+            <div v-if="hasChild(parent.id)">
                 <ul class="d-flex flex-column" style="width:95%; margin: 1rem 0 auto auto;">
                     <li v-for="child in commentsStore.getChildren(parent.id)"
-                         :key="child.id">
-                        <div class="d-flex flex-column ">
+                         :key="child.id" :id="'comment-' + child.id">
+                        <div class="d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
                                     <img v-if="child.commenterImagePath" :src="child.commenterImagePath"
@@ -256,7 +257,7 @@
             <el-divider v-if="!commentsStore.isLastParent(parent.id)" class="mt-3 mb-3"/>
         </li>
     </ul>
-    <Pagination v-if="pageStore.getCommentsMaxPage > 1" :key="route.fullPath" />
+    <Pagination v-if="pageStore.getCommentsMaxPage > 1" :key="paginationKey"/>
 </template>
 <script setup lang="ts">
 import {useCommentsStore} from "@/stores/comments";
@@ -268,8 +269,7 @@ import type {Comment} from "@/custom-types/comment";
 import {Avatar, CaretBottom, CaretTop, MoreFilled} from "@element-plus/icons-vue";
 import {dislikeComment, likeComment} from "@/controller/api/comment";
 import {useResponseStore} from "@/stores/Response";
-import {inject, ref} from "vue";
-import {valueOf} from "cypress";
+import {inject, onMounted, ref} from "vue";
 
 const commentsStore = useCommentsStore();
 const pageStore = usePageStore();
@@ -277,7 +277,17 @@ const authStore = useAuthStore();
 const resStore = useResponseStore();
 const router = useRouter();
 const route = useRoute();
+const paginationKey = ref(0);
 
+onMounted(async () => {
+    paginationKey.value++;
+})
+
+const hasChild = function(parentId: number){
+    console.log("has child? " + commentsStore.hasChild(parentId));
+    console.log("parent id = " + parentId);
+    return commentsStore.hasChild(parentId);
+}
 
 const isCommenter = function (comment: Comment) {
 
@@ -316,6 +326,7 @@ const setWriteMentionReply = function(target: Comment, parentId: number) {
     reply.value.parentId = parentId;
     reply.value.targetId = target.id.valueOf();
 }
+
 const resetReply = function(){
     reply.value.content = '';
     reply.value.parentId = null;

@@ -15,6 +15,8 @@ import {getCurrentInstance, inject, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {usePageStore} from "@/stores/page";
 import {Pagination} from "@/custom-types/pagination";
+import { toRefs } from "vue";
+
 const router = useRouter();
 const route = useRoute();
 const pageStore = usePageStore();
@@ -24,12 +26,12 @@ const maxPage = ref(1);
 const pageSize = 20;
 
 onMounted(() => {
-    if(pageStore.getCurrentPaginationType === Pagination.Articles){
+    if(componentName.value === 'Articles' || componentName.value === 'Activities'){
         currentPage.value = pageStore.getArticlesCurrentPage;
         if(pageStore.getArticlesMaxPage !== 0) {
             maxPage.value = pageStore.getArticlesMaxPage;
         }
-    } else if (pageStore.getCurrentPaginationType === Pagination.Comments){
+    } else if (componentName.value === 'Comments'){
         currentPage.value = pageStore.getCommentsCurrentPage;
         if(pageStore.getCommentsMaxPage !== 0) {
             maxPage.value = pageStore.getCommentsMaxPage;

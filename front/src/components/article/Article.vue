@@ -149,7 +149,7 @@
             </el-button>
         </div>
         <keep-alive>
-            <Comments />
+            <Comments id="comments" :key="commentsKey"/>
         </keep-alive>
     </div>
 </template>
@@ -173,6 +173,7 @@ const authStore = useAuthStore();
 const commentsStore = useCommentsStore();
 const pageStore = usePageStore();
 
+const commentsKey = ref(0);
 
 const article = ref({
     id:'',
@@ -194,8 +195,11 @@ const comment = ref({
     content: '',
 })
 
-const commentKey = ref(0);
 const category = ref('');
+
+
+const isSetArticlePage = ref(false);
+const isSetCommentPage = ref(false);
 
 const isAuthor = function () {
     if(authStore.isLoggedIn){
@@ -209,21 +213,50 @@ const isAuthor = function () {
 const onPaging = async function(page: number, componentName: string) {
     if(componentName === 'Articles'){
         await pageStore.setArticlesCurrentPage(page);
+        isSetArticlePage.value = true;
         await onGetArticle();
     } else if (componentName === 'Comments'){
         await pageStore.setCommentsCurrentPage(page);
+        isSetCommentPage.value = true;
         await onGetArticle();
     }
 }
 
 provide('onPaging', onPaging);
 
-onMounted( ()=>{
-    onGetArticle();
+onMounted( async ()=>{
+    await setDefaultFromPath(route.fullPath);
+    await onGetArticle();
 })
 
+function setDefaultFromPath(path: string):void {
+    const regex = /[?&]([^=]+)=([^&]+)/;
+
+    pageStore.setCommentsCurrentPage(1);
+
+    const match = regex.exec(path);
+    if (match) {
+        const paramName = match[1];
+        const paramValue = match[2];
+        if(paramName === "cpage") {
+            pageStore.setCommentsCurrentPage(parseInt(paramValue, 10));
+            isSetCommentPage.value = true;
+        }
+    }
+}
+
+const getPath = function(){
+    let path = route.path;
+
+    if(isSetCommentPage.value) {
+        path = path + '?cpage=' + pageStore.getCommentsCurrentPage;
+    }
+
+    return path;
+}
+
 const onGetArticle = async function() {
-    await getArticle(route.path)
+    await getArticle(getPath())
         .then((response: any)=>{
             if(resStore.isOK){
                 commentsStore.clean();
@@ -234,15 +267,18 @@ const onGetArticle = async function() {
                 })
                 pageStore.setCommentsMaxPage(response.commentsData.maxPage)
                 getKoreanCategory(article.value.category);
+                router.replace(getPath());
+                commentsKey.value++;
+                if(!isSetCommentPage.value){
+                    scrollTo(0, 0);
+                }
             } else {
                 alert(resStore.getErrorMessage);
-                if(resStore.getErrorCode === 'A004') {
-                    router.back();
-                }
+                console.log(resStore.getErrorMessage);
             }
         }).catch(error => {
             alert(error);
-            console.log(error)
+            console.log(error);
         })
 }
 
@@ -276,18 +312,18 @@ const onWriteComment = async function(c:any) {
     await write(route.path+'/comments', c)
         .then((response: any)=>{
             if(resStore.isOK){
-                commentKey.value++;
+                commentsKey.value++;
                 comment.value.content='';
                 onGetArticle();
             } else {
                 alert(resStore.getErrorMessage);
                 console.log(response);
-                commentKey.value++;
+                commentsKey.value++;
             }
         }).catch(error => {
             alert(error);
             console.log(error);
-            commentKey.value++;
+            commentsKey.value++;
         })
 }
 

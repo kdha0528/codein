@@ -19,9 +19,10 @@ router.beforeEach(function (to, from, next) {
     }
 
     if(resStore.getErrorCode === 'A002'){
+        console.log("refresh token 만료");
         alert("Refresh Token is invalid.");
         auth.logout();
-        next('/login');
+        resStore.setSuccess();
     }
 
     if (to.meta.authRequire) {

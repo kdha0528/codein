@@ -91,16 +91,16 @@ const onPaging = async function(page: number){
 
 function setDefaultFromPath(path: string):void {
     const regex = /[?&]([^=]+)=([^&]+)/;
-
     const match = regex.exec(path);
+
+    pageStore.setArticlesCurrentPage(1);
+
     if (match) {
         const paramName = match[1];
         const paramValue = match[2];
         if(paramName === "page"){
             pageStore.setArticlesCurrentPage(parseInt(paramValue, 10));
             isSetPage.value = true;
-        } else {
-            pageStore.setArticlesCurrentPage(1);
         }
     }
 }

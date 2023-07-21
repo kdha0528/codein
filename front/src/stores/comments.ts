@@ -68,13 +68,14 @@ export const useCommentsStore = defineStore("comments", {
             this.parents = [];
             this.children = [];
         },
-        hasChild(parentId: number):boolean{
+        hasChild(parentId: number) {
+            let response = false;
             this.children.forEach((c:Comment)=>{
                 if(c.parentId === parentId) {
-                    return true;
+                    response = true;
                 }
-            })
-            return false;
+            });
+            return response;
         }
     },
     persist: {
