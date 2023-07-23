@@ -119,7 +119,7 @@ public class CommentService {
                     comment.changeDislikeNum(1);
                 }
             } else { // 이미 추천 기록이 있다면 업데이트
-                if (LocalDateTime.now().minus(10, ChronoUnit.SECONDS).isAfter(exists.getLikedAt())) {
+                if (LocalDateTime.now().minus(3, ChronoUnit.SECONDS).isAfter(exists.getLikedAt())) {
                     LikeChanges changes = exists.change(commentLikeServiceDto.isLike());
                     comment.changeLikeNum(changes.getLike());
                     comment.changeDislikeNum(changes.getDislike());

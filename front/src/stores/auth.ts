@@ -4,7 +4,8 @@ import type { Profile } from "@/custom-types/profile";
 export const useAuthStore = defineStore("auth", {
     state: () => ({
         member: null as Profile | any,
-        notificationCount: 0
+        notificationCount: 0,
+        notificationCountChanged: false,
     }),
     getters: {
         getId: (state) => {
@@ -42,7 +43,12 @@ export const useAuthStore = defineStore("auth", {
             this.member = null;
         },
         setNotificationCount(count: number){
+            this.notificationCountChanged = true;
             this.notificationCount = count;
+        },
+        checkedNotifications(){
+            this.notificationCountChanged = false;
+            this.notificationCount = 0;
         }
     },
     persist: {

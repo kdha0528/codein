@@ -41,7 +41,7 @@ public enum ErrorCode {
     INVALID_AUTHOR(400,"A003", "게시글의 작성자가 아닙니다. 확인 후 다시 시도해주세요."),
     DELETED_ARTICLE(400, "A004", "삭제된 게시물입니다."),
     FREQUENT_WRITE_EXCEPTION(400, "A005", "연속으로 글을 작성할 수 없습니다. 잠시 후 다시 시도해주세요."),
-    FREQUENT_LIKE_EXCEPTION(400, "A006", "추천/비추천은 10초에 1번씩 할 수 있습니다. 담시후 다시 시도해주세요."),
+    FREQUENT_LIKE_EXCEPTION(400, "A006", "잠시 후 다시 시도해주세요."),
 
     // Comment
     COMMENT_NOT_EXISTS(400,"CMT001","존재하지 않는 댓글입니다."),

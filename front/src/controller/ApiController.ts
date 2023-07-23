@@ -30,7 +30,7 @@ apiController.interceptors.response.use(
         const errorAPI = error.config;
         console.log("error = ", error)
 
-        if(error.response === undefined){   // error response 메세지가 undefinced인 에러인 경우
+        if(error.response  === undefined){   // error response 메세지가 undefinced인 에러인 경우
             console.log("ERROR RESPONSE IS UNDEFINED : "+error.message)
             useResponseStore().setError(error.code, error.message);
             return await Promise.reject(error);

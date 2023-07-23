@@ -92,48 +92,53 @@ public class NotificationService {
         } else {    // 댓글 생성인 경우
             List<Notification> notifications = new ArrayList<>();
 
-            Member author = null;
-            if(isNotSender(sender, newNotificationServiceDto.getArticle().getMember())) author = newNotificationServiceDto.getArticle().getMember();; // sender와 receiver가 동일하면 알림 x
+            Member author = newNotificationServiceDto.getArticle().getMember();
 
             Comment target = newNotificationServiceDto.getComment().getTarget();
             Member parentMember = null;
 
-            if(newNotificationServiceDto.getComment().getParentId() != null) {
+            if (newNotificationServiceDto.getComment().getParentId() != null) {
                 Comment parentComment = commentRepository.findById(newNotificationServiceDto.getComment().getParentId())
                         .orElseThrow(CommentNotExistsException::new);
-                if(isNotSender(sender, parentComment.getMember())) parentMember = parentComment.getMember();  // sender와 receiver가 동일하면 알림 x
-            }
 
-             // target member가 존재하면 target member에게 알림
+                parentMember = parentComment.getMember();
+            }
+            // target member가 존재하면 target member에게 알림
             if (target != null) {
                 Member targetMember = target.getMember();
-                if(isNotSender(sender, targetMember)) { // sender와 receiver가 동일하면 알림 x
+                if (isNotSender(sender, targetMember)) { // sender와 receiver가 동일하면 알림 x
                     notifications.add(newNotificationServiceDto.toEntity(targetMember, NotificationContent.REPLY_TO_ME));
+                    if(parentMember != null ) {
+                        // target member와 parent member가 일치하지 않는다면 parent member에게 알림
+                        if (!parentMember.getId().equals(targetMember.getId()) && isNotSender(sender, parentMember)) {
+                            notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                        }
 
-                    // target member와 parent member가 일치하지 않는다면 parent member에게 알림
-                    if (!parentMember.getId().equals(targetMember.getId())) {
-                        notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
                     }
-
+                }
+                if(parentMember != null ) {
                     // author가 target member, parent member와 일치하지 않는다면 author에게 알림
-                    if (!author.getId().equals(targetMember.getId()) && !author.getId().equals(parentMember.getId())) {
+                    if (isNotSender(sender, author) && !author.getId().equals(targetMember.getId()) && !author.getId().equals(parentMember.getId())) {
                         notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
                     }
                 }
             } else {
                 // parent member가 존재한다면 parent member에게 알림
-                if(parentMember != null){
-                    notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                if (parentMember != null ) {
+                    if(isNotSender(sender, parentMember)) {
+                        notifications.add(newNotificationServiceDto.toEntity(parentMember, NotificationContent.REPLY_ON_MY_COMMENT));
+                    }
 
                     // parent member와 article author가 불일치한다면 article author에게도 알림
-                    if(!parentMember.getId().equals(author.getId())){
+                    if (!author.getId().equals(sender.getId()) && !parentMember.getId().equals(author.getId())) {
                         notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
                     }
 
-                }else{  // parent member도 존재하지 않는다면 article author에게만 알림
+                } else if(!author.getId().equals(sender.getId())) {  // parent member도 존재하지 않는다면 article author에게만 알림
                     notifications.add(newNotificationServiceDto.toEntity(author, NotificationContent.COMMENT_ON_MY_ARTICLE));
                 }
             }
+
 
             notificationRepository.saveAll(notifications);
         }
@@ -164,7 +169,7 @@ public class NotificationService {
     public NotificationListResponseDto getNotifications(GetNotificationsServiceDto getNotificationsServiceDto) {
         Member member = memberRepository.findByAccessToken(getNotificationsServiceDto.getAccessToken());
         if(member != null) {
-            if(getNotificationsServiceDto.getLastNotificationId() == null) {    // 알림버튼을 클릭하여 처음 열람한 경우
+            if(getNotificationsServiceDto.getLastNotificationId() == Long.MAX_VALUE) {    // 알림버튼을 클릭하여 처음 열람한 경우
                 checkNotifications(member);     // checked가 false인 모든 알림을 true로 변경
             }
             return notificationRepository.getNotificationList(getNotificationsServiceDto, member);
@@ -177,9 +182,7 @@ public class NotificationService {
     public void checkNotifications(Member member){
         List<Notification> notifications = notificationRepository.findNotCheckedByReceiver(member);
         if(!notifications.isEmpty()) {
-            notifications.forEach(notification ->
-                    notification.setChecked(true)
-            );
+            notifications.forEach(Notification::setChecked);
         }
     }
 

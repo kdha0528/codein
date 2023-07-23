@@ -10,6 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,20 +32,42 @@ public class CommentRepositoryCustomImpl implements CommentRepositoryCustom{
     @Override
     public CommentListResponseDto getCommentList(GetCommentListServiceDto getCommentListServiceDto) {
 
-        JPAQuery<Comment> query = jpaQueryFactory.selectFrom(comment)
-                .where(comment.article.id.eq(getCommentListServiceDto.getArticleId()))
-                .orderBy(comment.id.asc());
+        List<Comment> parentList = jpaQueryFactory.selectFrom(comment)
+                .where(comment.article.id.eq(getCommentListServiceDto.getArticleId()), comment.parentId.isNull())
+                .orderBy(comment.id.asc())
+                .fetch();
 
-        long count = query.fetch().size();
+        List<Comment> childList = jpaQueryFactory.selectFrom(comment)
+                .where(comment.article.id.eq(getCommentListServiceDto.getArticleId()), comment.parentId.isNotNull())
+                .orderBy(comment.parentId.asc(), comment.id.asc())
+                .fetch();
+
+        List<Comment> orderedList = new ArrayList<>();
+
+        int childIndex = 0;
+        for (Comment parent : parentList) {
+            orderedList.add(parent);
+            while (childIndex < childList.size()) {
+                Comment child = childList.get(childIndex);
+                if (child.getParentId().equals(parent.getId())) {
+                    orderedList.add(child);
+                    childIndex++;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        long count = orderedList.size();
         int maxPage = (int) Math.floorDiv(count, getCommentListServiceDto.getSize());
         if (count % getCommentListServiceDto.getSize() != 0) {
             maxPage++;
         }
 
-        List<Comment> fetchResult = query
-                .limit(getCommentListServiceDto.getSize())
-                .offset(getCommentListServiceDto.getOffset())
-                .fetch();
+        List<Comment> fetchResult = orderedList.subList(
+                (int)Math.min(getCommentListServiceDto.getOffset(), orderedList.size()),
+                (int)Math.min(getCommentListServiceDto.getOffset() + getCommentListServiceDto.getSize(), orderedList.size())
+        );
 
         List<CommentListItem> commentList = fetchResult
                 .stream()

@@ -2,51 +2,51 @@
     <Pagination v-if="pageStore.getCommentsMaxPage > 1"
                 :key="paginationKey"/>
     <ul class=" d-flex flex-column" style="width:100%; margin-block:0; padding-inline-start: 0">
-        <li v-for="parent in commentsStore.getParents"
-            :key="parent.id" :id="'comment-' + parent.id">
-            <div class="d-flex flex-column">
+        <li v-for="comment in commentsStore.getComments"
+            :key="comment.id" :id="'comment-' + comment.id">
+            <div  v-if="comment.parentId === null" class="d-flex flex-column">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <img v-if="parent.commenterImagePath" :src="parent.commenterImagePath"
+                        <img v-if="comment.commenterImagePath" :src="comment.commenterImagePath"
                              style="width: 2.5rem; height: 2.5em; border-radius: 100%; cursor: pointer;"
                              alt=""
-                             @click="router.replace( '/members/'+parent.commenterId)"/>
+                             @click="router.replace( '/members/'+comment.commenterId)"/>
                         <el-icon v-else size="30"
                                  style="width: 2.5rem;  height:2.5rem; border-radius: 100%; color:white; background-color: #E2E2E2; cursor: pointer;"
-                                 @click="router.replace( '/members/'+parent.commenterId)">
+                                 @click="router.replace( '/members/'+comment.commenterId)">
                             <Avatar/>
                         </el-icon>
                         <div class="ms-2 d-flex flex-column">
-                            <div @click="router.replace( '/members/'+parent.commenterId)" style="cursor: pointer; font-size:1.2rem;">{{ parent.commenterNickname }}</div>
-                            <div style="font-size:0.8rem; color:#929292;">{{ parent.createdAt }}</div>
+                            <div @click="router.replace( '/members/'+comment.commenterId)" style="cursor: pointer; font-size:1.2rem;">{{ comment.commenterNickname }}</div>
+                            <div style="font-size:0.8rem; color:#929292;">{{ comment.createdAt }}</div>
                         </div>
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="d-flex">
                             <el-button class="like_button pe-2 ps-2"
                                        size="default"
-                                       @click="onLikeComment(parent.id)"
+                                       @click="onLikeComment(comment.id)"
                                        :disabled="!authStore.isLoggedIn">
                                 <el-icon size="18">
                                     <CaretTop />
                                 </el-icon>
                                 <span style="font-size: 0.9rem;">
-                                    {{parent.likeNum}}
+                                    {{comment.likeNum}}
                                 </span>
                             </el-button>
                             <el-button class="dislike_button pe-2 ps-2"
                                        size="default"
-                                       @click="onDislikeComment( parent.id)"
+                                       @click="onDislikeComment( comment.id)"
                                        :disabled="!authStore.isLoggedIn">
                                 <el-icon size="18">
                                     <CaretBottom />
                                 </el-icon>
                                 <span style="font-size: 0.9rem;">
-                                    {{parent.dislikeNum}}
+                                    {{comment.dislikeNum}}
                                 </span>
                             </el-button>
                         </div>
-                        <div v-if="isCommenter(parent)" class="d-flex ms-4 pt-1">
+                        <div v-if="isCommenter(comment)" class="d-flex ms-4 pt-1">
                             <el-dropdown  trigger="click">
                                 <span class="el-dropdown-link">
                                     <el-icon size="18" color="#B2B2B2" class="dropdown" style="cursor: pointer;">
@@ -79,23 +79,23 @@
                     </div>
                 </div>
                 <div class="mt-1" style="white-space: pre-line; line-height: 2rem;">
-                    {{ parent.content }}
+                    {{ comment.content }}
                 </div>
-                <div v-if="!parent.reply"
+                <div v-if="!comment.reply"
                      class="write_reply"
                      style="font-size:0.8rem; cursor:pointer"
-                     @click="parent.reply = true; setWriteReply(parent)">
+                     @click="comment.reply = true; setWriteReply(comment)">
                     답글 쓰기
                 </div>
                 <div v-else>
                     <div class="write_reply"
                          style="font-size:0.8rem; cursor:pointer"
-                         @click="parent.reply = false, resetReply">
+                         @click="comment.reply = false, resetReply">
                         답글 취소
                     </div>
                     <div class="d-flex flex-column p-4">
                         <div class="d-flex justify-content-between" style="width:95%; margin:auto 0 auto auto;">
-                            <img v-if="parent.commenterImagePath" :src="parent.commenterImagePath"
+                            <img v-if="comment.commenterImagePath" :src="comment.commenterImagePath"
                                  style="width: 3rem; height: 3rem; border-radius: 100%;"
                                  alt="">
                             <el-icon v-else size="40"
@@ -125,136 +125,132 @@
                     </div>
                 </div>
             </div>
-            <div v-if="hasChild(parent.id)">
-                <ul class="d-flex flex-column" style="width:95%; margin: 1rem 0 auto auto;">
-                    <li v-for="child in commentsStore.getChildren(parent.id)"
-                         :key="child.id" :id="'comment-' + child.id">
-                        <div class="d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <img v-if="child.commenterImagePath" :src="child.commenterImagePath"
-                                         style="width: 2.5rem; height: 2.5em; border-radius: 100%; cursor: pointer;"
-                                         alt=""
-                                         @click="router.replace( '/members/'+child.commenterId)"/>
-                                    <el-icon v-else size="30"
-                                             style="width: 2.5rem;  height:2.5rem; border-radius: 100%; color:white; background-color: #E2E2E2; cursor: pointer;"
-                                             @click="router.replace( '/members/'+child.commenterId)">
-                                        <Avatar/>
-                                    </el-icon>
-                                    <div class="ms-2 d-flex flex-column">
-                                        <div @click="router.replace( '/members/'+child.commenterId)" style="cursor: pointer; font-size:1.2rem;">{{ child.commenterNickname }}</div>
-                                        <div style="font-size:0.8rem; color:#929292;">{{ child.createdAt }}</div>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <div class="d-flex">
-                                        <el-button class="like_button pe-2 ps-2"
-                                                   size="default"
-                                                   @click="onLikeComment(child.id)"
-                                                   :disabled="!authStore.isLoggedIn">
-                                            <el-icon size="18">
-                                                <CaretTop />
-                                            </el-icon>
-                                            <span style="font-size: 0.9rem;">
-                                             {{child.likeNum}}
-                                         </span>
-                                        </el-button>
-                                        <el-button class="dislike_button pe-2 ps-2"
-                                                   size="default"
-                                                   @click="onDislikeComment(child.id)"
-                                                   :disabled="!authStore.isLoggedIn">
-                                            <el-icon size="18">
-                                                <CaretBottom />
-                                            </el-icon>
-                                            <span style="font-size: 0.9rem;">
-                                            {{child.dislikeNum}}
-                                         </span>
-                                        </el-button>
-                                    </div>
-                                    <div v-if="isCommenter(child)" class="d-flex ms-4 pt-1">
-                                        <el-dropdown  trigger="click">
-                                            <span class="el-dropdown-link">
-                                                <el-icon size="18" color="#B2B2B2" class="dropdown" style="cursor: pointer;">
-                                                    <MoreFilled/>
-                                                </el-icon>
-                                            </span>
-                                            <template #dropdown>
-                                                <el-dropdown-menu class="dropdown_menu d-flex flex-column"
-                                                                  style="
-                                        --el-dropdown-menuItem-hover-fill: white;
-                                        --el-menu-hover-bg-color: white;
-                                        --el-menu-hover-text-color: #409eff;
-                                        --el-menu-active-color: #409eff">
-                                                    <el-dropdown-item class="d-flex" style="padding-right: 1rem; padding-left:1rem;" @click="onEditComment()">
-                                                        <el-icon>
-                                                            <Edit />
-                                                        </el-icon>
-                                                        수정하기
-                                                    </el-dropdown-item>
-                                                    <el-dropdown-item class="d-flex" @click="onDeleteComment()">
-                                                        <el-icon>
-                                                            <Delete />
-                                                        </el-icon>
-                                                        삭제하기
-                                                    </el-dropdown-item>
-                                                </el-dropdown-menu>
-                                            </template>
-                                        </el-dropdown>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-1" style="white-space: pre-line; line-height: 2rem;">
-                                <span v-if="child.targetNickname !== null" class="target_nickname d-inline" @click="router.replace('/members/'+child.targetMemberId)">@{{child.targetNickname}}</span><span style="display: inline;">{{ child.content }}</span>
-                            </div>
-                            <div v-if="!child.reply"
-                                 class="write_reply"
-                                 style="font-size:0.8rem; cursor:pointer"
-                                 @click="child.reply = true, reply.content = '@'+child.commenterNickname+' ', setWriteMentionReply(child, parent.id)">
-                                답글 쓰기
-                            </div>
-                            <div v-else>
-                                <div class="write_reply"
-                                     style="font-size:0.8rem; cursor:pointer"
-                                     @click="child.reply = false, resetReply">
-                                    답글 취소
-                                </div>
-                                <div class="d-flex flex-column p-4">
-                                    <div class="d-flex justify-content-between" style="width:95%; margin: auto 0 auto auto;">
-                                        <img v-if="child.commenterImagePath" :src="child.commenterImagePath"
-                                             style="width: 3rem; height: 3rem; border-radius: 100%;"
-                                             alt="">
-                                        <el-icon v-else size="40"
-                                                 style="width: 3rem;  height:3rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
-                                            <Avatar/>
-                                        </el-icon>
-                                        <el-input v-model="reply.content"
-                                                  class="comment-input ms-4"
-                                                  size="large"
-                                                  :autosize="{ minRows: 3, maxRows: 6 }"
-                                                  placeholder="댓글을 입력해주세요."
-                                                  show-word-limit
-                                                  maxlength="3000"
-                                                  type="textarea"
-                                                  resize="none"
-                                                  input-style="font-size: 1rem; line-height: 2rem; letter-spacing:0.05rem;">
-                                        </el-input>
-                                    </div>
-                                    <el-button class="comment-button"
-                                               type="primary"
-                                               @click="onWriteComment(reply)"
-                                               size="default"
-                                               :disabled="reply.content.length<1 || !authStore.isLoggedIn"
-                                               style="max-width: 5rem; margin: 1.5rem 0 auto auto;">
-                                        답글 쓰기
-                                    </el-button>
-                                </div>
+            <div v-else>
+                <div class="d-flex flex-column" style="width:95%; margin: 0 0 auto auto;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img v-if="comment.commenterImagePath" :src="comment.commenterImagePath"
+                                 style="width: 2.5rem; height: 2.5em; border-radius: 100%; cursor: pointer;"
+                                 alt=""
+                                 @click="router.replace( '/members/'+comment.commenterId)"/>
+                            <el-icon v-else size="30"
+                                     style="width: 2.5rem;  height:2.5rem; border-radius: 100%; color:white; background-color: #E2E2E2; cursor: pointer;"
+                                     @click="router.replace( '/members/'+comment.commenterId)">
+                                <Avatar/>
+                            </el-icon>
+                            <div class="ms-2 d-flex flex-column">
+                                <div @click="router.replace( '/members/'+comment.commenterId)" style="cursor: pointer; font-size:1.2rem;">{{ comment.commenterNickname }}</div>
+                                <div style="font-size:0.8rem; color:#929292;">{{ comment.createdAt }}</div>
                             </div>
                         </div>
-                        <el-divider v-if="!commentsStore.isLastChild(child)" border-style="dashed" class="mt-3 mb-3"/>
-                    </li>
-                </ul>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex">
+                                <el-button class="like_button pe-2 ps-2"
+                                           size="default"
+                                           @click="onLikeComment(comment.id)"
+                                           :disabled="!authStore.isLoggedIn">
+                                    <el-icon size="18">
+                                        <CaretTop />
+                                    </el-icon>
+                                    <span style="font-size: 0.9rem;">
+                                     {{comment.likeNum}}
+                                 </span>
+                                </el-button>
+                                <el-button class="dislike_button pe-2 ps-2"
+                                           size="default"
+                                           @click="onDislikeComment(comment.id)"
+                                           :disabled="!authStore.isLoggedIn">
+                                    <el-icon size="18">
+                                        <CaretBottom />
+                                    </el-icon>
+                                    <span style="font-size: 0.9rem;">
+                                    {{comment.dislikeNum}}
+                                 </span>
+                                </el-button>
+                            </div>
+                            <div v-if="isCommenter(comment)" class="d-flex ms-4 pt-1">
+                                <el-dropdown  trigger="click">
+                                    <span class="el-dropdown-link">
+                                        <el-icon size="18" color="#B2B2B2" class="dropdown" style="cursor: pointer;">
+                                            <MoreFilled/>
+                                        </el-icon>
+                                    </span>
+                                    <template #dropdown>
+                                        <el-dropdown-menu class="dropdown_menu d-flex flex-column"
+                                                          style="
+                                --el-dropdown-menuItem-hover-fill: white;
+                                --el-menu-hover-bg-color: white;
+                                --el-menu-hover-text-color: #409eff;
+                                --el-menu-active-color: #409eff">
+                                            <el-dropdown-item class="d-flex" style="padding-right: 1rem; padding-left:1rem;" @click="onEditComment()">
+                                                <el-icon>
+                                                    <Edit />
+                                                </el-icon>
+                                                수정하기
+                                            </el-dropdown-item>
+                                            <el-dropdown-item class="d-flex" @click="onDeleteComment()">
+                                                <el-icon>
+                                                    <Delete />
+                                                </el-icon>
+                                                삭제하기
+                                            </el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </template>
+                                </el-dropdown>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-1" style="white-space: pre-line; line-height: 2rem;">
+                        <span v-if="comment.targetNickname !== null" class="target_nickname d-inline" @click="router.replace('/members/'+comment.targetMemberId)">@{{comment.targetNickname}}</span><span style="display: inline;">{{ comment.content }}</span>
+                    </div>
+                    <div v-if="!comment.reply"
+                         class="write_reply"
+                         style="font-size:0.8rem; cursor:pointer"
+                         @click="comment.reply = true, reply.content = '@'+comment.commenterNickname+' ', setWriteMentionReply(comment, comment.parentId)">
+                        답글 쓰기
+                    </div>
+                    <div v-else>
+                        <div class="write_reply"
+                             style="font-size:0.8rem; cursor:pointer"
+                             @click="comment.reply = false, resetReply">
+                            답글 취소
+                        </div>
+                        <div class="d-flex flex-column p-4">
+                            <div class="d-flex justify-content-between" style="width:95%; margin: auto 0 auto auto;">
+                                <img v-if="comment.commenterImagePath" :src="comment.commenterImagePath"
+                                     style="width: 3rem; height: 3rem; border-radius: 100%;"
+                                     alt="">
+                                <el-icon v-else size="40"
+                                         style="width: 3rem;  height:3rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+                                    <Avatar/>
+                                </el-icon>
+                                <el-input v-model="reply.content"
+                                          class="comment-input ms-4"
+                                          size="large"
+                                          :autosize="{ minRows: 3, maxRows: 6 }"
+                                          placeholder="댓글을 입력해주세요."
+                                          show-word-limit
+                                          maxlength="3000"
+                                          type="textarea"
+                                          resize="none"
+                                          input-style="font-size: 1rem; line-height: 2rem; letter-spacing:0.05rem;">
+                                </el-input>
+                            </div>
+                            <el-button class="comment-button"
+                                       type="primary"
+                                       @click="onWriteComment(reply)"
+                                       size="default"
+                                       :disabled="reply.content.length<1 || !authStore.isLoggedIn"
+                                       style="max-width: 5rem; margin: 1.5rem 0 auto auto;">
+                                답글 쓰기
+                            </el-button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <el-divider v-if="!commentsStore.isLastParent(parent.id)" class="mt-3 mb-3"/>
+            <el-divider v-if=" commentsStore.hasChild(comment)" border-style="hidden" class="mt-3 mb-3"/>
+            <el-divider v-else-if="!commentsStore.isLastComment(comment) && comment.parentId !== null && !commentsStore.isLastChild(comment)" border-style="dashed" class="mt-3 mb-3" style="width:95%; margin: 0 0 auto auto;"/>
+            <el-divider v-else class="mt-3 mb-3"/>
         </li>
     </ul>
     <Pagination v-if="pageStore.getCommentsMaxPage > 1" :key="paginationKey"/>
@@ -283,10 +279,11 @@ onMounted(async () => {
     paginationKey.value++;
 })
 
-const hasChild = function(parentId: number){
-    console.log("has child? " + commentsStore.hasChild(parentId));
-    console.log("parent id = " + parentId);
-    return commentsStore.hasChild(parentId);
+const hasChild = function(parent: Comment){
+    if(commentsStore.hasChild(parent)){
+        console.log("true")
+    }
+    return commentsStore.hasChild(parent);
 }
 
 const isCommenter = function (comment: Comment) {

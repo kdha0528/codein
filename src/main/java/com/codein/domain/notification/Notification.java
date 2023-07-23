@@ -63,8 +63,8 @@ public class Notification {
         this.notifiedAt = LocalDateTime.now();
     }
 
-    public void setChecked(boolean checked) {
-        this.checked = checked;
+    public void setChecked() {
+        this.checked = true;
     }
 
     public void setClicked(boolean clicked) {

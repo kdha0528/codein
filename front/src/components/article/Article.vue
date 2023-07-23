@@ -1,5 +1,5 @@
 <template>
-    <div class="content d-flex flex-column">
+    <div id="content" class="content d-flex flex-column">
         <el-divider content-position="left" class="mt-4">
             <div class="text_link category"
                 @click="router.replace('/'+category)"
@@ -148,9 +148,11 @@
                 댓글 쓰기
             </el-button>
         </div>
-        <keep-alive>
-            <Comments id="comments" :key="commentsKey"/>
-        </keep-alive>
+        <div id="comment_list">
+            <keep-alive>
+                <Comments :key="commentsKey" />
+            </keep-alive>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -165,6 +167,7 @@ import {usePageStore} from "@/stores/page";
 import type {Comment} from "@/custom-types/comment";
 import Comments from "@/components/comment/Comments.vue";
 import {createCommentDummies, write} from "@/controller/api/comment";
+import {isUndefined} from "element-plus/es/utils";
 
 const route = useRoute();
 const router = useRouter();
@@ -200,6 +203,7 @@ const category = ref('');
 
 const isSetArticlePage = ref(false);
 const isSetCommentPage = ref(false);
+const clickCommentPaging = ref(false);
 
 const isAuthor = function () {
     if(authStore.isLoggedIn){
@@ -218,6 +222,7 @@ const onPaging = async function(page: number, componentName: string) {
     } else if (componentName === 'Comments'){
         await pageStore.setCommentsCurrentPage(page);
         isSetCommentPage.value = true;
+        clickCommentPaging.value = true;
         await onGetArticle();
     }
 }
@@ -227,6 +232,7 @@ provide('onPaging', onPaging);
 onMounted( async ()=>{
     await setDefaultFromPath(route.fullPath);
     await onGetArticle();
+    scrollTo( 0,  0);
 })
 
 function setDefaultFromPath(path: string):void {
@@ -267,10 +273,15 @@ const onGetArticle = async function() {
                 })
                 pageStore.setCommentsMaxPage(response.commentsData.maxPage)
                 getKoreanCategory(article.value.category);
-                router.replace(getPath());
                 commentsKey.value++;
-                if(!isSetCommentPage.value){
-                    scrollTo(0, 0);
+
+                if(clickCommentPaging.value) {
+                    clickCommentPaging.value = false;
+                    router.replace({
+                        path: getPath(),
+                        query: { cpage: pageStore.getCommentsCurrentPage },
+                        hash: "#comment_list"
+                    });
                 }
             } else {
                 alert(resStore.getErrorMessage);

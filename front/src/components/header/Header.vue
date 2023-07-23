@@ -22,31 +22,31 @@
                 </el-menu-item>
             </div>
             <div v-if="isUserLogin" class="position-relative d-flex justify-content-center align-items-center me-4">
-                    <div class="position-relative me-3" style="cursor: pointer;" @click="clickNotification">
-                        <keep-alive :key="auth.notificationCount">
-                            <div class="new_notification_count" v-if="auth.notificationCount > 0">
-                                {{ auth.notificationCount }}
-                            </div>
-                        </keep-alive>
-                        <div class="notification_button">
-                            <el-icon type="info" size="30" style="width: 3rem; height:3rem; color:#A6A6A6;">
-                                <Bell/>
-                            </el-icon>
+                <div class="position-relative me-3" style="cursor: pointer;" @click="clickNotification">
+                    <keep-alive>
+                        <div class="new_notification_count" v-if="auth.notificationCount > 0" :key="auth.notificationCount">
+                            {{ auth.notificationCount }}
                         </div>
-                        <div v-if="clickedNotification" style="overflow: auto; border: none;">
-                            <Notifications/>
-                        </div>
+                    </keep-alive>
+                    <div class="notification_button">
+                        <el-icon type="info" size="30" style="width: 3rem; height:3rem; color:#A6A6A6;">
+                            <Bell/>
+                        </el-icon>
                     </div>
+                    <div v-if="clickedNotification" style="overflow: auto; border: none;">
+                        <Notifications/>
+                    </div>
+                </div>
                 <div  class="d-flex justify-content-center align-items-center" style="cursor: pointer;" @click="clickedNotification = false">
                     <el-dropdown trigger="click">
-                        <span class="el-dropdown-link">
-                        <img v-if="auth.getProfileImage" :src="auth.getProfileImage"
-                             style="width: 2.8rem; height: 2.8rem; border-radius: 100%;"
-                             alt=""/>
-                        <el-icon v-else size="40"
-                                 style="width: 2.8rem;  height:2.8rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
-                            <Avatar/>
-                        </el-icon>
+                        <span class="el-dropdown-link" :key="auth.getProfileImage">
+                            <img v-if="auth.getProfileImage" :src="auth.getProfileImage"
+                                 style="width: 2.8rem; height: 2.8rem; border-radius: 100%;"
+                                 alt=""/>
+                            <el-icon v-else size="40"
+                                     style="width: 2.8rem;  height:2.8rem; border-radius: 100%; color:white; background-color: #E2E2E2;">
+                                <Avatar/>
+                            </el-icon>
                         </span>
                         <template #dropdown>
                             <el-dropdown-menu class="dropdown_menu d-flex flex-column"
@@ -124,6 +124,7 @@ const clickedNotification = ref(false);
 
 const clickNotification = function () {
     clickedNotification.value = !clickedNotification.value;
+    auth.checkedNotifications();
     notificationStore.clean();
 }
 
