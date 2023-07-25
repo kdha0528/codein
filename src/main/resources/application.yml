@@ -6,9 +6,10 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     defer-datasource-initialization: true
+    show-sql: true
     generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
   sql:
     init:
       mode: always

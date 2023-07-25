@@ -115,6 +115,7 @@ public class NotificationService {
                         }
 
                     }
+
                 }
                 if(parentMember != null ) {
                     // author가 target member, parent member와 일치하지 않는다면 author에게 알림

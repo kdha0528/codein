@@ -167,7 +167,6 @@ import {usePageStore} from "@/stores/page";
 import type {Comment} from "@/custom-types/comment";
 import Comments from "@/components/comment/Comments.vue";
 import {createCommentDummies, write} from "@/controller/api/comment";
-import {isUndefined} from "element-plus/es/utils";
 
 const route = useRoute();
 const router = useRouter();
