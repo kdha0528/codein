@@ -1,26 +1,11 @@
 spring:
-  datasource:
-    url: jdbc:mariadb://localhost:3306/codein_db
-    username: root
-    password:
-    driver-class-name: org.mariadb.jdbc.Driver
-  jpa:
-    defer-datasource-initialization: true
-    show-sql: true
-    generate-ddl: true
-    hibernate:
-      ddl-auto: validate
-  sql:
-    init:
-      mode: always
-  servlet:
-    multipart:
-      max-file-size: 1MB
-      max-request-size: 1MB
-      location: C:\workspace\springboot\codein\images\profile\
-  mvc:
-    throw-exception-if-no-handler-found: true
-  web:
-    resources:
-      add-mappings: false
-
+  profiles:
+    active:
+      - prod
+    group:
+      dev:
+        - db-dev
+      prod:
+        - db-prod
+    include:
+      - secret
