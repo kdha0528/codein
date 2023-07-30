@@ -47,7 +47,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://localhost:5173", "https://codein.loca.lt")
+                .allowedOrigins("https://localhost:5173", "https://codein.loca.lt", "https://code-in.site")
                 .allowedHeaders("Origin, X-Requested-With, Content-Type, Accept, Authorization")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowCredentials(true)

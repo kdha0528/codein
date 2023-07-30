@@ -20,5 +20,4 @@ public class PasswordEncoder {
     public boolean matches(String rawPassword, String encryptedPassword) {
         return encoder.matches(rawPassword, encryptedPassword);
     }
-
 }
