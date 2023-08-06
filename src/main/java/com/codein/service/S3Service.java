@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.File;
@@ -25,8 +26,8 @@ public class S3Service {
     @Autowired
     private S3Client s3Client;
 
-    private final String bucketName = "codein-bucket";
-    private final String profilePath = "public/images/profile/";
+    private final String bucketName = "codein-resource-bucket";
+    private final String profilePath = "images/profile/";
 
     public String uploadProfileImage(MultipartFile multipartFile) throws IOException {
 
@@ -37,9 +38,6 @@ public class S3Service {
         if (!Objects.requireNonNull(multipartFile.getContentType()).startsWith("image")) {
             throw new InvalidImageException();
         }
-
-        // convert multipart file  to a file
-        File file = convertToFile(multipartFile);
 
         // 사진 크기가 1MB 넘어가면 Exception
         if (multipartFile.getSize() > 1000000) throw new ImageTooLargeException();
@@ -53,9 +51,10 @@ public class S3Service {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(profilePath+imageFileName)
+                .acl(ObjectCannedACL.PRIVATE)
                 .build();
 
-        s3Client.putObject(putObjectRequest, RequestBody.fromFile(file));
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(multipartFile.getBytes()));
 
         return imageFileName;
     }
@@ -69,12 +68,5 @@ public class S3Service {
         s3Client.deleteObject(deleteObjectRequest);
     }
 
-    private File convertToFile(MultipartFile multipartFile) throws IOException {
-        File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-        try (FileOutputStream fileOutputStream = new FileOutputStream(file)){
-            fileOutputStream.write(multipartFile.getBytes());
-        }
-        return file;
-    }
 
 }
