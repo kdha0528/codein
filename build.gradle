@@ -31,7 +31,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.security:spring-security-crypto'
 
-
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'

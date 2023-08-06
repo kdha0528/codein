@@ -8,8 +8,6 @@ import com.codein.domain.member.ProfileEditor;
 import com.codein.error.exception.auth.InvalidTokensCookieException;
 import com.codein.error.exception.auth.RefreshTokenNullException;
 import com.codein.error.exception.member.*;
-import com.codein.error.exception.profileimage.ImageTooLargeException;
-import com.codein.error.exception.profileimage.InvalidImageException;
 import com.codein.repository.tokens.TokensRepository;
 import com.codein.repository.member.MemberRepository;
 import com.codein.repository.member.follow.FollowRepository;
@@ -18,15 +16,9 @@ import com.codein.requestservicedto.member.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -38,9 +30,8 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TokensRepository tokensRepository;
     private final FollowRepository followRepository;
+    private final S3Service s3Service;
 
-    @Value("${spring.servlet.multipart.location}")
-    private String uploadPath;
 
     @Transactional
     public Member signup(SignupServiceDto signupServiceDto) {
@@ -145,7 +136,7 @@ public class MemberService {
 
 
     @Transactional
-    public void editProfile(String accessToken, EditProfileServiceDto editProfileServiceDto) {
+    public void editProfile(String accessToken, EditProfileServiceDto editProfileServiceDto) throws IOException {
         Tokens tokens = tokensRepository.findByAccessToken(accessToken)
                 .orElseThrow(MemberNotLoginException::new);
 
@@ -159,53 +150,18 @@ public class MemberService {
         }
 
         ProfileEditor.ProfileEditorBuilder profileEditorBuilder = member.toProfileEditor();
-        String imgFileName = saveProfileImage(editProfileServiceDto.getProfileImage());
+        String imgFileName = s3Service.uploadProfileImage(editProfileServiceDto.getProfileImage());
         ProfileEditor profileEditor = profileEditorBuilder
                 .name(editProfileServiceDto.getName())
                 .nickname(editProfileServiceDto.getNickname())
                 .imgFileName(imgFileName)
                 .build();
         if (member.getProfileImage() != null) {
-            removeProfileImage(member.getProfileImage().getImgFileName());
+            s3Service.removeProfileImage(member.getProfileImage().getImgFileName());
         }
         member.editProfile(profileEditor);
     }
 
-    @Transactional
-    public void removeProfileImage(String imgFileName) {
-        File file = new File(uploadPath + imgFileName);
-        if (file.exists()) {
-            if (file.delete()) {
-                System.out.println("파일 삭제 성공");
-            } else {
-                System.out.println("파일 삭제 실패");
-            }
-        }
-    }
-
-    @Transactional
-    public String saveProfileImage(MultipartFile file) {
-        if (file == null) return null; // 이미지 변경 없을 시 return null
-
-        if (!Objects.requireNonNull(file.getContentType()).startsWith("image")) {
-            throw new InvalidImageException();  // 이미지파일 아닐 시 EXCEPTION
-        }
-
-        if (file.getSize() > 1000000) throw new ImageTooLargeException(); // 사진 크기가 1MB 넘어가면 Exception
-        String extension = Objects.requireNonNull(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));
-        UUID uuid = UUID.randomUUID();
-        String imageFileName = uuid + extension;
-        System.out.println(uploadPath);
-        Path imageFilePath = Paths.get(uploadPath + imageFileName);
-
-        try {
-            Files.write(imageFilePath, file.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return imageFileName;
-    }
 
     @Transactional
     public void deleteMember(String accessToken) {

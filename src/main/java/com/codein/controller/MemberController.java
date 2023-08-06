@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 @Slf4j
@@ -83,7 +84,7 @@ public class MemberController {
 
     @MySecured(role = Role.MEMBER)
     @PostMapping(value ="/settings/profile")
-    public void editProfile(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute @Valid EditProfileDto editProfileDto) {
+    public void editProfile(@CookieValue(value = "accesstoken") Cookie cookie, @ModelAttribute @Valid EditProfileDto editProfileDto) throws IOException {
         memberService.editProfile(cookie.getValue(), editProfileDto.toEditProfileServiceDto());
     }
 

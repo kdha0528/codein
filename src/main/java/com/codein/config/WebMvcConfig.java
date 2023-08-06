@@ -36,7 +36,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String resourceLocation = "file:///C:/workspace/springboot/codein/images/profile/";
+        String resourceLocation = "https://codein-bucket.s3.ap-northeast-2.amazonaws.com/public/images/profile/";
         registry.addResourceHandler("/images/profile/**")
                 .addResourceLocations(resourceLocation)
                 .setCachePeriod(3600)
