@@ -39,6 +39,8 @@ public class AuthInterceptor implements HandlerInterceptor {
         String accessToken = null;
         Integer beforeNotificationCount = null;
 
+        response.setContentType("application/json");
+
         // 정적 리소스
         if (handler instanceof ResourceHttpRequestHandler) {
             return true;

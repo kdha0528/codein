@@ -25,7 +25,7 @@ public class CorsFilter implements Filter {
         String origin = request.getHeader("origin");
         if (origin == null) {
             response.setHeader("Access-Control-Allow-Origin", "https://code-in.site");
-        } else if (origin.endsWith("code-in.site") || origin.endsWith("codein.loca.lt") || origin.endsWith("localhost:5173")) {
+        } else if (origin.endsWith("code-in.site")) {
             response.setHeader("Access-Control-Allow-Origin", origin);
         }
         response.setHeader("Access-Control-Allow-Credentials", "true");
