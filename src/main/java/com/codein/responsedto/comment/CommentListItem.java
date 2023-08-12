@@ -40,7 +40,7 @@ public class CommentListItem {
         this.commenterId = commenterId;
         this.commenterNickname = commenterNickname;
         if (commenterProfileImage != null) {
-            this.commenterImagePath = "/my-backend-api/images/profile/" + commenterProfileImage.getImgFileName();
+            this.commenterImagePath = "https://d32r1r4pmjmgdj.cloudfront.net/images/profile/" + commenterProfileImage.getImgFileName();
         } else {
             this.commenterImagePath = null;
         }

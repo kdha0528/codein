@@ -36,7 +36,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String resourceLocation = "https://www.code-in.site/images/profile/";
+        String resourceLocation = "https://d32r1r4pmjmgdj.cloudfront.net/images/profile/";
         registry.addResourceHandler("/images/profile/**")
                 .addResourceLocations(resourceLocation)
                 .setCachePeriod(3600)

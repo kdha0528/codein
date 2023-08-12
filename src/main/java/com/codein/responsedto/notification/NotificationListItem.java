@@ -34,7 +34,7 @@ public class NotificationListItem {
         this.senderId = sender.getId();
         this.senderNickname = sender.getNickname();
         if (sender.getProfileImage() != null) {
-            this.senderImageUrl = "/my-backend-api/images/profile/" + sender.getProfileImage();
+            this.senderImageUrl = "https://d32r1r4pmjmgdj.cloudfront.net/images/profile/" + sender.getProfileImage();
         } else {
             this.senderImageUrl = null;
         }

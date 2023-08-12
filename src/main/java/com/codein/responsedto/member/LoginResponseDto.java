@@ -24,7 +24,7 @@ public class LoginResponseDto {
         this.point = point;
         this.role = role;
         if (profileImage != null) {
-            this.imagePath = "/my-backend-api/images/profile/" + profileImage.getImgFileName();
+            this.imagePath = "https://d32r1r4pmjmgdj.cloudfront.net/images/profile/" + profileImage.getImgFileName();
         } else {
             this.imagePath = null;
         }
