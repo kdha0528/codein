@@ -36,7 +36,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String resourceLocation = "https://codein-resource-bucket.s3.ap-northeast-2.amazonaws.com/images/profile/";
+        String resourceLocation = "https://www.code-in.site/images/profile/";
         registry.addResourceHandler("/images/profile/**")
                 .addResourceLocations(resourceLocation)
                 .setCachePeriod(3600)
@@ -49,7 +49,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("https://api.code-in.site")
                 .allowedHeaders("Origin, X-Requested-With, Content-Type, Accept, Authorization")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                .allowedMethods("*")
                 .allowCredentials(true)
                 .maxAge(1800);
     }

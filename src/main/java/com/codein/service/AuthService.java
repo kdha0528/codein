@@ -55,7 +55,7 @@ public class AuthService {
                 .secure(true)
                 .maxAge(Duration.ofDays(1L))
                 .sameSite("None")
-                .domain(".code-in.site")
+                .domain("code-in.site")
                 .build();
     }
 
@@ -67,7 +67,7 @@ public class AuthService {
                 .secure(true)
                 .maxAge(Duration.ofMinutes(30L))
                 .sameSite("None")
-                .domain(".code-in.site")
+                .domain("code-in.site")
                 .build();
     }
 
@@ -79,7 +79,7 @@ public class AuthService {
                 .secure(true)
                 .maxAge(0)
                 .sameSite("None")
-                .domain(".code-in.site")
+                .domain("code-in.site")
                 .build();
     }
 

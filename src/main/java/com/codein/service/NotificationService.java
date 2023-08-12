@@ -159,7 +159,7 @@ public class NotificationService {
         if(count > 0) {
             return ResponseCookie.from("count_new_notifications", count.toString())
                     .path("/")
-                    .domain(".code-in.site")
+                    .domain("code-in.site")
                     .build();
         } else {
             return null;
@@ -192,7 +192,7 @@ public class NotificationService {
         return ResponseCookie.from("count_new_notifications", "0")
                 .path("/")
                 .maxAge(0)
-                .domain(".code-in.site")
+                .domain("code-in.site")
                 .build();
     }
 
